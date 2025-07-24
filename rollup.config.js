@@ -17,7 +17,7 @@ export default packages.flatMap(pkg => [
     plugins: [
       nodeResolve(),
       typescript({
-        tsconfig: './tsconfig.json',
+        tsconfig: `packages/${pkg}/tsconfig.json`,
         declaration: false,
       }),
     ],
