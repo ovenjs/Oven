@@ -122,20 +122,7 @@ export interface APIGuild extends DiscordEntity<'guild', GuildSnowflake> {
 /**
  * Advanced Channel type with discriminated unions
  */
-export type APIChannel =
-  | GuildTextChannel
-  | DMChannel
-  | GuildVoiceChannel
-  | GroupDMChannel
-  | GuildCategoryChannel
-  | GuildAnnouncementChannel
-  | AnnouncementThread
-  | PublicThread
-  | PrivateThread
-  | GuildStageVoiceChannel
-  | GuildDirectoryChannel
-  | GuildForumChannel
-  | GuildMediaChannel;
+export type APIChannel = GuildTextChannel;
 
 interface BaseChannel<TType extends ChannelType, TId extends ChannelSnowflake = ChannelSnowflake> {
   readonly id: TId;
@@ -153,13 +140,7 @@ export interface GuildTextChannel extends BaseChannel<ChannelType.GUILD_TEXT> {
   readonly rate_limit_per_user: number;
   readonly parent_id?: ChannelSnowflake | null;
   readonly last_pin_timestamp?: ISO8601Timestamp | null;
-  readonly default_auto_archive_duration?: ThreadAutoArchiveDuration;
-  readonly default_thread_rate_limit_per_user?: number;
-  readonly default_sort_order?: SortOrderType | null;
-  readonly default_forum_layout?: ForumLayoutType;
 }
-
-// ... Continue with other channel types
 
 /**
  * Advanced Message type with sophisticated structure
