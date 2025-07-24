@@ -2,6 +2,7 @@
   "name": "ovenjs",
   "version": "0.1.0",
   "description": "A modern Discord API wrapper for Node.js",
+  "type": "module",
   "private": true,
   "workspaces": [
     "packages/*"
