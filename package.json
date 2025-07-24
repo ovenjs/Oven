@@ -1,0 +1,43 @@
+{
+  "name": "ovenjs",
+  "version": "0.1.0",
+  "description": "A modern Discord API wrapper for Node.js",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "dev": "yarn workspaces run dev",
+    "lint": "eslint packages/*/src/**/*.ts",
+    "lint:fix": "eslint packages/*/src/**/*.ts --fix",
+    "test": "jest",
+    "clean": "yarn workspaces run clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0",
+    "rollup": "^4.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "rollup-plugin-dts": "^6.0.0"
+  },
+  "keywords": [
+    "discord",
+    "api",
+    "wrapper",
+    "bot",
+    "typescript"
+  ],
+  "author": "OvenJS Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ovenjs/oven.git"
+  }
+}
