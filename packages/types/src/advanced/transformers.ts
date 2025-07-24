@@ -113,7 +113,7 @@ export const constantFolding: TransformerFactory<ts.SourceFile> = (context) => {
       return ts.visitEachChild(node, visitor, context);
     };
 
-    return ts.visitNode(sourceFile, visitor) || sourceFile;
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
   };
 };
 
@@ -146,7 +146,7 @@ export const stripDebugCode: TransformerFactory<ts.SourceFile> = (context) => {
       return ts.visitEachChild(node, visitor, context);
     };
 
-    return ts.visitNode(sourceFile, visitor) || sourceFile;
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
   };
 };
 
@@ -166,20 +166,10 @@ export const optimizeTypeAssertions: TransformerFactory<ts.SourceFile> = (contex
         return node.expression;
       }
 
-      // Remove redundant type assertions
-      if (ts.isAsExpression(node)) {
-        const expressionType = context.getTypeChecker?.()?.getTypeAtLocation(node.expression);
-        const assertionType = context.getTypeChecker?.()?.getTypeFromTypeNode(node.type);
-        
-        if (expressionType && assertionType && expressionType === assertionType) {
-          return node.expression; // Remove redundant assertion
-        }
-      }
-
       return ts.visitEachChild(node, visitor, context);
     };
 
-    return ts.visitNode(sourceFile, visitor) || sourceFile;
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
   };
 };
 
@@ -203,7 +193,7 @@ export const generateTypeValidators: TransformerFactory<ts.SourceFile> = (contex
       return ts.visitEachChild(node, visitor, context);
     };
 
-    const visitedFile = ts.visitNode(sourceFile, visitor) || sourceFile;
+    const visitedFile = ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
     
     // Add generated validators to the file
     if (typeValidators.length > 0) {
