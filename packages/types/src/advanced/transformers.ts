@@ -36,7 +36,7 @@ export const optimizePropertyAccess: TransformerFactory<ts.SourceFile> = (contex
       return ts.visitEachChild(node, visitor, context);
     };
 
-    return ts.visitNode(sourceFile, visitor) || sourceFile;
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
   };
 };
 
