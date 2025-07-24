@@ -1,0 +1,21 @@
+{
+  "name": "@ovenjs/core",
+  "version": "0.1.0",
+  "description": "A modern Discord API wrapper for Node.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c ../../rollup.config.js",
+    "dev": "rollup -c ../../rollup.config.js --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ovenjs/types": "^0.1.0",
+    "@ovenjs/rest": "^0.1.0",
+    "@ovenjs/ws": "^0.1.0",
+    "@ovenjs/builders": "^0.1.0"
+  },
+  "keywords": ["discord", "api", "wrapper", "bot"],
+  "author": "OvenJS Team",
+  "license": "MIT"
+}
