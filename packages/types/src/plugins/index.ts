@@ -107,16 +107,16 @@ export interface PluginSystemConfig {
  * Create a complete plugin system instance
  */
 export function createPluginSystem(config: PluginSystemConfig = {}): PluginSystem {
-  const logger = config.logger || {
-    debug: (msg, meta) => console.debug(`[PluginSystem] ${msg}`, meta),
-    info: (msg, meta) => console.info(`[PluginSystem] ${msg}`, meta),
-    warn: (msg, meta) => console.warn(`[PluginSystem] ${msg}`, meta),
-    error: (msg, meta) => console.error(`[PluginSystem] ${msg}`, meta)
+  const logger: PluginLogger = config.logger || {
+    debug: (msg: string, meta?: any) => console.debug(`[PluginSystem] ${msg}`, meta),
+    info: (msg: string, meta?: any) => console.info(`[PluginSystem] ${msg}`, meta),
+    warn: (msg: string, meta?: any) => console.warn(`[PluginSystem] ${msg}`, meta),
+    error: (msg: string, meta?: any) => console.error(`[PluginSystem] ${msg}`, meta)
   };
 
   const loader = createPluginLoader(config.pluginPaths, logger);
   const dependencyGraph = createDependencyGraph();
-  const dependencyInjector = createDependencyInjector();
+  const dependencyInjector = createDependencyInjector();  
   const sandbox = createPluginSandbox(config.sandboxLimits, logger);
 
   // Enable hot reload if requested
