@@ -238,7 +238,7 @@ export const transformers = {
    * Deep merge objects transformer
    */
   deepMerge: <T, U>(other: U) => 
-    (input: T): T & U => {
+    (input: T): any => {
       const result = transformers.deepClone(input) as any;
       
       const mergeRecursive = (target: any, source: any): any => {
