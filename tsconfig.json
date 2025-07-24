@@ -1,21 +1,21 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "noEmit": true
   },
-  "include": ["packages/*/src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "references": [
+    { "path": "./packages/types" },
+    { "path": "./packages/rest" },
+    { "path": "./packages/ws" },
+    { "path": "./packages/cache" },
+    { "path": "./packages/state" },
+    { "path": "./packages/plugins" },
+    { "path": "./packages/builders" },
+    { "path": "./packages/analytics" },
+    { "path": "./packages/security" },
+    { "path": "./packages/core" }
+  ],
+  "include": [
+    "packages/*/src/**/*"
+  ]
 }

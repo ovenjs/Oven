@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2023", "DOM"],
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "incremental": true,
+    
+    // Strict Type Checking
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    
+    // Advanced Module System
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": false,
+    
+    // Experimental Features
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": true,
+    
+    // Path Mapping
+    "baseUrl": ".",
+    "paths": {
+      "@ovenjs/*": ["packages/*/src/index.ts"],
+      "@ovenjs/types/*": ["packages/types/src/*"],
+      "@ovenjs/core/*": ["packages/core/src/*"],
+      "@ovenjs/rest/*": ["packages/rest/src/*"],
+      "@ovenjs/ws/*": ["packages/ws/src/*"],
+      "@ovenjs/cache/*": ["packages/cache/src/*"],
+      "@ovenjs/state/*": ["packages/state/src/*"],
+      "@ovenjs/plugins/*": ["packages/plugins/src/*"],
+      "@ovenjs/builders/*": ["packages/builders/src/*"],
+      "@ovenjs/analytics/*": ["packages/analytics/src/*"],
+      "@ovenjs/security/*": ["packages/security/src/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}
