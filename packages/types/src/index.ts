@@ -43,40 +43,6 @@ export type {
   MessageType
 } from './discord/entities.js';
 
-// Export Discord API objects
-export type {
-  User,
-  Guild,
-  Channel,
-  Message,
-  Role,
-  Emoji,
-  Embed,
-  EmbedFooter,
-  EmbedImage,
-  EmbedThumbnail,
-  EmbedVideo,
-  EmbedProvider,
-  EmbedAuthor,
-  EmbedField,
-  MessageComponent,
-  SelectOption,
-  Attachment,
-  Reaction
-} from './discord.js';
-
-// Export REST API types
-export type {
-  APIRequest,
-  APIResponse,
-  RESTOptions,
-  RateLimitData,
-  CreateMessageData,
-  EditMessageData,
-  ModifyGuildData,
-  CreateChannelData
-} from './rest.js';
-
 // Export advanced generics
 export type {
   DiscordEntity,
