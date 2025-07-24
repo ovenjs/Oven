@@ -74,7 +74,8 @@ export interface WebhookUser extends BaseUser {
 /**
  * Advanced Guild type with comprehensive properties
  */
-export interface APIGuild extends DiscordEntity<'guild', GuildSnowflake> {
+export interface APIGuild {
+  readonly id: GuildSnowflake;
   readonly name: string;
   readonly icon?: string | null;
   readonly icon_hash?: string | null;
