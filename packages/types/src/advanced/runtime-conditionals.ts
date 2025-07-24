@@ -353,8 +353,8 @@ export function conditionalExecute<
   config: TConfig,
   feature: keyof TConfig['features'],
   executor: () => TResult
-): ConditionalExecution<TConfig['features'], typeof feature, TResult, undefined> {
-  return (config.features[feature] ? executor() : undefined) as any;
+): TResult | undefined {
+  return (config.features[feature] as any) ? executor() : undefined;
 }
 
 /**
