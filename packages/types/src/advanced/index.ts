@@ -155,7 +155,7 @@ export type {
   TableName,
   CacheKey,
   RedisKey,
-  LogLevel,
+  LogLevel as TemplateLogLevel,
   MetricName,
   RoutePattern,
   ExtractRouteParams,
