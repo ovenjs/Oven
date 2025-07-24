@@ -50,7 +50,6 @@ export type {
   TypedEventEmitter,
   Manager,
   Plugin,
-  PluginContext,
   CacheManager,
   Logger
 } from './advanced/generics.js';
