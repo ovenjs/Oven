@@ -1,0 +1,15 @@
+{
+  "name": "@ovenjs/types",
+  "version": "0.1.0",
+  "description": "TypeScript definitions for OvenJS",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c ../../rollup.config.js",
+    "dev": "rollup -c ../../rollup.config.js --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["discord", "types", "typescript"],
+  "author": "OvenJS Team",
+  "license": "MIT"
+}
