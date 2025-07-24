@@ -55,6 +55,48 @@ export type {
   Logger
 } from './advanced/generics.js';
 
+// Export Phase 1.3: Advanced Compiler Features
+export type {
+  TransformerFactory,
+  TransformerConfig,
+  ClientExtensions,
+  ChannelExtensions, 
+  GuildExtensions,
+  UserExtensions,
+  MessageExtensions,
+  EventMapExtensions,
+  RESTEndpointExtensions,
+  WebSocketEventExtensions,
+  CacheExtensions,
+  ConfigurationExtensions,
+  FeatureFlag,
+  RuntimeBehaviorConfig,
+  Environment,
+  PerformanceMode,
+  BuildMode,
+  Platform,
+  TypeSafeConfig,
+  ConditionalMethod,
+  ConditionalReturn
+} from './advanced/index.js';
+
+export {
+  optimizePropertyAccess,
+  inlineSmallFunctions,
+  constantFolding,
+  stripDebugCode,
+  optimizeTypeAssertions,
+  generateTypeValidators,
+  createTransformerProgram,
+  applyMixins,
+  ExtensionRegistry,
+  Extension,
+  createExtension,
+  mergeExtensions,
+  createRuntimeConfig,
+  conditionalExecute
+} from './advanced/index.js';
+
 // Export utilities
 export type {
   TypeGuard,
