@@ -3,7 +3,12 @@
  */
 
 export * from './guards.js';
-export * from './transformers.js';
 
-// Avoid re-export conflicts by being selective
-export { when as whenTransform } from './transformers.js';
+// Re-export transformers selectively to avoid conflicts
+export {
+  transformers,
+  createTransformChain,
+  compose,
+  pipe,
+  tryTransform
+} from './transformers.js';
