@@ -81,7 +81,7 @@ export type {
   DeepKeyMapping,
   DeepGet,
   DeepPaths,
-  DeepMerge,
+  DeepMerge as MappedDeepMerge,
   Intersection,
   Difference,
   SymmetricDifference,
