@@ -145,7 +145,10 @@ export const transformers = {
    * Make mutable transformer  
    */
   makeMutable: <T>(input: T): T => {
-    return transformers.deepClone(input as T) as T;
+    if (input && typeof input === 'object') {
+      return transformers.deepClone(input as T) as T;
+    }
+    return input;
   },
 
   /**
