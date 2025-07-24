@@ -271,6 +271,7 @@ export type NSFWLevel = number;
 export type SystemChannelFlags = number;
 export type MessageFlags = number;
 export type RoleFlags = number;
+// Remove some unused types that are causing issues
 export type ThreadAutoArchiveDuration = number;
 export type SortOrderType = number;
 export type ForumLayoutType = number;
