@@ -154,7 +154,7 @@ export const transformers = {
   /**
    * Partial transformer
    */
-  makePartial: <T>(input: T): DeepPartial<T> => {
+  makePartial: <T extends Record<string, any>>(input: T): DeepPartial<T> => {
     return input as DeepPartial<T>;
   },
 
