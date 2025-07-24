@@ -68,7 +68,7 @@ export const inlineSmallFunctions: TransformerFactory<ts.SourceFile> = (context)
       return ts.visitEachChild(node, visitor, context);
     };
 
-    return ts.visitNode(sourceFile, visitor) || sourceFile;
+    return ts.visitNode(sourceFile, visitor) as ts.SourceFile || sourceFile;
   };
 };
 
