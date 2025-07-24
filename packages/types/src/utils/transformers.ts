@@ -158,7 +158,7 @@ export const transformers = {
   /**
    * Pick properties transformer
    */
-  pick: <T, K extends keyof T>(keys: readonly K[]) => 
+  pick: <T extends Record<string, any>, K extends keyof T>(keys: readonly K[]) => 
     (input: T): Pick<T, K> => {
       const result = {} as Pick<T, K>;
       for (const key of keys) {
