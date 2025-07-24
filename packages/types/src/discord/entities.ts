@@ -145,7 +145,8 @@ export interface GuildTextChannel extends BaseChannel<ChannelType.GUILD_TEXT> {
 /**
  * Advanced Message type with sophisticated structure
  */
-export interface APIMessage extends DiscordEntity<'message', MessageSnowflake> {
+export interface APIMessage {
+  readonly id: MessageSnowflake;
   readonly channel_id: ChannelSnowflake;
   readonly author: APIUser;
   readonly content: string;
