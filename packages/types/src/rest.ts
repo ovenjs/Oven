@@ -16,6 +16,7 @@ export interface APIResponse {
   statusText: string;
   headers: Record<string, string>;
   data: any;
+  ok: boolean;
 }
 
 export interface RESTOptions {
