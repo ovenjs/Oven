@@ -50,6 +50,7 @@ export type {
   TypedEventEmitter,
   Manager,
   Plugin,
+  PluginContext,
   CacheManager,
   Logger
 } from './advanced/generics.js';
@@ -95,34 +96,6 @@ export {
   createRuntimeConfig,
   conditionalExecute
 } from './advanced/index.js';
-
-// Export Phase 2.1: Plugin Architecture System
-export type {
-  PluginManifest,
-  PluginPermission,
-  LoadedPlugin,
-  PluginInstance,
-  PluginContext,
-  PluginLoader,
-  DependencyGraph,
-  DependencyInjector,
-  PluginSandbox,
-  PluginSystem,
-  PluginSystemConfig,
-  ResourceLimits,
-  SandboxContext,
-  SandboxResult,
-  SecurityAuditResult
-} from './plugins/index.js';
-
-export {
-  PluginStatus,
-  createPluginLoader,
-  createDependencyGraph,
-  createDependencyInjector,
-  createPluginSandbox,
-  createPluginSystem
-} from './plugins/index.js';
 
 // Export utilities
 export type {
