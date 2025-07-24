@@ -128,7 +128,7 @@ export type Properties<T> = {
  */
 export type Match<T, TPattern> = T extends infer U
   ? TPattern extends {
-      [K in keyof TPattern]: (value: U) => value is infer TResult ? TResult : never;
+      [K in keyof TPattern]: (value: U) => value is any;
     }
     ? TPattern[keyof TPattern] extends (value: U) => value is infer TResult
       ? TResult
