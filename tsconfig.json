@@ -7,12 +7,7 @@
     { "path": "./packages/types" },
     { "path": "./packages/rest" },
     { "path": "./packages/ws" },
-    { "path": "./packages/cache" },
-    { "path": "./packages/state" },
-    { "path": "./packages/plugins" },
     { "path": "./packages/builders" },
-    { "path": "./packages/analytics" },
-    { "path": "./packages/security" },
     { "path": "./packages/core" }
   ],
   "include": [
