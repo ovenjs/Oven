@@ -21,9 +21,11 @@ export type {
 export type {
   Phantom,
   Brand,
-  Validated,
-  Sanitized,
-  Encrypted
+  Snowflake,
+  UserSnowflake,
+  GuildSnowflake,
+  ChannelSnowflake,
+  MessageSnowflake
 } from './primitives/brand.js';
 
 // Export core Discord types
