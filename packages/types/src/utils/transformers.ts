@@ -137,15 +137,15 @@ export const transformers = {
   /**
    * Make readonly transformer
    */
-  makeReadonly: <T>(input: T): DeepReadonly<T> => {
-    return Object.freeze(transformers.deepClone(input)) as DeepReadonly<T>;
+  makeReadonly: <T>(input: T): T => {
+    return Object.freeze(transformers.deepClone(input)) as T;
   },
 
   /**
-   * Make mutable transformer
+   * Make mutable transformer  
    */
-  makeMutable: <T>(input: DeepReadonly<T>): DeepMutable<T> => {
-    return transformers.deepClone(input as T) as DeepMutable<T>;
+  makeMutable: <T>(input: T): T => {
+    return transformers.deepClone(input as T) as T;
   },
 
   /**
