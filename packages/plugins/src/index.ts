@@ -18,8 +18,3 @@ export * from './hooks/HookManager.js';
 
 // Utils
 export * from './utils/SecurityValidator.js';
-
-// Types
-export * from './types/PluginTypes.js';
-export * from './types/HookTypes.js';
-export * from './types/MetadataTypes.js';
