@@ -63,13 +63,13 @@ export interface PluginContext {
 /**
  * Plugin interface
  */
-export interface Plugin<TConfig = Record<string, unknown>, TContext = PluginContext> {
+export interface Plugin {
   readonly meta: PluginMetadata;
-  readonly config: PluginConfiguration<TConfig>;
-  readonly hooks: PluginHooks<TContext>;
+  readonly config: PluginConfiguration;
+  readonly hooks: PluginHooks;
   readonly lifecycle: PluginLifecycle;
   
-  initialize(context: TContext): Promise<void> | void;
+  initialize(context: PluginContext): Promise<void> | void;
   destroy(): Promise<void> | void;
   getMetrics?(): Record<string, unknown>;
   validate?(): Promise<boolean> | boolean;
