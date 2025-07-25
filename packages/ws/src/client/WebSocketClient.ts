@@ -125,7 +125,7 @@ export class WebSocketClient extends EventEmitter {
       this.emit('disconnect');
       this.emit('debug', 'WebSocket client disconnected');
     } catch (error) {
-      this.emit('error', error);
+      this.emit('error', error as Error);
       throw error;
     }
   }
