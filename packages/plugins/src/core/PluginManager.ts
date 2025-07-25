@@ -9,14 +9,14 @@ import type {
   PluginLoadOptions, 
   PluginUnloadOptions,
   PluginStatus,
-  PluginEvents
+  PluginEvents,
+  PluginContext,
+  PluginMetadata
 } from './Plugin.js';
-import type { PluginContext } from './PluginContext.js';
 import type { PluginSandbox } from './PluginSandbox.js';
 import type { DependencyGraph } from '../dependencies/DependencyGraph.js';
 import type { HookManager } from '../hooks/HookManager.js';
 import type { SecurityValidator } from '../utils/SecurityValidator.js';
-import type { PluginMetadata } from '../types/PluginTypes.js';
 
 /**
  * Advanced plugin manager with sophisticated lifecycle management
@@ -146,7 +146,7 @@ export class PluginManager extends EventEmitter {
       
       this.emit('pluginUnloaded', entry.plugin);
     } catch (error) {
-      this.emit('pluginError', entry.plugin, error);
+      this.emit('pluginError', entry.plugin, error as Error);
       if (!force) {
         throw error;
       }
@@ -173,13 +173,6 @@ export class PluginManager extends EventEmitter {
   }
 
   /**
-   * Get all loaded plugins
-   */
-  public getLoadedPlugins(): Plugin[] {
-    return Array.from(this.registry.values()).map(entry => entry.plugin);
-  }
-
-  /**
    * Get plugin status
    */
   public getPluginStatus(name: string): PluginStatus | null {
@@ -196,55 +189,6 @@ export class PluginManager extends EventEmitter {
       dependents: this.dependencyGraph.getDependents(name),
       metrics: entry.plugin.getMetrics?.()
     };
-  }
-
-  /**
-   * Get all plugin statuses
-   */
-  public getAllPluginStatuses(): PluginStatus[] {
-    return Array.from(this.registry.keys()).map(name => this.getPluginStatus(name)!);
-  }
-
-  /**
-   * Reload a plugin
-   */
-  public async reloadPlugin<TConfig = Record<string, unknown>>(
-    pluginName: string,
-    options: PluginLoadOptions<TConfig> = {}
-  ): Promise<Plugin<TConfig>> {
-    const entry = this.registry.get(pluginName);
-    if (!entry) {
-      throw new Error(`Plugin ${pluginName} is not loaded`);
-    }
-
-    // Store current config if not provided
-    const config = options.config || entry.plugin.config.defaults;
-    const pluginPath = entry.plugin.meta.repository || entry.plugin.meta.name;
-
-    // Unload current plugin
-    await this.unloadPlugin(pluginName, { force: true, cascade: false });
-
-    // Load with new options
-    return await this.loadPlugin(pluginPath, { ...options, config });
-  }
-
-  /**
-   * Validate all plugins
-   */
-  public async validateAllPlugins(): Promise<Map<string, boolean>> {
-    const results = new Map<string, boolean>();
-    
-    for (const [name, entry] of this.registry) {
-      try {
-        const isValid = await entry.plugin.validate?.() ?? true;
-        results.set(name, isValid);
-      } catch (error) {
-        results.set(name, false);
-        this.emit('pluginError', entry.plugin, error);
-      }
-    }
-    
-    return results;
   }
 
   /**
@@ -286,7 +230,7 @@ export class PluginManager extends EventEmitter {
         ]);
         
         if (config) {
-          await plugin.initialize(this.createPluginContext(config));
+          await plugin.initialize(this.createPluginContext(plugin.meta.name, config));
         }
         
         return plugin;
@@ -328,7 +272,7 @@ export class PluginManager extends EventEmitter {
    * Private method to initialize plugin
    */
   private async initializePlugin(plugin: Plugin): Promise<void> {
-    const context = this.createPluginContext(plugin.config.defaults);
+    const context = this.createPluginContext(plugin.meta.name, plugin.config.defaults);
     
     // Call lifecycle beforeLoad hook
     await plugin.hooks.beforeLoad?.(context);
@@ -346,7 +290,7 @@ export class PluginManager extends EventEmitter {
    * Private method to destroy plugin
    */
   private async destroyPlugin(plugin: Plugin, timeout: number): Promise<void> {
-    const context = this.createPluginContext(plugin.config.defaults);
+    const context = this.createPluginContext(plugin.meta.name, plugin.config.defaults);
     
     try {
       // Call lifecycle beforeUnload hook
@@ -365,7 +309,7 @@ export class PluginManager extends EventEmitter {
       
       this.emit('pluginDestroyed', plugin);
     } catch (error) {
-      this.emit('pluginError', plugin, error);
+      this.emit('pluginError', plugin, error as Error);
       throw error;
     }
   }
@@ -373,11 +317,9 @@ export class PluginManager extends EventEmitter {
   /**
    * Private method to create plugin context
    */
-  private createPluginContext(config: unknown): PluginContext {
+  private createPluginContext(pluginName: string, config: unknown): PluginContext {
     return {
-      plugins: this,
-      hooks: this.hookManager,
-      sandbox: this.sandbox,
+      pluginName,
       config
     };
   }
