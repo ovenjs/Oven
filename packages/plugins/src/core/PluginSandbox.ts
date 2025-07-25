@@ -4,6 +4,7 @@
 
 import { Worker } from 'worker_threads';
 import { createContext, runInContext } from 'vm';
+import type * as vm from 'vm';
 import type { Plugin } from './Plugin.js';
 
 /**
