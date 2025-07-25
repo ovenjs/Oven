@@ -191,7 +191,7 @@ export class RequestHandler {
       method: options.method,
       headers,
       body: body as any, // Cast to any for undici compatibility
-      timeout: options.timeout ?? this.config.timeout,
+      // Remove timeout as it's not supported in newer undici versions
     });
 
     return response as unknown as Response;
