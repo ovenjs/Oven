@@ -80,7 +80,7 @@ export class RequestHandler {
         }
 
         // Wait before retrying with exponential backoff
-        await this.wait(this.config.retryDelay * Math.pow(2, attempt));
+        await this.wait(ms(this.config.retryDelay * Math.pow(2, attempt)));
       }
     }
 
