@@ -54,7 +54,7 @@ export class RESTClient {
     // Initialize core components
     this.bucketManager = new BucketManager();
     this.requestHandler = new RequestHandler({
-      timeout: this.options.timeout,
+      timeout: this.options.timeout as Milliseconds,
       retries: this.options.retries,
       userAgent: this.options.userAgent,
     });
