@@ -483,12 +483,12 @@ class CodeValidator {
     
     for (const exp of exports) {
       const match = exp.match(/export\s+(?:function|class|const|let|var)\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     for (const exp of defaultExports) {
       const match = exp.match(/export\s+default\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     return result;
