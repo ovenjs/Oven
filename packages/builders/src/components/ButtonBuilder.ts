@@ -5,16 +5,13 @@
 
 import type { 
   ButtonData, 
-  ButtonStyle, 
-  ComponentType, 
   EmojiResolvable,
   EmojiData,
   ValidationResult,
-  FluentBuilder,
-  COMPONENT_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, ButtonStyle, ComponentType, COMPONENT_LIMITS } from '@ovenjs/types';
 
 export class ButtonBuilder implements FluentBuilder<ButtonData> {
   private data: ButtonData = {
