@@ -61,7 +61,7 @@ export class Guild extends Base {
     super(options, data);
     
     this.name = data.name;
-    this.icon = data.icon;
+    this.icon = data.icon ?? null;
     this.iconHash = data.icon_hash ?? null;
     this.splash = data.splash ?? null;
     this.discoverySplash = data.discovery_splash ?? null;
