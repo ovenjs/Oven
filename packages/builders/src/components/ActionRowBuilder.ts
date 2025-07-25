@@ -6,13 +6,11 @@
 import type { 
   ActionRowData, 
   ComponentData, 
-  ComponentType, 
   ValidationResult,
-  FluentBuilder,
-  COMPONENT_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, ComponentType, COMPONENT_LIMITS } from '@ovenjs/types';
 
 export class ActionRowBuilder implements FluentBuilder<ActionRowData> {
   private data: ActionRowData = {
