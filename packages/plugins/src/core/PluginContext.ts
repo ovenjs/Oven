@@ -2,43 +2,43 @@
  * @fileoverview Plugin context for providing runtime services to plugins
  */
 
-import type { PluginManager } from './PluginManager.js';
-import type { HookManager } from '../hooks/HookManager.js';
-import type { PluginSandbox } from './PluginSandbox.js';
+// Re-export types from the central type definitions
+export type {
+  PluginContext,
+  ExtendedPluginContext,
+  PluginEnvironment,
+  PluginServices
+} from '@ovenjs/types/plugins';
 
-/**
- * Basic plugin context
- */
-export interface PluginContext {
-  readonly pluginName: string;
-  readonly config: unknown;
-}
-
-/**
- * Plugin context providing access to runtime services
- */
-export interface ExtendedPluginContext extends PluginContext {
-  readonly plugins: PluginManager;
-  readonly hooks: HookManager;
-  readonly sandbox: PluginSandbox;
-}
+import type {
+  PluginContext,
+  ExtendedPluginContext,
+  PluginServices,
+  PluginSandboxContext,
+  PluginEnvironment
+} from '@ovenjs/types/plugins';
 
 /**
  * Plugin context factory
  */
 export class PluginContextFactory {
-  private readonly plugins: PluginManager;
-  private readonly hooks: HookManager;
-  private readonly sandbox: PluginSandbox;
+  private readonly services: PluginServices;
+  private readonly environment: PluginEnvironment;
 
   constructor(
-    plugins: PluginManager,
-    hooks: HookManager,
-    sandbox: PluginSandbox
+    services: PluginServices,
+    environment?: Partial<PluginEnvironment>
   ) {
-    this.plugins = plugins;
-    this.hooks = hooks;
-    this.sandbox = sandbox;
+    this.services = services;
+    this.environment = {
+      nodeVersion: process.version,
+      ovenjsVersion: '0.1.0', // TODO: Get from package.json
+      platform: process.platform,
+      architecture: process.arch,
+      development: process.env.NODE_ENV !== 'production',
+      variables: process.env as Record<string, string>,
+      ...environment
+    };
   }
 
   /**
@@ -54,13 +54,19 @@ export class PluginContextFactory {
   /**
    * Create an extended plugin context with all services
    */
-  public createExtendedContext(pluginName: string, config: unknown): ExtendedPluginContext {
+  public createExtendedContext(
+    pluginName: string, 
+    config: unknown,
+    sandbox: PluginSandboxContext
+  ): ExtendedPluginContext {
     return {
       pluginName,
       config,
-      plugins: this.plugins,
-      hooks: this.hooks,
-      sandbox: this.sandbox
+      services: this.services,
+      sandbox,
+      version: '0.1.0', // TODO: Get from plugin metadata
+      environment: this.environment,
+      metadata: {}
     };
   }
 }
