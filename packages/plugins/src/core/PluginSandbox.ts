@@ -5,29 +5,33 @@
 import { Worker } from 'worker_threads';
 import { createContext, runInContext } from 'vm';
 import type * as vm from 'vm';
-import type { Plugin } from './Plugin.js';
+
+// Import types from centralized location
+import type { 
+  Plugin,
+  PluginSandbox as IPluginSandbox,
+  SandboxContext as ISandboxContext,
+  SandboxRestrictions,
+  SandboxStats
+} from '@ovenjs/types/plugins';
 
 /**
- * Plugin sandbox interface
+ * Code validation result
  */
-export interface PluginSandbox {
-  createContext(): Promise<SandboxContext>;
-  destroyContext(context: SandboxContext): Promise<void>;
-  validateCode(code: string): Promise<CodeValidationResult>;
-  executeCode(code: string, context: SandboxContext): Promise<unknown>;
+export interface CodeValidationResult {
+  readonly valid: boolean;
+  readonly errors: readonly string[];
+  readonly warnings: readonly string[];
 }
 
 /**
  * Sandbox context for plugin execution
  */
-export interface SandboxContext {
-  readonly id: string;
+export interface SandboxContext extends ISandboxContext {
   readonly globals: Record<string, unknown>;
-  readonly restrictions: SandboxRestrictions;
-  readonly stats: SandboxStats;
-  loadModule(modulePath: string): Promise<Plugin>;
   evaluateCode(code: string): Promise<unknown>;
   cleanup(): Promise<void>;
+}
 }
 
 /**
