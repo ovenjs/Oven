@@ -11,7 +11,9 @@ import type {
   BotToken,
   API_BASE_URL,
   API_VERSION,
+  Milliseconds,
 } from '@ovenjs/types';
+import { ms } from '@ovenjs/types';
 
 import { BucketManager } from '../buckets/index.js';
 import { RequestHandler, ResponseHandler } from '../handlers/index.js';
