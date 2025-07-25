@@ -9,12 +9,29 @@ import type {
 } from '../primitives/index.js';
 
 import type { 
-  PluginMetadata,
-  PluginConfiguration,
-  PluginHooks,
-  PluginLifecycle,
+  PluginMetadata
+} from './metadata.js';
+
+import type {
+  PluginConfiguration
+} from './configuration.js';
+
+import type {
+  PluginHooks
+} from './lifecycle.js';
+
+import type {
   PluginContext
-} from './index.js';
+} from './context.js';
+
+/**
+ * Plugin lifecycle interface
+ */
+export interface PluginLifecycle {
+  readonly state: string;
+  readonly transitions?: readonly unknown[];
+  readonly hooks?: PluginHooks;
+}
 
 /**
  * Core plugin interface with advanced type safety
