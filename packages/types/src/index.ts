@@ -18,6 +18,12 @@ export * from './utils/index.js';
 // Plugin system types
 export * from './plugins.js';
 
+// Core client types
+export * from './core.js';
+
+// Builder types
+export * from './builders.js';
+
 // Version info
 export const VERSION = '0.1.0' as const;
 export const API_SUPPORT = {
