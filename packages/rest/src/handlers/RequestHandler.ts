@@ -66,7 +66,7 @@ export class RequestHandler {
 
         // Server error - retry if we have attempts left
         if (attempt < this.config.retries) {
-          await this.wait(this.config.retryDelay * (attempt + 1));
+          await this.wait(ms(this.config.retryDelay * (attempt + 1)));
           continue;
         }
 
