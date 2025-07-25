@@ -4,26 +4,40 @@
 
 // Re-export types from the central type definitions
 export type {
-  PluginLifecycleState,
   PluginHooks,
   PluginLifecycle,
   PluginTransition,
   HealthCheckResult,
-  HealthCheck,
-  PluginLifecycleManager
+  HealthCheck
 } from '@ovenjs/types/plugins';
 
 import type {
   PluginContext,
-  PluginLifecycleState,
   PluginHooks,
   PluginLifecycle,
   PluginTransition,
-  HealthCheckResult,
-  PluginLifecycleManager as IPluginLifecycleManager
+  HealthCheckResult
 } from '@ovenjs/types/plugins';
 
 import { PluginLifecycleState } from '@ovenjs/types/plugins';
+
+/**
+ * Plugin lifecycle manager interface (avoid naming conflict)
+ */
+export interface IPluginLifecycleManager {
+  registerHooks(pluginName: string, hooks: PluginHooks): void;
+  unregisterHooks(pluginName: string): void;
+  getState(pluginName: string): PluginLifecycleState;
+  transition(pluginName: string, newState: PluginLifecycleState, context: PluginContext): Promise<void>;
+  canTransition(pluginName: string, from: PluginLifecycleState, to: PluginLifecycleState): boolean;
+  getAllStates(): Map<string, PluginLifecycleState>;
+  getPluginsInState(state: PluginLifecycleState): string[];
+  isRunning(pluginName: string): boolean;
+  hasError(pluginName: string): boolean;
+  resetState(pluginName: string): void;
+  clearAll(): void;
+  handleConfigChange(pluginName: string, newConfig: unknown, oldConfig: unknown, context: PluginContext): Promise<void>;
+}
 
 /**
  * Plugin lifecycle manager implementation
