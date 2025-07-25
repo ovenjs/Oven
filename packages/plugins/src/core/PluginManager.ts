@@ -46,10 +46,10 @@ export class PluginManager extends EventEmitter {
   /**
    * Load a plugin with advanced dependency resolution
    */
-  public async loadPlugin<TConfig = Record<string, unknown>>(
+  public async loadPlugin(
     pluginPath: string,
-    options: PluginLoadOptions<TConfig> = {}
-  ): Promise<Plugin<TConfig>> {
+    options: PluginLoadOptions = {}
+  ): Promise<Plugin> {
     const { config, force = false, timeout = 30000, retries = 3 } = options;
 
     // Check if already loading
@@ -76,7 +76,7 @@ export class PluginManager extends EventEmitter {
       
       // Register plugin
       const entry: PluginRegistryEntry = {
-        plugin: plugin as Plugin,
+        plugin,
         loadedAt: new Date(),
         status: 'loaded'
       };
@@ -84,15 +84,15 @@ export class PluginManager extends EventEmitter {
       this.registry.set(plugin.meta.name, entry);
       
       // Initialize plugin
-      await this.initializePlugin(plugin as Plugin);
+      await this.initializePlugin(plugin);
       
       // Register hooks
-      await this.hookManager.registerPluginHooks(plugin as Plugin);
+      await this.hookManager.registerPluginHooks(plugin);
       
       // Update status
       entry.status = 'initialized';
       
-      this.emit('pluginLoaded', plugin as Plugin);
+      this.emit('pluginLoaded', plugin);
       
       return plugin;
     } catch (error) {
