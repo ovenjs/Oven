@@ -34,7 +34,7 @@ export class UserManager extends BaseManager<UserId, User> {
   /**
    * Resolve a user from cache or API
    */
-  async resolve(id: UserId, options: FetchOptions = {}): Promise<User> {
+  override async resolve(id: UserId, options: FetchOptions = {}): Promise<User> {
     return super.resolve(id, options);
   }
 
