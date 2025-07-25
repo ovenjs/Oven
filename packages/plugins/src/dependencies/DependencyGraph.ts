@@ -139,6 +139,18 @@ export class DependencyGraph implements IDependencyGraph {
   }
 
   /**
+   * Check if there are any circular dependencies in the graph
+   */
+  public hasCycles(): boolean {
+    try {
+      this.getLoadOrder();
+      return false;
+    } catch (error) {
+      return error instanceof CircularDependencyError;
+    }
+  }
+
+  /**
    * Get all plugins in the graph
    */
   public getAllPlugins(): string[] {
