@@ -377,7 +377,7 @@ export class OvenClient extends EventEmitter {
   /**
    * String representation
    */
-  toString(): string {
+  override toString(): string {
     return `OvenClient(${this.user?.tag || 'Not logged in'})`;
   }
 }
