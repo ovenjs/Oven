@@ -150,7 +150,7 @@ export const customRules = {
 };
 ```
 
-#### Custom Transformers 🚀 **NEXT**
+#### Custom Transformers ✅
 
 AST transformations for performance optimizations:
 
