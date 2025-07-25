@@ -78,8 +78,8 @@ export interface Plugin<TConfig = Record<string, unknown>, TContext = PluginCont
 /**
  * Plugin registry entry
  */
-export interface PluginRegistryEntry<TConfig = Record<string, unknown>, TContext = PluginContext> {
-  readonly plugin: Plugin<TConfig, TContext>;
+export interface PluginRegistryEntry {
+  readonly plugin: Plugin;
   readonly loadedAt: Date;
   status: 'loaded' | 'initialized' | 'error' | 'disabled';
   readonly error?: Error;
