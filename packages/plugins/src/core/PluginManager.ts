@@ -158,11 +158,9 @@ export class PluginManager extends EventEmitter {
   /**
    * Get plugin by name
    */
-  public getPlugin<TConfig = Record<string, unknown>>(
-    name: string
-  ): Plugin<TConfig> | null {
+  public getPlugin(name: string): Plugin | null {
     const entry = this.registry.get(name);
-    return entry ? (entry.plugin as Plugin<TConfig>) : null;
+    return entry ? entry.plugin : null;
   }
 
   /**
