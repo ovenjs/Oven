@@ -975,24 +975,24 @@ graph TD
 
 ```mermaid
 graph TB
-    types[[@ovenjs/types]]
-    rest[[@ovenjs/rest]]
-    ws[[@ovenjs/ws]]
-    cache[[@ovenjs/cache]]
-    state[[@ovenjs/state]]
-    plugins[[@ovenjs/plugins]]
-    core[[@ovenjs/core]]
-    
-    types --> rest
-    types --> ws
-    types --> cache
-    types --> state
-    types --> plugins
-    rest --> core
-    ws --> core
-    cache --> core
-    state --> core
-    plugins --> core
+types[[@ovenjs/types]]
+rest[[@ovenjs/rest]]
+ws[[@ovenjs/ws]]
+cache[[@ovenjs/cache]]
+state[[@ovenjs/state]]
+plugins[[@ovenjs/plugins]]
+core[[@ovenjs/core]]
+
+types --> rest
+types --> ws
+types --> cache
+types --> state
+types --> plugins
+rest --> core
+ws --> core
+cache --> core
+state --> core
+plugins --> core
 ```
 
 ### Quality Gates:
