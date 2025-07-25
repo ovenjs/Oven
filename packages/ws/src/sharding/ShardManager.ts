@@ -40,8 +40,8 @@ export interface ShardManagerStatus {
  * Manages multiple Discord gateway shards
  */
 export class ShardManager extends EventEmitter {
-  private readonly options: Required<Omit<ShardManagerOptions, 'shardCount' | 'shardIds'>> & 
-    Pick<ShardManagerOptions, 'shardCount' | 'shardIds'>;
+  private readonly options: Required<Omit<ShardManagerOptions, 'shardCount' | 'shardIds' | 'presence'>> & 
+    Pick<ShardManagerOptions, 'shardCount' | 'shardIds' | 'presence'>;
   private readonly shards = new Map<number, Shard>();
   private gatewayInfo?: GatewayInfo;
   private spawnQueue: number[] = [];
