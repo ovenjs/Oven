@@ -255,7 +255,7 @@ function inlineFunction(func: ts.FunctionDeclaration, args: ts.NodeArray<ts.Expr
   // Simplified inlining - in practice, this would need parameter substitution
   if (func.body && func.body.statements.length === 1) {
     const statement = func.body.statements[0];
-    if (ts.isReturnStatement(statement) && statement.expression) {
+    if (statement && ts.isReturnStatement(statement) && statement.expression) {
       return statement.expression;
     }
   }
