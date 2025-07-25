@@ -326,7 +326,7 @@ export class OvenClient extends EventEmitter {
    * Get application information
    */
   async fetchApplication(): Promise<any> {
-    return await this.rest.applications.getCurrent();
+    return await this.rest.request({ method: 'GET', path: '/applications/@me' });
   }
 
   /**
