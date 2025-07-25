@@ -75,8 +75,8 @@ export class PluginManager extends EventEmitter {
       await this.resolveDependencies(plugin.meta);
       
       // Register plugin
-      const entry: PluginRegistryEntry<TConfig> = {
-        plugin,
+      const entry: PluginRegistryEntry = {
+        plugin: plugin as Plugin,
         loadedAt: new Date(),
         status: 'loaded'
       };
@@ -84,15 +84,15 @@ export class PluginManager extends EventEmitter {
       this.registry.set(plugin.meta.name, entry);
       
       // Initialize plugin
-      await this.initializePlugin(plugin);
+      await this.initializePlugin(plugin as Plugin);
       
       // Register hooks
-      await this.hookManager.registerPluginHooks(plugin);
+      await this.hookManager.registerPluginHooks(plugin as Plugin);
       
       // Update status
       entry.status = 'initialized';
       
-      this.emit('pluginLoaded', plugin);
+      this.emit('pluginLoaded', plugin as Plugin);
       
       return plugin;
     } catch (error) {
