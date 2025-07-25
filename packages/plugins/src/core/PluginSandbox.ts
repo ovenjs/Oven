@@ -184,7 +184,7 @@ class VMSandboxContext implements SandboxContext {
   public readonly restrictions: SandboxRestrictions;
   public readonly stats: SandboxStats;
   
-  private readonly vmContext: unknown;
+  private readonly vmContext: vm.Context;
   private readonly memoryMonitor: MemoryMonitor;
   private readonly cpuMonitor: CPUMonitor;
   private executionCount = 0;
