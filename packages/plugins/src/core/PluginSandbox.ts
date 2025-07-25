@@ -341,7 +341,7 @@ class MemoryMonitor {
  */
 class CPUMonitor {
   private readonly maxCpuTime: number;
-  private startTime = 0;
+  private startTime: bigint = 0n;
   private currentTime = 0;
   private monitoring = false;
 
