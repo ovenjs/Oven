@@ -13,14 +13,16 @@ import type {
   MessageComponent,
   SelectOption,
   Application,
+  ImageURL
+} from './discord/index.js';
+import type { 
   Snowflake,
-  EmojiId,
   UserId,
   ChannelId,
   RoleId,
   MessageId,
-  ImageURL
-} from './discord/index.js';
+  BotToken
+} from './primitives/index.js';
 import type { Optional, DeepPartial } from './primitives/index.js';
 
 // ========================= EMBED BUILDER TYPES =========================
