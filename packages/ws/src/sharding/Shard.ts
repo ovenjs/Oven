@@ -216,7 +216,7 @@ export class Shard extends EventEmitter {
       // Handle compressed data
       let rawData = data;
       if (this.options.compress && data instanceof Buffer) {
-        rawData = inflate(data).toString();
+        rawData = inflateSync(data).toString();
       }
 
       payload = JSON.parse(rawData.toString());
