@@ -6,12 +6,11 @@
 import type { 
   ModalData, 
   ActionRowData, 
-  ComponentType,
   ValidationResult,
   FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, ComponentType } from '@ovenjs/types';
 
 export class ModalBuilder implements FluentBuilder<ModalData> {
   private data: ModalData = {
