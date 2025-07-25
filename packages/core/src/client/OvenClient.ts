@@ -361,7 +361,7 @@ export class OvenClient extends EventEmitter {
   /**
    * Convert to JSON representation
    */
-  toJSON(): Record<string, any> {
+  override toJSON(): Record<string, any> {
     return {
       user: this.user?.toJSON(),
       guilds: this.guildCount,
