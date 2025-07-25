@@ -96,7 +96,7 @@ export class PluginManager extends EventEmitter {
       
       return plugin;
     } catch (error) {
-      this.emit('pluginError', null, error);
+      this.emit('pluginError', null, error as Error);
       throw error;
     } finally {
       this.loadingQueue.delete(pluginPath);
