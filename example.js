@@ -1,6 +1,5 @@
-import { Client } from './packages/core/src/Client.js';
-import { GatewayIntents } from './packages/types/src/gateway.js';
-import { EmbedBuilder } from './packages/builders/src/EmbedBuilder.js';
+import { OvenClient } from '@ovenjs/core';
+import { EmbedBuilder, ButtonBuilder, Colors } from '@ovenjs/builders';
 
 // Example usage of OvenJS Discord API wrapper
 console.log('🔥 OvenJS Discord API Wrapper Example');
