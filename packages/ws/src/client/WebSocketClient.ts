@@ -366,22 +366,22 @@ export class WebSocketClient extends EventEmitter {
   /**
    * Add event listener with type safety
    */
-  on<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
-    return super.on(event, listener);
+  override on<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
+    return super.on(event as string, listener);
   }
 
   /**
    * Add one-time event listener with type safety
    */
-  once<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
-    return super.once(event, listener);
+  override once<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
+    return super.once(event as string, listener);
   }
 
   /**
    * Emit event with type safety
    */
-  emit<T extends keyof WebSocketClientEvents>(event: T, ...args: Parameters<WebSocketClientEvents[T]>): boolean {
-    return super.emit(event, ...args);
+  override emit<T extends keyof WebSocketClientEvents>(event: T, ...args: Parameters<WebSocketClientEvents[T]>): boolean {
+    return super.emit(event as string, ...args);
   }
 
   /**
