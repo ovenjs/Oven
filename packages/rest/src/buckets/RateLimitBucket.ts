@@ -167,7 +167,7 @@ export class RateLimitBucket {
     const index = this.queue.findIndex(req => req.id === requestId);
     if (index !== -1) {
       const removed = this.queue.splice(index, 1)[0];
-      if (removed.timeout) {
+      if (removed?.timeout) {
         clearTimeout(removed.timeout);
       }
     }
