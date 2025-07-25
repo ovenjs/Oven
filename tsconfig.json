@@ -4,11 +4,7 @@
     "noEmit": true
   },
   "references": [
-    { "path": "./packages/types" },
-    { "path": "./packages/rest" },
-    { "path": "./packages/ws" },
-    { "path": "./packages/builders" },
-    { "path": "./packages/core" }
+    { "path": "./packages/types" }
   ],
   "include": [
     "packages/*/src/**/*"
