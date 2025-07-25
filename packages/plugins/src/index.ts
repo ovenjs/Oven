@@ -1,20 +1,17 @@
 /**
- * @fileoverview Advanced plugin system for OvenJS Discord API wrapper
- * Provides sophisticated plugin architecture with type safety and extensibility
+ * @fileoverview OvenJS Plugin System - Advanced Plugin Architecture
  */
 
-// Core plugin system
+// Re-export all types from the centralized types package
+export * from '@ovenjs/types/plugins';
+
+// Export implementations
 export * from './core/Plugin.js';
 export * from './core/PluginManager.js';
 export * from './core/PluginContext.js';
 export * from './core/PluginLifecycle.js';
 export * from './core/PluginSandbox.js';
 
-// Dependencies
-export * from './dependencies/DependencyGraph.js';
-
-// Hooks
 export * from './hooks/HookManager.js';
-
-// Utils
+export * from './dependencies/DependencyGraph.js';
 export * from './utils/SecurityValidator.js';
