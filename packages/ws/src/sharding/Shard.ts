@@ -145,7 +145,7 @@ export class Shard extends EventEmitter {
       lastHeartbeat: this.heartbeat?.getHealth().lastHeartbeat || new Date(),
       sessionId: this.sessionId,
       resumeGatewayURL: this.resumeGatewayURL,
-      sequence: this.sequence,
+      sequence: this.sequence || undefined,
       closeCode: this.closeSequence,
     };
   }
