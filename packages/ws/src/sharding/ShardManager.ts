@@ -156,12 +156,7 @@ export class ShardManager extends EventEmitter {
       encoding: this.options.encoding,
       compress: this.options.compress,
       largeThreshold: this.options.largeThreshold,
-      presence: this.options.presence || {
-        activities: [],
-        status: 'online',
-        afk: false,
-        since: null,
-      },
+      presence: this.options.presence,
     };
 
     const shard = new Shard(shardOptions);
