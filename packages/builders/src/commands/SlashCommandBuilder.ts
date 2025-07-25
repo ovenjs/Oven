@@ -286,10 +286,10 @@ export class SlashCommandBuilder implements FluentBuilder<SlashCommandData> {
   /**
    * Clone the builder
    */
-  clone(): SlashCommandBuilder {
+  clone(): this {
     const cloned = new SlashCommandBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
