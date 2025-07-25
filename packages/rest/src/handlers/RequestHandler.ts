@@ -190,7 +190,7 @@ export class RequestHandler {
     const response = await request(finalUrl, {
       method: options.method,
       headers,
-      body,
+      body: body as any, // Cast to any for undici compatibility
       timeout: options.timeout ?? this.config.timeout,
     });
 
