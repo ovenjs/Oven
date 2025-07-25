@@ -12,11 +12,10 @@ import type {
   EmbedThumbnailData,
   ColorResolvable,
   ValidationResult,
-  FluentBuilder,
-  EMBED_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, EMBED_LIMITS } from '@ovenjs/types';
 import { resolveColor } from '../utils/ColorUtils.js';
 
 export class EmbedBuilder implements FluentBuilder<EmbedData> {
