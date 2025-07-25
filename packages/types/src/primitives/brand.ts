@@ -74,6 +74,11 @@ export type Token<TType extends 'Bot' | 'Bearer' | 'User' = 'Bot'> = Phantom<str
 export type APIVersion = Brand<string, 'APIVersion'>;
 
 /**
+ * Semver version with brand typing
+ */
+export type SemverVersion = Brand<string, 'SemverVersion'>;
+
+/**
  * Locale string with brand typing for i18n
  */
 export type LocaleString = Brand<string, 'LocaleString'>;
