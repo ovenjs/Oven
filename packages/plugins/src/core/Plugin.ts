@@ -57,11 +57,11 @@ export function createPlugin<TConfig = Record<string, unknown>, TContext = Plugi
   return {
     meta: definition.meta,
     config: definition.config,
-    hooks: definition.hooks || {},
+    hooks: definition.hooks || {} as PluginHooks<TContext>,
     lifecycle: {
       state: 'unloaded' as any,
       transitions: [],
-      hooks: definition.hooks || {},
+      hooks: definition.hooks || {} as PluginHooks<TContext>,
       canTransition: () => true
     },
     initialize: definition.initialize,
