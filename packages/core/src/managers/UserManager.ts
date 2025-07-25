@@ -16,7 +16,7 @@ export class UserManager extends BaseManager<UserId, User> {
   /**
    * Fetch a user from the API
    */
-  async fetch(id: UserId, options: FetchOptions = {}): Promise<User> {
+  override async fetch(id: UserId, options: FetchOptions = {}): Promise<User> {
     try {
       const userData = await this.client.rest.users.get(id);
       const user = new User({ client: this.client }, userData);
