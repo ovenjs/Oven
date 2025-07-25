@@ -6,15 +6,13 @@
 import type { 
   SelectMenuData, 
   SelectOptionData, 
-  ComponentType, 
   EmojiResolvable,
   EmojiData,
   ValidationResult,
-  FluentBuilder,
-  COMPONENT_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, ComponentType, COMPONENT_LIMITS } from '@ovenjs/types';
 
 export class SelectMenuBuilder implements FluentBuilder<SelectMenuData> {
   private data: SelectMenuData = {
