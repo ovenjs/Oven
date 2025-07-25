@@ -10,6 +10,15 @@ export * from './core/PluginContext.js';
 export * from './core/PluginLifecycle.js';
 export * from './core/PluginSandbox.js';
 
+// Dependencies
+export * from './dependencies/DependencyGraph.js';
+
+// Hooks
+export * from './hooks/HookManager.js';
+
+// Utils
+export * from './utils/SecurityValidator.js';
+
 // Types
 export * from './types/PluginTypes.js';
 export * from './types/HookTypes.js';
