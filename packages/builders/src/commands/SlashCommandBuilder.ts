@@ -5,9 +5,7 @@
 
 import type { 
   SlashCommandData, 
-  ApplicationCommandType,
   ApplicationCommandOptionData,
-  ApplicationCommandOptionType,
   StringOptionData,
   IntegerOptionData,
   NumberOptionData,
@@ -20,11 +18,17 @@ import type {
   SubCommandData,
   SubCommandGroupData,
   ValidationResult,
-  FluentBuilder,
-  COMMAND_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { 
+  BuilderValidationError, 
+  ApplicationCommandType,
+  ApplicationCommandOptionType,
+  InteractionContextType,
+  ApplicationIntegrationType,
+  COMMAND_LIMITS
+} from '@ovenjs/types';
 
 export class SlashCommandBuilder implements FluentBuilder<SlashCommandData> {
   private data: SlashCommandData = {
