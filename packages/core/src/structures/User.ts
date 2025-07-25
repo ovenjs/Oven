@@ -31,7 +31,7 @@ export class User extends Base {
     this.username = data.username;
     this.globalName = data.global_name ?? null;
     this.discriminator = data.discriminator;
-    this.avatar = data.avatar;
+    this.avatar = data.avatar ?? null;
     this.bot = data.bot ?? false;
     this.system = data.system ?? false;
     this.mfaEnabled = data.mfa_enabled ?? false;
