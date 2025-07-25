@@ -311,10 +311,20 @@ export interface ValidationResult {
   errors: string[];
 }
 
-export interface BuilderValidationError extends Error {
-  field: string;
-  value: unknown;
-  expected: string;
+// ========================= ERROR TYPES =========================
+
+export class BuilderValidationError extends Error {
+  public field: string;
+  public value: unknown;
+  public expected: string;
+
+  constructor(field: string, value: unknown, expected: string) {
+    super(`Builder validation failed for field '${field}': ${expected}`);
+    this.name = 'BuilderValidationError';
+    this.field = field;
+    this.value = value;
+    this.expected = expected;
+  }
 }
 
 // ========================= BUILDER BASE TYPES =========================
