@@ -39,7 +39,7 @@ export class RESTClient {
       token: options.token,
       version: options.version ?? 10,
       baseURL: options.baseURL ?? 'https://discord.com/api',
-      timeout: options.timeout ?? 15000,
+      timeout: options.timeout ?? ms(15000),
       retries: options.retries ?? 3,
       rateLimitOffset: options.rateLimitOffset ?? 50,
       globalRequestsPerSecond: options.globalRequestsPerSecond ?? 50,
