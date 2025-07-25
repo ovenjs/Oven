@@ -79,6 +79,23 @@ export type {
   InteractionCallbackData,
 } from './api.js';
 
+// Re-export primitives for convenience
+export type {
+  Snowflake,
+  UserId,
+  GuildId,
+  ChannelId,
+  MessageId,
+  RoleId,
+  EmojiId,
+  WebhookId,
+  ApplicationId,
+  BotToken,
+  UserToken,
+  ImageURL,
+  WebhookURL,
+} from '../primitives/index.js';
+
 // API constants
 export {
   API_VERSION,
