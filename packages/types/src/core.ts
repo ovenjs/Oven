@@ -221,13 +221,13 @@ export interface SweepOptions {
 // ========================= ERROR TYPES =========================
 
 export class OvenError extends Error {
+  public code?: string;
+  
   constructor(message: string, code?: string) {
     super(message);
     this.name = 'OvenError';
     this.code = code;
   }
-  
-  code?: string;
 }
 
 export class OvenClientError extends OvenError {
@@ -238,11 +238,11 @@ export class OvenClientError extends OvenError {
 }
 
 export class OvenAPIError extends OvenError {
+  public status?: number;
+  
   constructor(message: string, code?: string, status?: number) {
     super(message, code);
     this.name = 'OvenAPIError';
     this.status = status;
   }
-  
-  status?: number;
 }
