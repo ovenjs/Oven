@@ -2,7 +2,7 @@
  * @fileoverview Dependency graph for plugin dependency resolution
  */
 
-import type { PluginMetadata } from '../types/PluginTypes.js';
+import type { PluginMetadata } from '../core/Plugin.js';
 
 /**
  * Dependency node in the graph
