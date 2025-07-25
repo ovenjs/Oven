@@ -284,8 +284,8 @@ export class OvenClient extends EventEmitter {
   /**
    * Broadcast a message to all shards
    */
-  broadcastEval(script: string): Promise<any[]> {
-    return this.ws.broadcastEval(script);
+  broadcast(payload: any): Promise<number> {
+    return Promise.resolve(this.ws.broadcast(payload));
   }
 
   /**
