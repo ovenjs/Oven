@@ -414,7 +414,6 @@ export interface WebSocketClientEvents {
   debug: (message: string) => void;
   
   // Discord events (lowercase)
-  ready: (event: ProcessedEvent) => void;
   resumed: (event: ProcessedEvent) => void;
   guild_create: (event: ProcessedEvent) => void;
   guild_update: (event: ProcessedEvent) => void;
