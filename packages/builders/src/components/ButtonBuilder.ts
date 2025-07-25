@@ -160,10 +160,10 @@ export class ButtonBuilder implements FluentBuilder<ButtonData> {
   /**
    * Clone the builder
    */
-  clone(): ButtonBuilder {
+  clone(): this {
     const cloned = new ButtonBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
