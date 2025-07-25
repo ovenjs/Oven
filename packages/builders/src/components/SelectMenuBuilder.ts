@@ -252,10 +252,10 @@ export class SelectMenuBuilder implements FluentBuilder<SelectMenuData> {
   /**
    * Clone the builder
    */
-  clone(): SelectMenuBuilder {
+  clone(): this {
     const cloned = new SelectMenuBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
