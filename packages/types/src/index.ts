@@ -25,7 +25,8 @@ export type {
   UserSnowflake,
   GuildSnowflake,
   ChannelSnowflake,
-  MessageSnowflake
+  MessageSnowflake,
+  SemverVersion
 } from './primitives/brand.js';
 
 // Export core Discord types
