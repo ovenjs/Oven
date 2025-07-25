@@ -230,7 +230,7 @@ export class OvenClient extends EventEmitter {
    * Get the client's ping to Discord
    */
   get ping(): number {
-    return this.ws.getShardManager().getAveragePing();
+    return 0; // TODO: Implement ping calculation
   }
 
   /**
