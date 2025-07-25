@@ -1,0 +1,27 @@
+{
+  "name": "@ovenjs/rest",
+  "version": "0.1.0",
+  "description": "Discord REST API client with intelligent request handling for OvenJS",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ovenjs/types": "^0.1.0",
+    "undici": "^6.0.0"
+  },
+  "keywords": ["discord", "api", "rest", "client", "rate-limit"],
+  "author": "OvenJS Team",
+  "license": "MIT"
+}
