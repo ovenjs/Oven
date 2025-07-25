@@ -198,10 +198,10 @@ export class TextInputBuilder implements FluentBuilder<TextInputData> {
   /**
    * Clone the builder
    */
-  clone(): TextInputBuilder {
+  clone(): this {
     const cloned = new TextInputBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
