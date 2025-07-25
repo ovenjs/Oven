@@ -500,7 +500,7 @@ class CodeValidator {
     
     for (const imp of imports) {
       const match = imp.match(/import\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     return result;
@@ -514,12 +514,12 @@ class CodeValidator {
     
     for (const func of functions) {
       const match = func.match(/function\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     for (const func of arrowFunctions) {
       const match = func.match(/const\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     return result;
@@ -531,7 +531,7 @@ class CodeValidator {
     
     for (const cls of classes) {
       const match = cls.match(/class\s+(\w+)/);
-      if (match) result.push(match[1]);
+      if (match && match[1]) result.push(match[1]);
     }
     
     return result;
