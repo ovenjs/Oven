@@ -261,7 +261,7 @@ export class Shard extends EventEmitter {
   /**
    * Handle HELLO opcode - start heartbeat and identify
    */
-  private handleHello(data: { heartbeat_interval: number }): void {
+  private handleHello(data: any): void {
     const interval = ms(data.heartbeat_interval) as HeartbeatInterval;
     
     // Setup heartbeat
