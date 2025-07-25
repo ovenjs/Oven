@@ -223,7 +223,7 @@ export function hasRequiredProperties<T extends Record<string, unknown>>(
   keys: (keyof T)[]
 ): obj is T {
   if (!isObject(obj)) return false;
-  return keys.every(key => key in obj && obj[key] !== undefined);
+  return keys.every(key => key in obj && obj[key as string] !== undefined);
 }
 
 // ============================================================================
