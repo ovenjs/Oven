@@ -5,14 +5,11 @@
 
 import type { 
   TextInputData, 
-  TextInputStyle, 
-  ComponentType,
   ValidationResult,
-  FluentBuilder,
-  COMPONENT_LIMITS
+  FluentBuilder
 } from '@ovenjs/types';
 
-import { BuilderValidationError } from '@ovenjs/types';
+import { BuilderValidationError, TextInputStyle, ComponentType, COMPONENT_LIMITS } from '@ovenjs/types';
 
 export class TextInputBuilder implements FluentBuilder<TextInputData> {
   private data: TextInputData = {
