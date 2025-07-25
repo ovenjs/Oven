@@ -88,8 +88,8 @@ export interface PluginRegistryEntry {
 /**
  * Plugin load options
  */
-export interface PluginLoadOptions<TConfig = Record<string, unknown>> {
-  readonly config?: TConfig;
+export interface PluginLoadOptions {
+  readonly config?: Record<string, unknown>;
   readonly force?: boolean;
   readonly timeout?: number;
   readonly retries?: number;
