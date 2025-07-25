@@ -346,10 +346,10 @@ export class EmbedBuilder implements FluentBuilder<EmbedData> {
   /**
    * Clone the builder
    */
-  clone(): EmbedBuilder {
+  clone(): this {
     const cloned = new EmbedBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
