@@ -91,7 +91,7 @@ export class OvenClient extends EventEmitter {
    */
   private setupEventHandlers(): void {
     // Ready event
-    this.ws.on('ready', (data: any) => {
+    (this.ws as any).on('ready', (data: any) => {
       this.user = new User({ client: this }, data.user);
       this.readyAt = new Date();
       this.isReady = true;
@@ -99,20 +99,20 @@ export class OvenClient extends EventEmitter {
     });
 
     // Guild events
-    this.ws.on('guildCreate', (data: GuildData) => {
+    (this.ws as any).on('guildCreate', (data: GuildData) => {
       const guild = new Guild({ client: this }, data);
       this.guilds.set(guild.id as any, guild);
       this.emit('guildCreate', guild);
     });
 
-    this.ws.on('guildUpdate', (data: GuildData) => {
+    (this.ws as any).on('guildUpdate', (data: GuildData) => {
       const oldGuild = this.guilds.get(data.id as any);
       const newGuild = new Guild({ client: this }, data);
       this.guilds.set(data.id as any, newGuild);
       this.emit('guildUpdate', oldGuild, newGuild);
     });
 
-    this.ws.on('guildDelete', (data: GuildData) => {
+    (this.ws as any).on('guildDelete', (data: GuildData) => {
       const guild = this.guilds.get(data.id as any);
       if (guild) {
         this.guilds.delete(data.id as any);
@@ -121,23 +121,23 @@ export class OvenClient extends EventEmitter {
     });
 
     // Message events
-    this.ws.on('messageCreate', (data: MessageData) => {
+    (this.ws as any).on('messageCreate', (data: MessageData) => {
       // Create Message structure and emit event
       this.emit('messageCreate', data);
     });
 
-    this.ws.on('messageUpdate', (data: MessageData) => {
+    (this.ws as any).on('messageUpdate', (data: MessageData) => {
       // Handle message update
       this.emit('messageUpdate', null, data);
     });
 
-    this.ws.on('messageDelete', (data: any) => {
+    (this.ws as any).on('messageDelete', (data: any) => {
       // Handle message delete
       this.emit('messageDelete', data);
     });
 
     // User events
-    this.ws.on('userUpdate', (data: UserData) => {
+    (this.ws as any).on('userUpdate', (data: UserData) => {
       if (data.id === this.user?.id) {
         this.user = new User({ client: this }, data);
       }
@@ -147,15 +147,15 @@ export class OvenClient extends EventEmitter {
     });
 
     // Error handling
-    this.ws.on('error', (error: Error) => {
+    (this.ws as any).on('error', (error: Error) => {
       this.emit('error', error);
     });
 
-    this.ws.on('warn', (message: string) => {
+    (this.ws as any).on('warn', (message: string) => {
       this.emit('warn', message);
     });
 
-    this.ws.on('debug', (message: string) => {
+    (this.ws as any).on('debug', (message: string) => {
       this.emit('debug', message);
     });
   }
