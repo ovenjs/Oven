@@ -4,8 +4,6 @@
  */
 
 import { EventEmitter } from 'events';
-import type { RESTClient } from '@ovenjs/rest';
-import type { WebSocketClient } from '@ovenjs/ws';
 import type { 
   User, 
   ClientUser, 
@@ -15,6 +13,9 @@ import type {
   GuildMember,
   Role,
   Emoji,
+  ImageURL
+} from './discord/index.js';
+import type { 
   Snowflake,
   UserId,
   GuildId,
@@ -23,7 +24,7 @@ import type {
   RoleId,
   EmojiId,
   BotToken
-} from './discord/index.js';
+} from './primitives/index.js';
 import type { DeepPartial, Optional } from './primitives/index.js';
 
 // ========================= CLIENT TYPES =========================
