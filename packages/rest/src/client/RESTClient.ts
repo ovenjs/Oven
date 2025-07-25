@@ -158,7 +158,7 @@ export class RESTClient {
     // Update request handler config
     if (options.timeout || options.retries || options.userAgent) {
       this.requestHandler.updateConfig({
-        timeout: options.timeout,
+        timeout: options.timeout ? ms(options.timeout as number) : undefined,
         retries: options.retries,
         userAgent: options.userAgent,
       });
