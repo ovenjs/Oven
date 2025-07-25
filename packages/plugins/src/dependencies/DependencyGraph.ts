@@ -2,7 +2,11 @@
  * @fileoverview Dependency graph for plugin dependency resolution
  */
 
-import type { PluginMetadata } from '../core/Plugin.js';
+// Import types from centralized location
+import type { 
+  PluginMetadata,
+  DependencyGraph as IDependencyGraph
+} from '@ovenjs/types/plugins';
 
 /**
  * Dependency node in the graph
@@ -31,7 +35,7 @@ export class CircularDependencyError extends Error {
 /**
  * Dependency graph for managing plugin dependencies
  */
-export class DependencyGraph {
+export class DependencyGraph implements IDependencyGraph {
   private readonly nodes = new Map<string, DependencyNode>();
   private readonly edges = new Map<string, Set<string>>();
 
