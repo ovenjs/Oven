@@ -2,122 +2,73 @@
  * @fileoverview Core plugin interface with advanced type safety
  */
 
-import type { SemverVersion } from '@ovenjs/types';
-import type { PluginContext } from './PluginContext.js';
+import type { 
+  Plugin as IPlugin,
+  PluginMetadata,
+  PluginConfiguration,
+  PluginHooks,
+  PluginLifecycle,
+  PluginContext
+} from '@ovenjs/types/plugins';
+
+// Re-export types for convenience
+export type {
+  PluginMetadata,
+  PluginConfiguration,
+  PluginHooks,
+  PluginLifecycle,
+  PluginContext
+} from '@ovenjs/types/plugins';
 
 /**
- * Plugin metadata
+ * Plugin implementation base class
  */
-export interface PluginMetadata {
-  readonly name: string;
-  readonly version: SemverVersion;
-  readonly author: string;
-  readonly description: string;
-  readonly dependencies?: readonly string[];
-  readonly peerDependencies?: readonly string[];
-  readonly optionalDependencies?: readonly string[];
-}
+export abstract class BasePlugin<TConfig = Record<string, unknown>, TContext = PluginContext> implements IPlugin<TConfig, TContext> {
+  abstract readonly meta: PluginMetadata;
+  abstract readonly config: PluginConfiguration<TConfig>;
+  abstract readonly hooks: PluginHooks<TContext>;
+  abstract readonly lifecycle: PluginLifecycle;
 
-/**
- * Plugin configuration
- */
-export interface PluginConfiguration {
-  readonly defaults: Record<string, unknown>;
-  readonly schema?: ValidationSchema;
-}
+  abstract initialize(context: TContext): Promise<void> | void;
+  abstract destroy(): Promise<void> | void;
 
-/**
- * Simple validation schema
- */
-export interface ValidationSchema {
-  readonly type: string;
-  readonly properties?: Record<string, ValidationSchema>;
-  readonly required?: string[];
-}
-
-/**
- * Plugin hooks
- */
-export interface PluginHooks {
-  readonly beforeLoad?: (context: PluginContext) => Promise<void> | void;
-  readonly afterLoad?: (context: PluginContext) => Promise<void> | void;
-  readonly beforeUnload?: (context: PluginContext) => Promise<void> | void;
-  readonly afterUnload?: (context: PluginContext) => Promise<void> | void;
-  readonly onError?: (error: Error, context: PluginContext) => Promise<void> | void;
-}
-
-/**
- * Plugin lifecycle
- */
-export interface PluginLifecycle {
-  readonly state?: string;
-}
-
-/**
- * Plugin interface
- */
-export interface Plugin {
-  readonly meta: PluginMetadata;
-  readonly config: PluginConfiguration;
-  readonly hooks: PluginHooks;
-  readonly lifecycle: PluginLifecycle;
-  
-  initialize(context: PluginContext): Promise<void> | void;
-  destroy(): Promise<void> | void;
   getMetrics?(): Record<string, unknown>;
   validate?(): Promise<boolean> | boolean;
+  onConfigChange?(newConfig: TConfig, oldConfig: TConfig): Promise<void> | void;
+  getHealth?(): Promise<import('@ovenjs/types/plugins').PluginHealthStatus> | import('@ovenjs/types/plugins').PluginHealthStatus;
 }
 
 /**
- * Plugin registry entry
+ * Simple plugin helper for creating plugins
  */
-export interface PluginRegistryEntry {
-  readonly plugin: Plugin;
-  readonly loadedAt: Date;
-  status: 'loaded' | 'initialized' | 'error' | 'disabled';
-  readonly error?: Error;
-}
-
-/**
- * Plugin load options
- */
-export interface PluginLoadOptions {
-  readonly config?: Record<string, unknown>;
-  readonly force?: boolean;
-  readonly timeout?: number;
-  readonly retries?: number;
-}
-
-/**
- * Plugin unload options
- */
-export interface PluginUnloadOptions {
-  readonly force?: boolean;
-  readonly timeout?: number;
-  readonly cascade?: boolean;
-}
-
-/**
- * Plugin status
- */
-export interface PluginStatus {
-  readonly name: string;
-  readonly version: SemverVersion;
-  readonly status: 'loaded' | 'initialized' | 'error' | 'disabled';
-  readonly loadedAt?: Date;
-  readonly error?: string;
-  readonly dependencies: readonly string[];
-  readonly dependents: readonly string[];
-  readonly metrics?: Record<string, unknown>;
-}
-
-/**
- * Plugin events
- */
-export interface PluginEvents {
-  pluginLoaded: [plugin: Plugin];
-  pluginUnloaded: [plugin: Plugin];
-  pluginError: [plugin: Plugin | null, error: Error];
-  pluginInitialized: [plugin: Plugin];
-  pluginDestroyed: [plugin: Plugin];
+export function createPlugin<TConfig = Record<string, unknown>, TContext = PluginContext>(
+  definition: {
+    meta: PluginMetadata;
+    config: PluginConfiguration<TConfig>;
+    hooks?: PluginHooks<TContext>;
+    initialize: (context: TContext) => Promise<void> | void;
+    destroy: () => Promise<void> | void;
+    getMetrics?: () => Record<string, unknown>;
+    validate?: () => Promise<boolean> | boolean;
+    onConfigChange?: (newConfig: TConfig, oldConfig: TConfig) => Promise<void> | void;
+    getHealth?: () => Promise<import('@ovenjs/types/plugins').PluginHealthStatus> | import('@ovenjs/types/plugins').PluginHealthStatus;
+  }
+): IPlugin<TConfig, TContext> {
+  return {
+    meta: definition.meta,
+    config: definition.config,
+    hooks: definition.hooks || {},
+    lifecycle: {
+      state: 'unloaded' as any,
+      transitions: [],
+      hooks: definition.hooks || {},
+      canTransition: () => true
+    },
+    initialize: definition.initialize,
+    destroy: definition.destroy,
+    getMetrics: definition.getMetrics,
+    validate: definition.validate,
+    onConfigChange: definition.onConfigChange,
+    getHealth: definition.getHealth
+  };
 }
