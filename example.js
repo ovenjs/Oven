@@ -5,8 +5,9 @@ import { EmbedBuilder, ButtonBuilder, Colors } from '@ovenjs/builders';
 console.log('🔥 OvenJS Discord API Wrapper Example');
 
 // Create a client instance
-const client = new Client({
-  intents: GatewayIntents.GUILDS | GatewayIntents.GUILD_MESSAGES | GatewayIntents.MESSAGE_CONTENT
+const client = new OvenClient({
+  token: 'YOUR_BOT_TOKEN_HERE', // This would be provided by the user
+  intents: 513 // GUILDS + GUILD_MESSAGES + MESSAGE_CONTENT
 });
 
 // Event: Client is ready
