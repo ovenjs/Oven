@@ -167,10 +167,10 @@ export class ModalBuilder implements FluentBuilder<ModalData> {
   /**
    * Clone the builder
    */
-  clone(): ModalBuilder {
+  clone(): this {
     const cloned = new ModalBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
