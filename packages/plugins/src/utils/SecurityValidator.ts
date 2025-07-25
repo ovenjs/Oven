@@ -2,12 +2,16 @@
  * @fileoverview Security validator for plugin system
  */
 
-import type { Plugin } from '../core/Plugin.js';
+// Import types from centralized location
+import type { 
+  Plugin,
+  SecurityValidator as ISecurityValidator
+} from '@ovenjs/types/plugins';
 
 /**
- * Simple security validator implementation
+ * Security validator implementation
  */
-export class SecurityValidator {
+export class SecurityValidator implements ISecurityValidator {
   /**
    * Validate plugin security
    */
