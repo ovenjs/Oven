@@ -117,3 +117,6 @@ export {
   isAPIMessage,
   createTypeGuard
 } from './utils/guards.js';
+
+// Export plugin system types
+export * from './plugins/index.js';
