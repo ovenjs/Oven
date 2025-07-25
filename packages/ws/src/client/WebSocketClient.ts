@@ -345,7 +345,7 @@ export class WebSocketClient extends EventEmitter {
       if (processedEvent) {
         // Emit the processed event
         this.emit('event', processedEvent);
-        this.emit(processedEvent.type.toLowerCase(), processedEvent);
+        this.emit(processedEvent.type.toLowerCase() as keyof WebSocketClientEvents, processedEvent);
       }
     });
 
