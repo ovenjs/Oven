@@ -142,10 +142,10 @@ export class ActionRowBuilder implements FluentBuilder<ActionRowData> {
   /**
    * Clone the builder
    */
-  clone(): ActionRowBuilder {
+  clone(): this {
     const cloned = new ActionRowBuilder();
     cloned.data = JSON.parse(JSON.stringify(this.data));
-    return cloned;
+    return cloned as this;
   }
 
   /**
