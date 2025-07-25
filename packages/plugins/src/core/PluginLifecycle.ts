@@ -2,32 +2,36 @@
  * @fileoverview Plugin lifecycle management system
  */
 
-import type { PluginContext } from './PluginContext.js';
+// Re-export types from the central type definitions
+export type {
+  PluginLifecycleState,
+  PluginHooks,
+  PluginLifecycle,
+  PluginTransition,
+  HealthCheckResult,
+  HealthCheck,
+  PluginLifecycleManager
+} from '@ovenjs/types/plugins';
+
+import type {
+  PluginContext,
+  PluginLifecycleState,
+  PluginHooks,
+  PluginLifecycle,
+  PluginTransition,
+  HealthCheckResult,
+  PluginLifecycleManager as IPluginLifecycleManager
+} from '@ovenjs/types/plugins';
+
+import { PluginLifecycleState } from '@ovenjs/types/plugins';
 
 /**
- * Plugin lifecycle states
+ * Plugin lifecycle manager implementation
  */
-export enum PluginLifecycleState {
-  UNLOADED = 'unloaded',
-  LOADING = 'loading',
-  LOADED = 'loaded',
-  INITIALIZING = 'initializing',
-  INITIALIZED = 'initialized',
-  RUNNING = 'running',
-  STOPPING = 'stopping',
-  STOPPED = 'stopped',
-  ERROR = 'error',
-  DESTROYING = 'destroying',
-  DESTROYED = 'destroyed'
-}
-
-/**
- * Plugin lifecycle manager
- */
-export class PluginLifecycleManager {
+export class PluginLifecycleManager implements IPluginLifecycleManager {
   private readonly states = new Map<string, PluginLifecycleState>();
   private readonly transitions = new Map<string, PluginLifecycleState[]>();
-  private readonly hooks = new Map<string, PluginLifecycle>();
+  private readonly hooks = new Map<string, PluginHooks>();
 
   constructor() {
     this.initializeTransitions();
@@ -36,7 +40,7 @@ export class PluginLifecycleManager {
   /**
    * Register plugin lifecycle hooks
    */
-  public registerHooks(pluginName: string, hooks: PluginLifecycle): void {
+  public registerHooks(pluginName: string, hooks: PluginHooks): void {
     this.hooks.set(pluginName, hooks);
     this.states.set(pluginName, PluginLifecycleState.UNLOADED);
   }
@@ -67,7 +71,7 @@ export class PluginLifecycleManager {
   ): Promise<void> {
     const currentState = this.getState(pluginName);
     
-    if (!this.canTransition(currentState, newState)) {
+    if (!this.canTransition(pluginName, currentState, newState)) {
       throw new Error(`Invalid transition from ${currentState} to ${newState} for plugin ${pluginName}`);
     }
 
@@ -80,12 +84,13 @@ export class PluginLifecycleManager {
   /**
    * Check if transition is valid
    */
-  private canTransition(
-    currentState: PluginLifecycleState,
-    newState: PluginLifecycleState
+  public canTransition(
+    pluginName: string,
+    from: PluginLifecycleState,
+    to: PluginLifecycleState
   ): boolean {
-    const validTransitions = this.getValidTransitions(currentState);
-    return validTransitions.includes(newState);
+    const validTransitions = this.getValidTransitions(from);
+    return validTransitions.includes(to);
   }
 
   /**
