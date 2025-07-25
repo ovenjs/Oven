@@ -464,12 +464,12 @@ class CodeValidator {
     
     for (const imp of imports) {
       const match = imp.match(/from\s+['"]([^'"]+)['"]/);
-      if (match) dependencies.push(match[1]);
+      if (match && match[1]) dependencies.push(match[1]);
     }
     
     for (const req of requires) {
       const match = req.match(/['"]([^'"]+)['"]/);
-      if (match) dependencies.push(match[1]);
+      if (match && match[1]) dependencies.push(match[1]);
     }
     
     return [...new Set(dependencies)];
