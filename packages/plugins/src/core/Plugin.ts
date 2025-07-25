@@ -20,29 +20,29 @@ export interface PluginMetadata {
 /**
  * Plugin configuration
  */
-export interface PluginConfiguration<T = Record<string, unknown>> {
-  readonly defaults: T;
-  readonly schema?: ValidationSchema<T>;
+export interface PluginConfiguration {
+  readonly defaults: Record<string, unknown>;
+  readonly schema?: ValidationSchema;
 }
 
 /**
  * Simple validation schema
  */
-export interface ValidationSchema<T> {
+export interface ValidationSchema {
   readonly type: string;
-  readonly properties?: Record<string, ValidationSchema<any>>;
-  readonly required?: (keyof T)[];
+  readonly properties?: Record<string, ValidationSchema>;
+  readonly required?: string[];
 }
 
 /**
  * Plugin hooks
  */
-export interface PluginHooks<TContext = unknown> {
-  readonly beforeLoad?: (context: TContext) => Promise<void> | void;
-  readonly afterLoad?: (context: TContext) => Promise<void> | void;
-  readonly beforeUnload?: (context: TContext) => Promise<void> | void;
-  readonly afterUnload?: (context: TContext) => Promise<void> | void;
-  readonly onError?: (error: Error, context: TContext) => Promise<void> | void;
+export interface PluginHooks {
+  readonly beforeLoad?: (context: PluginContext) => Promise<void> | void;
+  readonly afterLoad?: (context: PluginContext) => Promise<void> | void;
+  readonly beforeUnload?: (context: PluginContext) => Promise<void> | void;
+  readonly afterUnload?: (context: PluginContext) => Promise<void> | void;
+  readonly onError?: (error: Error, context: PluginContext) => Promise<void> | void;
 }
 
 /**
