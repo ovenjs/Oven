@@ -5,18 +5,6 @@
 import type { PluginContext } from './PluginContext.js';
 
 /**
- * Plugin lifecycle hooks
- */
-export interface PluginLifecycle {
-  readonly beforeLoad?: (context: PluginContext) => Promise<void> | void;
-  readonly afterLoad?: (context: PluginContext) => Promise<void> | void;
-  readonly beforeUnload?: (context: PluginContext) => Promise<void> | void;
-  readonly afterUnload?: (context: PluginContext) => Promise<void> | void;
-  readonly onError?: (error: Error, context: PluginContext) => Promise<void> | void;
-  readonly onConfigChange?: (newConfig: unknown, oldConfig: unknown, context: PluginContext) => Promise<void> | void;
-}
-
-/**
  * Plugin lifecycle states
  */
 export enum PluginLifecycleState {
