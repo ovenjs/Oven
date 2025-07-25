@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events';
 import WebSocket from 'ws';
 import { inflate } from 'zlib-sync';
-import type { 
+import { 
   GatewayPayload, 
   GatewayOpcodes, 
   GatewayCloseCodes,
