@@ -174,10 +174,6 @@ export class OvenClient extends EventEmitter {
     }
 
     try {
-      // Set token for REST and WebSocket clients
-      this.rest.setToken(this._token);
-      this.ws.setToken(this._token);
-
       // Connect WebSocket
       await this.ws.connect();
       
