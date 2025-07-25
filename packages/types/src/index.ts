@@ -119,4 +119,4 @@ export {
 } from './utils/guards.js';
 
 // Export plugin system types
-export * from './plugins/index.js';
+export * from './plugins.js';
