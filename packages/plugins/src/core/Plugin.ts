@@ -3,6 +3,7 @@
  */
 
 import type { SemverVersion } from '@ovenjs/types';
+import type { PluginContext } from './PluginContext.js';
 
 /**
  * Plugin metadata
@@ -50,14 +51,6 @@ export interface PluginHooks {
  */
 export interface PluginLifecycle {
   readonly state?: string;
-}
-
-/**
- * Plugin context
- */
-export interface PluginContext {
-  readonly pluginName: string;
-  readonly config: unknown;
 }
 
 /**
