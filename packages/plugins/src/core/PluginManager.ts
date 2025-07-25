@@ -3,25 +3,41 @@
  */
 
 import { EventEmitter } from 'events';
+
+// Import types from centralized location
 import type { 
   Plugin, 
   PluginRegistryEntry, 
   PluginLoadOptions, 
   PluginUnloadOptions,
   PluginStatus,
-  PluginEvents,
   PluginContext,
-  PluginMetadata
-} from './Plugin.js';
+  PluginMetadata,
+  PluginManager as IPluginManager,
+  PluginLifecycleState
+} from '@ovenjs/types/plugins';
+
+// Import implementations
 import type { PluginSandbox } from './PluginSandbox.js';
 import type { DependencyGraph } from '../dependencies/DependencyGraph.js';
 import type { HookManager } from '../hooks/HookManager.js';
 import type { SecurityValidator } from '../utils/SecurityValidator.js';
 
 /**
+ * Plugin events for EventEmitter
+ */
+export interface PluginEvents {
+  pluginLoaded: [plugin: Plugin];
+  pluginUnloaded: [plugin: Plugin];
+  pluginError: [plugin: Plugin | null, error: Error];
+  pluginInitialized: [plugin: Plugin];
+  pluginDestroyed: [plugin: Plugin];
+}
+
+/**
  * Advanced plugin manager with sophisticated lifecycle management
  */
-export class PluginManager extends EventEmitter {
+export class PluginManager extends EventEmitter implements IPluginManager {
   private readonly registry = new Map<string, PluginRegistryEntry>();
   private readonly dependencyGraph: DependencyGraph;
   private readonly sandbox: PluginSandbox;
@@ -46,10 +62,10 @@ export class PluginManager extends EventEmitter {
   /**
    * Load a plugin with advanced dependency resolution
    */
-  public async loadPlugin(
+  public async loadPlugin<TConfig = Record<string, unknown>>(
     pluginPath: string,
-    options: PluginLoadOptions = {}
-  ): Promise<Plugin> {
+    options: PluginLoadOptions<TConfig> = {}
+  ): Promise<Plugin<TConfig>> {
     const { config, force = false, timeout = 30000, retries = 3 } = options;
 
     // Check if already loading
@@ -75,10 +91,10 @@ export class PluginManager extends EventEmitter {
       await this.resolveDependencies(plugin.meta);
       
       // Register plugin
-      const entry: PluginRegistryEntry = {
-        plugin,
+      const entry: PluginRegistryEntry<TConfig> = {
+        plugin: plugin as Plugin<TConfig>,
         loadedAt: new Date(),
-        status: 'loaded'
+        status: 'loaded' as PluginStatus
       };
       
       this.registry.set(plugin.meta.name, entry);
@@ -90,11 +106,11 @@ export class PluginManager extends EventEmitter {
       await this.hookManager.registerPluginHooks(plugin);
       
       // Update status
-      entry.status = 'initialized';
+      entry.status = 'initialized' as PluginStatus;
       
       this.emit('pluginLoaded', plugin);
       
-      return plugin;
+      return plugin as Plugin<TConfig>;
     } catch (error) {
       this.emit('pluginError', null, error as Error);
       throw error;
@@ -177,16 +193,14 @@ export class PluginManager extends EventEmitter {
     const entry = this.registry.get(name);
     if (!entry) return null;
 
-    return {
-      name: entry.plugin.meta.name,
-      version: entry.plugin.meta.version,
-      status: entry.status,
-      loadedAt: entry.loadedAt,
-      error: entry.error?.message,
-      dependencies: entry.plugin.meta.dependencies || [],
-      dependents: this.dependencyGraph.getDependents(name),
-      metrics: entry.plugin.getMetrics?.()
-    };
+    return entry.status;
+  }
+
+  /**
+   * Get all plugins
+   */
+  public getAllPlugins(): readonly Plugin[] {
+    return Array.from(this.registry.values()).map(entry => entry.plugin);
   }
 
   /**
@@ -211,7 +225,7 @@ export class PluginManager extends EventEmitter {
    */
   private async loadWithRetries(
     pluginPath: string,
-    config: Record<string, unknown> | undefined,
+    config: unknown,
     retries: number,
     timeout: number
   ): Promise<Plugin> {
