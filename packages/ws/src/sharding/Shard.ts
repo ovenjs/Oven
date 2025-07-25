@@ -317,7 +317,8 @@ export class Shard extends EventEmitter {
   /**
    * Handle invalid session
    */
-  private handleInvalidSession(resumable: boolean): void {
+  private handleInvalidSession(resumable: any): void {
+    const canResume = Boolean(resumable);
     if (!resumable) {
       this.sessionId = undefined;
       this.resumeGatewayURL = undefined;
