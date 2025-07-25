@@ -211,12 +211,12 @@ export class PluginManager extends EventEmitter {
   /**
    * Private method to load plugin with retries
    */
-  private async loadWithRetries<TConfig>(
+  private async loadWithRetries(
     pluginPath: string,
-    config: TConfig | undefined,
+    config: Record<string, unknown> | undefined,
     retries: number,
     timeout: number
-  ): Promise<Plugin<TConfig>> {
+  ): Promise<Plugin> {
     let lastError: Error | null = null;
     
     for (let attempt = 0; attempt <= retries; attempt++) {
