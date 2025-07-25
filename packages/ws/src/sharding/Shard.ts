@@ -319,7 +319,7 @@ export class Shard extends EventEmitter {
    */
   private handleInvalidSession(resumable: any): void {
     const canResume = Boolean(resumable);
-    if (!resumable) {
+    if (!canResume) {
       this.sessionId = undefined;
       this.resumeGatewayURL = undefined;
       this.sequence = null;
@@ -327,7 +327,7 @@ export class Shard extends EventEmitter {
 
     // Wait a bit before identifying again
     setTimeout(() => {
-      if (resumable && this.sessionId) {
+      if (canResume && this.sessionId) {
         this.resume();
       } else {
         this.identify();
