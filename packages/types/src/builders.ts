@@ -21,6 +21,7 @@ import type {
   ChannelId,
   RoleId,
   MessageId,
+  EmojiId,
   BotToken
 } from './primitives/index.js';
 import type { Optional, DeepPartial } from './primitives/index.js';
