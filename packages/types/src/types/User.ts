@@ -1,29 +1,27 @@
 import { UserId } from "../primitives/brand";
 
 export interface User {
-    id:                 UserId;
-    username:           string;
-    discriminator:      string;
-    global_name?:       string;
-    avatar?:            string;
-    bot?:               boolean;
-    system?:            boolean;
-    mfa_enabled?:       boolean;
-    banner?:            string;
-    accent_color?:      number;
-    locale?:            string;
-    verified?:          boolean;
-    email?:             string | null;
-    flags?:             number;
-    premium_type?:      number;
-    public_flags?:      number;
-    avatar_decoration?: string;
+    userId:            UserId;
+    name:              string;
+    tag:               string;
+    globalName?:       string;
+    avatar?:           string;
+    bot?:              boolean;
+    system?:           boolean;
+    MFAEnabled?:       boolean;
+    banner?:           string;
+    accentColor?:      number;
+    locale?:           string;
+    verified?:         boolean;
+    flags?:            number;
+    premiumType?:      number;
+    publicFlags?:      number;
+    avatarDecoration?: string;
 }
 
 export interface ClientUser extends User {
-  verified:     boolean;
-  email:        string | null;
-  flags:        number;
-  premium_type: number;
-  mfa_enabled:  boolean;
+  verified:    boolean;
+  flags:       number;
+  premiumType: number;
+  MFAEnabled:  boolean;
 }
