@@ -10,17 +10,12 @@ import type {
   ChannelId,
   MessageId,
   RoleId,
-  BotToken,
-  ISO8601Timestamp,
+  BotToken
 } from '../primitives/brand.js';
 
 import type {
-  User,
-  Guild,
   Channel,
-  Message,
   Role,
-  GuildMember,
   Embed,
   MessageComponent,
   Attachment,
@@ -129,7 +124,7 @@ export interface APIErrorResponse {
 // ============================================================================
 
 export interface GatewayInfo {
-  url: string;
+  url: string | undefined;
   shards: number;
   session_start_limit: SessionStartLimit;
 }

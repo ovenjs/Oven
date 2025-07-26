@@ -3,29 +3,19 @@
  * Types for the main client, managers, and structures
  */
 
-import { EventEmitter } from 'events';
 import type { 
-  User, 
   ClientUser, 
-  Guild, 
-  Channel, 
+  Guild,
   Message, 
-  GuildMember,
-  Role,
-  Emoji,
-  ImageURL
 } from './discord/index.js';
 import type { 
-  Snowflake,
   UserId,
   GuildId,
   ChannelId,
   MessageId,
   RoleId,
-  EmojiId,
   BotToken
 } from './primitives/index.js';
-import type { DeepPartial, Optional } from './primitives/index.js';
 
 // ========================= CLIENT TYPES =========================
 
@@ -222,7 +212,7 @@ export interface SweepOptions {
 // ========================= ERROR TYPES =========================
 
 export class OvenError extends Error {
-  public code?: string;
+  public code: string | undefined;
   
   constructor(message: string, code?: string) {
     super(message);
@@ -239,7 +229,7 @@ export class OvenClientError extends OvenError {
 }
 
 export class OvenAPIError extends OvenError {
-  public status?: number;
+  public status: number | undefined;
   
   constructor(message: string, code?: string, status?: number) {
     super(message, code);

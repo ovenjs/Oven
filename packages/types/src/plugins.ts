@@ -3,9 +3,6 @@
  * Simplified plugin architecture types
  */
 
-import type { EventEmitter } from 'events';
-import type { DeepPartial } from './primitives/utility.js';
-
 // ============================================================================
 // CORE PLUGIN INTERFACES
 // ============================================================================

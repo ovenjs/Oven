@@ -3,28 +3,14 @@
  * Types for type-safe Discord object builders
  */
 
-import type { 
-  Embed, 
+import type {  
   EmbedField, 
   EmbedFooter, 
   EmbedAuthor, 
   EmbedImage, 
-  EmbedThumbnail,
-  MessageComponent,
-  SelectOption,
-  Application,
-  ImageURL
+  EmbedThumbnail
 } from './discord/index.js';
-import type { 
-  Snowflake,
-  UserId,
-  ChannelId,
-  RoleId,
-  MessageId,
-  EmojiId,
-  BotToken
-} from './primitives/index.js';
-import type { Optional, DeepPartial } from './primitives/index.js';
+import type { EmojiId } from './primitives/index.js';
 
 // ========================= EMBED BUILDER TYPES =========================
 

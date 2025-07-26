@@ -13,7 +13,6 @@ import type {
   EmojiId,
   WebhookId,
   ApplicationId,
-  ImageURL,
   ISO8601Timestamp,
 } from '../primitives/brand.js';
 
