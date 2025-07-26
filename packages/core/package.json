@@ -25,9 +25,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ovenjs/types": "workspace:^",
-    "@ovenjs/rest": "workspace:^",
-    "@ovenjs/ws": "workspace:^"
+    "@ovenjs/types": "*",
+    "@ovenjs/rest": "*",
+    "@ovenjs/ws": "*"
   },
   "keywords": ["discord", "api", "client", "bot", "core"],
   "author": "OvenJS Team",
