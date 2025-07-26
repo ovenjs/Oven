@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ovenjs/types": "workspace:^",
+    "@ovenjs/types": "*",
     "undici": "^6.0.0"
   },
   "keywords": ["discord", "api", "rest", "client", "rate-limit"],
