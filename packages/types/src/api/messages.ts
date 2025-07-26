@@ -36,15 +36,15 @@ export interface APIPatchMessageEdit {
  * @link https://discord.com/developers/docs/resources/message#allowed-mentions-object
  */
 export interface APIObjectAllowedMentions {
-  parse?: ('roles' | 'users' | 'everyone')[];
-  roles?: RoleId[];
-  users?: UserId[];
+  parse?:        ('roles' | 'users' | 'everyone')[];
+  roles?:        RoleId[];
+  users?:        UserId[];
   replied_user?: boolean;
 }
 
 export interface APIObjectMessageReference {
-  message_id?: MessageId;
-  channel_id?: ChannelId;
-  guild_id?: GuildId;
+  message_id?:         MessageId;
+  channel_id?:         ChannelId;
+  guild_id?:           GuildId;
   fail_if_not_exists?: boolean;
 }
