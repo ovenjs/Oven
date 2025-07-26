@@ -19,7 +19,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -noEmit && tsup",
+    "build": "tsc --noEmit && tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit"
