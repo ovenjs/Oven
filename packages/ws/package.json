@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ovenjs/types": "workspace:^",
+    "@ovenjs/types": "*",
     "ws": "^8.16.0",
     "zlib-sync": "^0.1.9"
   },
