@@ -25,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ovenjs/types": "workspace:^"
+    "@ovenjs/types": "*"
   },
   "keywords": ["discord", "api", "builders", "typescript", "type-safe"],
   "author": "OvenJS Team",
