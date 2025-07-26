@@ -21,9 +21,12 @@
   },
   "scripts": {
     "build": "tsc --noEmit && tsup",
-    "dev": "tsc -b --watch",
+    "dev": "tsup --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "discord-api-types": "^0.37.83"
   },
   "keywords": ["discord", "api", "types", "typescript", "advanced"],
   "author": "OvenJS Team",
