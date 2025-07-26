@@ -15,6 +15,9 @@
     "test": "jest",
     "clean": "yarn workspaces run clean"
   },
+  "dependencies": {
+    "discord-api-types": "^0.37.83"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
