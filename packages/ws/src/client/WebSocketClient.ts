@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import type { BotToken, GatewayIntentBits, GatewayInfo } from '@ovenjs/types';
+import type { BotToken, GatewayInfo } from '@ovenjs/types';
 import { ShardManager, ShardManagerOptions, ShardManagerStatus } from '../sharding/index.js';
 import { EventHandler, EventHandlerOptions, ProcessedEvent } from '../handlers/index.js';
 
@@ -47,7 +47,7 @@ export class WebSocketClient extends EventEmitter {
   private readonly options: WebSocketClientOptions;
   private readonly shardManager: ShardManager;
   private readonly eventHandler: EventHandler;
-  private readonly restClient?: any;
+  //private readonly restClient?: any;
   private connected = false;
   private ready = false;
 
@@ -55,30 +55,30 @@ export class WebSocketClient extends EventEmitter {
     super();
     
     this.options = options;
-    this.restClient = options.restClient;
+    //this.restClient = options.restClient;
 
     // Initialize shard manager
     const shardManagerOptions: ShardManagerOptions = {
-      token: options.token,
-      intents: options.intents,
-      shardCount: options.shardCount,
-      shardIds: options.shardIds,
-      gatewayURL: options.gatewayURL,
-      version: options.version,
+      token: this.options.token,
+      intents: this.options.intents,
+      shardCount: this.options.shardCount,
+      shardIds: this.options.shardIds,
+      gatewayURL: this.options.gatewayURL,
+      version: this.options.version,
       encoding: options.encoding,
-      compress: options.compress,
-      largeThreshold: options.largeThreshold,
-      presence: options.presence,
-      spawnDelay: options.spawnDelay,
-      spawnTimeout: options.spawnTimeout,
+      compress: this.options.compress,
+      largeThreshold: this.options.largeThreshold,
+      presence: this.options.presence,
+      spawnDelay: this.options.spawnDelay,
+      spawnTimeout: this.options.spawnTimeout,
     };
 
     this.shardManager = new ShardManager(shardManagerOptions);
 
     // Initialize event handler
     const eventHandlerOptions: EventHandlerOptions = {
-      validateEvents: options.validateEvents,
-      debugMode: options.debugMode,
+      validateEvents: this.options.validateEvents,
+      debugMode: this.options.debugMode,
     };
 
     this.eventHandler = new EventHandler(eventHandlerOptions);

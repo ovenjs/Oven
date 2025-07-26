@@ -10,21 +10,21 @@ import { Shard, ShardOptions, ShardState, ShardStatus } from './Shard.js';
 export interface ShardManagerOptions {
   token: BotToken;
   intents: number;
-  shardCount?: number | 'auto';
-  shardIds?: number[];
-  gatewayURL?: string;
-  version?: number;
-  encoding?: 'json' | 'etf';
-  compress?: boolean;
-  largeThreshold?: number;
+  shardCount?: number | 'auto' | undefined;
+  shardIds?: number[] | undefined;
+  gatewayURL?: string | undefined;
+  version?: number | undefined;
+  encoding?: 'json' | 'etf' | undefined;
+  compress?: boolean | undefined;
+  largeThreshold?: number | undefined;
   presence?: {
     activities?: any[];
     status?: 'online' | 'dnd' | 'idle' | 'invisible';
     afk?: boolean;
     since?: number | null;
-  };
-  spawnDelay?: number;
-  spawnTimeout?: number;
+  } | undefined;
+  spawnDelay?: number | undefined
+  spawnTimeout?: number | undefined;
 }
 
 export interface ShardManagerStatus {

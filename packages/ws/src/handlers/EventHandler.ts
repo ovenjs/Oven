@@ -8,15 +8,15 @@ import type { GatewayPayload } from '@ovenjs/types';
 import { isObject, isString, isNumber } from '@ovenjs/types';
 
 export interface EventHandlerOptions {
-  validateEvents?: boolean;
-  debugMode?: boolean;
+  validateEvents?: boolean | undefined;
+  debugMode?: boolean | undefined;
 }
 
 export interface ProcessedEvent {
   type: string;
   data: any;
   shardId: number;
-  sequence?: number;
+  sequence?: number | undefined;
   timestamp: Date;
 }
 

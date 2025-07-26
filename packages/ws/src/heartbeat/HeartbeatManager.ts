@@ -3,8 +3,8 @@
  * Handles Discord gateway heartbeat protocol
  */
 
-import type { Milliseconds, HeartbeatInterval } from '@ovenjs/types';
-import { ms, DISCORD_TIMEOUTS } from '@ovenjs/types';
+import type { HeartbeatInterval } from '@ovenjs/types';
+import { DISCORD_TIMEOUTS } from '@ovenjs/types';
 
 export interface HeartbeatOptions {
   interval: HeartbeatInterval;
@@ -26,7 +26,7 @@ export interface ConnectionHealth {
  * Manages heartbeat protocol for Discord gateway connection
  */
 export class HeartbeatManager {
-  private interval?: NodeJS.Timeout;
+  private interval?: NodeJS.Timeout | undefined;
   private lastSequence: number | null = null;
   private lastHeartbeat = new Date();
   private lastHeartbeatAck = new Date();

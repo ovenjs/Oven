@@ -10,7 +10,6 @@ import {
   GatewayPayload, 
   GatewayOpcodes, 
   GatewayCloseCodes,
-  GatewayIntentBits,
   HeartbeatInterval,
   BotToken 
 } from '@ovenjs/types';
@@ -22,29 +21,29 @@ export interface ShardOptions {
   count: number;
   token: BotToken;
   intents: number;
-  gatewayURL: string;
-  version?: number;
-  encoding?: 'json' | 'etf';
-  compress?: boolean;
-  largeThreshold?: number;
+  gatewayURL: string | undefined;
+  version?: number | undefined;
+  encoding?: 'json' | 'etf' | undefined;
+  compress?: boolean | undefined;
+  largeThreshold?: number | undefined;
   presence?: {
-    activities?: any[];
-    status?: 'online' | 'dnd' | 'idle' | 'invisible';
-    afk?: boolean;
-    since?: number | null;
-  };
+  activities?: any[];
+  status?: 'online' | 'dnd' | 'idle' | 'invisible';
+  afk?: boolean;
+  since?: number | null;
+} | undefined;
 }
 
 export interface ShardStatus {
   id: number;
-  state: ShardState;
+  state: ShardState | undefined;
   ping: number;
   lastHeartbeat: Date;
-  sessionId?: string;
-  resumeGatewayURL?: string;
-  sequence?: number;
-  closeCode?: number;
-  closeReason?: string;
+  sessionId?: string | undefined;
+  resumeGatewayURL?: string | undefined;
+  sequence?: number | undefined;
+  closeCode?: number | undefined;
+  closeReason?: string | undefined;
 }
 
 export enum ShardState {
@@ -63,18 +62,18 @@ export enum ShardState {
  */
 export class Shard extends EventEmitter {
   private readonly options: ShardOptions;
-  private ws?: WebSocket;
-  private heartbeat?: HeartbeatManager;
+  private ws?: WebSocket | undefined;
+  private heartbeat?: HeartbeatManager | undefined;
   private state = ShardState.DISCONNECTED;
   private sequence: number | null = null;
-  private sessionId?: string;
-  private resumeGatewayURL?: string;
+  private sessionId?: string | undefined;
+  private resumeGatewayURL?: string | undefined;
   private closeSequence = 0;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private reconnectTimeout?: NodeJS.Timeout;
-  private connectTimeout?: NodeJS.Timeout;
-  private identifyTimeout?: NodeJS.Timeout;
+  private reconnectTimeout?: NodeJS.Timeout | undefined;
+  private connectTimeout?: NodeJS.Timeout | undefined;
+  private identifyTimeout?: NodeJS.Timeout | undefined;
 
   constructor(options: ShardOptions) {
     super();
