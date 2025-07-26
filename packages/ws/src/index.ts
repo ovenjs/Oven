@@ -1,9 +1,7 @@
 /**
  * OvenJS WebSocket - Discord WebSocket client
- * Advanced WebSocket client with sharding and connection management
  */
 
-// Main client
 export { WebSocketClient } from './client/index.js';
 export type { WebSocketClientOptions, WebSocketClientStatus, WebSocketClientEvents } from './client/index.js';
 

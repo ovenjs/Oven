@@ -30,25 +30,32 @@ export const brand = <T, B>(value: T): Brand<T, B> => value as Brand<T, B>;
  */
 export const unbrand = <T, B>(value: Brand<T, B>): T => value as T;
 
-// Common Discord branded types
 export type Snowflake = Brand<string, 'Snowflake'>;
+
 export type UserId = Brand<Snowflake, 'UserId'>;
+
 export type GuildId = Brand<Snowflake, 'GuildId'>;
+
 export type ChannelId = Brand<Snowflake, 'ChannelId'>;
+
 export type MessageId = Brand<Snowflake, 'MessageId'>;
+
 export type RoleId = Brand<Snowflake, 'RoleId'>;
+
 export type EmojiId = Brand<Snowflake, 'EmojiId'>;
+
 export type WebhookId = Brand<Snowflake, 'WebhookId'>;
+
 export type ApplicationId = Brand<Snowflake, 'ApplicationId'>;
 
-// Token types
 export type BotToken = Brand<string, 'BotToken'>;
+
 export type UserToken = Brand<string, 'UserToken'>;
 
-// URL types  
 export type ImageURL = Brand<string, 'ImageURL'>;
+
 export type WebhookURL = Brand<string, 'WebhookURL'>;
 
-// Timestamp types
 export type ISO8601Timestamp = Brand<string, 'ISO8601Timestamp'>;
+
 export type UnixTimestamp = Brand<number, 'UnixTimestamp'>;
