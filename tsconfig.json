@@ -1,13 +1,43 @@
 {
-  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    // Environment
+    "lib": ["ESNext", "ESNext.Disposable"],
+    "target": "ES2023",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": true,
+
+    // Modules
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "allowArbitraryExtensions": false,
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "resolvePackageJsonImports": true,
+    "resolvePackageJsonExports": true,
+
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "importHelpers": false,
+    "newLine": "lf",
+    "noEmitHelpers": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "outDir": ".dist",
+    
+    // Type Checking
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"exactOptionalPropertyTypes": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noPropertyAccessFromIndexSignature": false,
+		"noUncheckedIndexedAccess": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strict": true,
   },
-  "references": [
-    { "path": "./packages/types" },
-    { "path": "./packages/plugins" }
-  ],
-  "include": [
-    "packages/*/src/**/*"
-  ]
+
+  "include": ["packages/*/src/**/*"]
 }
