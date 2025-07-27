@@ -145,14 +145,10 @@ export interface APIErrorDetail {
 }
 
 /**
- * Rate limit headers
+ * Queued request
  */
-export interface RateLimitHeaders {
-  'x-ratelimit-limit'?: string;
-  'x-ratelimit-remaining'?: string;
-  'x-ratelimit-reset'?: string;
-  'x-ratelimit-reset-after'?: string;
-  'x-ratelimit-bucket'?: string;
-  'x-ratelimit-global'?: string;
-  'x-ratelimit-scope'?: string;
+export interface QueuedRequest {
+  resolve: (value: any) => void;
+  reject: (reason?: any) => void;
+  request: () => Promise<any>;
 }
