@@ -34,8 +34,8 @@ export class RESTClient {
     // Set default options
     this.options = {
       token: options.token,
-      version: options.version ?? 10,
-      baseURL: options.baseURL ?? 'https://discord.com/api',
+      version: options.version ?? API_VERSION,
+      baseURL: options.baseURL ?? API_BASE_URL,
       timeout: options.timeout ?? ms(15000),
       retries: options.retries ?? 3,
       rateLimitOffset: options.rateLimitOffset ?? 50,
