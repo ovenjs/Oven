@@ -19,7 +19,7 @@ export interface QueuedRequest {
   resolve: (response: Response) => void;
   reject: (error: Error) => void;
   request: () => Promise<Response>;
-  timeout?: NodeJS.Timeout;
+  timeout?: NodeJS.Timeout | undefined;
 }
 
 /**
