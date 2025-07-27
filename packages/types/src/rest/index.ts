@@ -126,10 +126,33 @@ export interface BucketInfo {
 }
 
 /**
- * Queued request
+ * API error response from Discord
  */
-export interface QueuedRequest {
-  resolve: (value: any) => void;
-  reject: (reason?: any) => void;
-  request: () => Promise<any>;
+export interface APIErrorResponse {
+  message: string;
+  code: number;
+  errors?: Record<string, APIErrorDetail>;
+  retry_after?: number;
+  global?: boolean;
+}
+
+/**
+ * API error detail
+ */
+export interface APIErrorDetail {
+  code: string;
+  message: string;
+}
+
+/**
+ * Rate limit headers
+ */
+export interface RateLimitHeaders {
+  'x-ratelimit-limit'?: string;
+  'x-ratelimit-remaining'?: string;
+  'x-ratelimit-reset'?: string;
+  'x-ratelimit-reset-after'?: string;
+  'x-ratelimit-bucket'?: string;
+  'x-ratelimit-global'?: string;
+  'x-ratelimit-scope'?: string;
 }
