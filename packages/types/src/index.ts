@@ -6,6 +6,12 @@
 // Re-export commonly used discord-api-types
 export * from 'discord-api-types/v10';
 
+// Additional gateway types not in discord-api-types or custom aliases
+export type {
+  GatewayReceivePayload as GatewayPayload,
+  GatewaySendPayload
+} from 'discord-api-types/v10';
+
 // Package-specific types (avoiding conflicts)
 export type {
   OvenClientOptions,
