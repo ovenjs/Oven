@@ -1,28 +1,31 @@
 # OvenJS - Modern Discord API Wrapper
 
-OvenJS is a modern, TypeScript-first Discord API wrapper for Node.js, designed to be powerful, flexible, and easy to use.
+OvenJS is a modern, TypeScript-first Discord API wrapper for Node.js, designed to be powerful, flexible, and easy to use. Built with a modular monorepo architecture for optimal performance and developer experience.
 
-## Features
+## ✨ Features
 
-- 🚀 **Modern TypeScript** - Built with TypeScript 5.0+ with full type safety
-- 📦 **Modular Architecture** - Monorepo structure with specialized packages
-- 🔌 **Plugin System** - Extensible architecture for custom functionality
+- 🚀 **Modern TypeScript** - Built with TypeScript 5.0+ with full type safety using discord-api-types
+- 📦 **Modular Architecture** - Clean monorepo structure with specialized packages
+- 🔌 **Plugin System** - Extensible architecture for custom functionality  
 - ⚡ **Performance Focused** - Optimized for speed and memory efficiency
-- 🛡️ **Built-in Rate Limiting** - Automatic rate limit handling
-- 🔄 **Auto-Reconnection** - Robust WebSocket connection management
-- 📚 **Comprehensive Types** - Complete Discord API type definitions
+- 🛡️ **Built-in Rate Limiting** - Automatic rate limit handling with intelligent bucketing
+- 🔄 **Auto-Reconnection** - Robust WebSocket connection management with sharding support
+- 📚 **Comprehensive Types** - Full integration with discord-api-types for complete Discord API coverage
+- 🏗️ **Type-Safe Builders** - Fluent API for creating embeds, components, and commands
 
-## Packages
+## 📦 Packages
 
-OvenJS is split into several focused packages:
+OvenJS is organized into focused packages for maximum flexibility:
 
-- `@ovenjs/core` - Main client and high-level abstractions
-- `@ovenjs/rest` - REST API client with rate limiting
-- `@ovenjs/ws` - WebSocket gateway client
-- `@ovenjs/types` - TypeScript definitions for Discord API
-- `@ovenjs/builders` - Utilities for building Discord objects (embeds, components, etc.)
+- **`@ovenjs/core`** - Main client orchestrating REST and WebSocket connections
+- **`@ovenjs/rest`** - Advanced REST API client with intelligent rate limiting
+- **`@ovenjs/ws`** - WebSocket gateway client with sharding and auto-reconnection
+- **`@ovenjs/types`** - Package-specific TypeScript definitions + discord-api-types integration
+- **`@ovenjs/builders`** - Type-safe builders for Discord objects (embeds, components, etc.)
 
-## Quick Start
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
 npm install @ovenjs/core
@@ -33,49 +36,43 @@ yarn add @ovenjs/core
 ### Basic Bot Example
 
 ```typescript
-import { Client, Intents, EmbedBuilder } from '@ovenjs/core';
+import { OvenClient } from '@ovenjs/core';
+import { GatewayIntentBits } from 'discord-api-types/v10';
 
-const client = new Client({
+const client = new OvenClient({
   intents: [
-    Intents.GUILDS,
-    Intents.GUILD_MESSAGES,
-    Intents.MESSAGE_CONTENT
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
   ]
 });
 
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user?.username}!`);
+client.on('ready', (user) => {
+  console.log(`Logged in as ${user.username}!`);
 });
 
 client.on('messageCreate', async (message) => {
   if (message.content === '!ping') {
-    const embed = new EmbedBuilder()
-      .setTitle('Pong!')
-      .setDescription(`Latency: ${client.ping}ms`)
-      .setColor(0x00ff00)
-      .setTimestamp();
-
-    await message.channel.send({ embeds: [embed] });
+    await message.channel.send('Pong!');
   }
 });
 
 client.login('YOUR_BOT_TOKEN');
 ```
 
-### Advanced Usage
+### Advanced Usage with Builders
 
 ```typescript
-import { 
-  Client, 
-  Intents, 
-  EmbedBuilder, 
-  ButtonBuilder, 
-  ActionRowBuilder,
-  ButtonStyle 
-} from '@ovenjs/core';
+import { OvenClient } from '@ovenjs/core';
+import { EmbedBuilder, ButtonBuilder, ActionRowBuilder } from '@ovenjs/builders';
+import { GatewayIntentBits, ButtonStyle } from 'discord-api-types/v10';
 
-const client = new Client({
-  intents: [Intents.GUILDS, Intents.GUILD_MESSAGES, Intents.MESSAGE_CONTENT]
+const client = new OvenClient({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 client.on('messageCreate', async (message) => {
@@ -83,7 +80,8 @@ client.on('messageCreate', async (message) => {
     const embed = new EmbedBuilder()
       .setTitle('Interactive Example')
       .setDescription('Click the button below!')
-      .setColor(0x5865F2);
+      .setColor(0x5865F2)
+      .setTimestamp();
 
     const button = new ButtonBuilder()
       .setCustomId('example_button')
@@ -94,8 +92,8 @@ client.on('messageCreate', async (message) => {
       .addComponents(button);
 
     await message.channel.send({
-      embeds: [embed],
-      components: [actionRow]
+      embeds: [embed.toJSON()],
+      components: [actionRow.toJSON()]
     });
   }
 });
@@ -110,51 +108,157 @@ client.on('interactionCreate', async (interaction) => {
 client.login('YOUR_BOT_TOKEN');
 ```
 
-## Development Status
+### Using Individual Packages
 
-This is a work-in-progress Discord API wrapper. The basic structure and core functionality have been implemented:
+For specialized use cases, you can use individual packages:
 
-✅ **Completed:**
-- Monorepo structure with TypeScript packages
-- Core Client class with event handling
-- REST API client with rate limiting
-- WebSocket gateway client with auto-reconnection
-- Comprehensive Discord API type definitions
-- Builder classes for embeds, messages, buttons, and select menus
-- Manager classes for guilds, channels, and users
-- Basic structure classes
+```typescript
+// REST-only usage
+import { RESTClient } from '@ovenjs/rest';
+import { Routes } from 'discord-api-types/v10';
 
-🚧 **In Development:**
-- Advanced caching system
-- Slash command support
-- Voice connection support
-- Additional REST endpoints
-- Comprehensive testing
-- Documentation website
+const rest = new RESTClient({ token: 'YOUR_BOT_TOKEN' });
+const user = await rest.request({
+  method: 'GET',
+  path: Routes.user()
+});
 
-## Package Structure
+// WebSocket-only usage  
+import { WebSocketClient } from '@ovenjs/ws';
+import { GatewayIntentBits } from 'discord-api-types/v10';
 
-```
-packages/
-├── core/           # Main client and high-level API
-├── rest/           # REST API client
-├── ws/             # WebSocket gateway client  
-├── types/          # TypeScript definitions
-└── builders/       # Object builders (embeds, components)
+const ws = new WebSocketClient({
+  token: 'YOUR_BOT_TOKEN',
+  intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages
+});
+
+ws.on('ready', () => console.log('WebSocket ready!'));
+await ws.connect();
 ```
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
-OvenJS follows a modular architecture where each package has a specific responsibility:
+OvenJS follows a clean, modular architecture:
 
-- **@ovenjs/types**: Provides comprehensive TypeScript definitions for all Discord API objects
-- **@ovenjs/rest**: Handles HTTP requests to Discord's REST API with built-in rate limiting
-- **@ovenjs/ws**: Manages WebSocket connections to Discord's Gateway with automatic reconnection
-- **@ovenjs/builders**: Utilities for constructing Discord objects like embeds and message components
-- **@ovenjs/core**: Main client that orchestrates all other packages and provides a high-level API
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         @ovenjs/core                       │
+│                     (Main Client)                          │
+├─────────────────────────┬───────────────────────────────────┤
+│      @ovenjs/rest       │         @ovenjs/ws                │
+│   (HTTP API Client)     │    (WebSocket Gateway)            │
+├─────────────────────────┼───────────────────────────────────┤
+│     @ovenjs/builders    │       @ovenjs/types               │
+│   (Object Builders)     │   (TypeScript Definitions)       │
+└─────────────────────────┴───────────────────────────────────┘
+```
 
-This design allows developers to use individual packages if they only need specific functionality, or use the core package for a complete Discord bot framework.
+### Package Responsibilities
+
+- **@ovenjs/types**: Provides package-specific types and re-exports discord-api-types for seamless Discord API integration
+- **@ovenjs/rest**: Handles HTTP requests with advanced rate limiting, batching, and retry logic
+- **@ovenjs/ws**: Manages WebSocket connections with automatic sharding, reconnection, and event processing
+- **@ovenjs/builders**: Offers fluent APIs for constructing Discord objects with full type safety
+- **@ovenjs/core**: Orchestrates all packages and provides a unified, high-level Discord bot framework
+
+## 🔧 Development Setup
+
+### Prerequisites
+
+- Node.js 18+ 
+- Yarn (package manager)
+- TypeScript 5.0+
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/ovenjs/oven.git
+cd oven
+
+# Install dependencies
+yarn install
+
+# Build all packages
+yarn build
+
+# Run type checking
+yarn workspaces run typecheck
+
+# Run tests
+yarn test
+```
+
+### Package Scripts
+
+Each package supports these scripts:
+- `yarn build` - Build the package with tsup
+- `yarn dev` - Build in watch mode
+- `yarn typecheck` - Run TypeScript type checking
+- `yarn clean` - Clean build artifacts
+
+## 📈 Development Status
+
+### ✅ Completed Features
+
+- **✅ Monorepo Architecture** - Clean workspace structure with yarn workspaces
+- **✅ TypeScript Integration** - Full discord-api-types integration with package-specific types
+- **✅ Build System** - Standardized tsup-based build system across all packages
+- **✅ REST API Client** - Complete with rate limiting, batching, and error handling
+- **✅ WebSocket Gateway** - With sharding, auto-reconnection, and event processing
+- **✅ Type-Safe Builders** - For embeds, buttons, select menus, and other Discord objects
+- **✅ Core Client** - Event-driven architecture with manager classes
+- **✅ Comprehensive Types** - Package-focused types with discord-api-types integration
+
+### 🚧 In Development
+
+- **🔄 Advanced Caching** - Intelligent cache management with TTL and size limits
+- **🔄 Slash Commands** - Full application command support with auto-registration
+- **🔄 Voice Connections** - Voice channel support with audio streaming
+- **🔄 Additional REST Endpoints** - Complete Discord API coverage
+- **🔄 Testing Suite** - Comprehensive unit and integration tests
+- **🔄 Documentation Website** - Full API documentation with examples
+
+### 🗺️ Roadmap
+
+- **Q1 2024**: Stable v1.0 release with core features
+- **Q2 2024**: Voice support and advanced caching
+- **Q3 2024**: Plugin ecosystem and additional integrations
+- **Q4 2024**: Performance optimizations and enterprise features
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with tests
+4. Run `yarn build` and `yarn test`
+5. Submit a pull request
+
+### Code Standards
+
+- TypeScript strict mode enabled
+- ESLint with TypeScript rules
+- Prettier for code formatting
+- Comprehensive JSDoc comments
+- Integration with discord-api-types for Discord API objects
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🔗 Links
+
+- **Documentation**: [Coming Soon]
+- **Discord Server**: [Coming Soon]
+- **GitHub**: https://github.com/ovenjs/oven
+- **NPM**: https://www.npmjs.com/org/ovenjs
 
 ---
 
-**Note**: This is a development version. For production use, please wait for the stable release.
+**Note**: This project is under active development. While the core functionality is implemented, some features are still being refined. For production use, please wait for the stable v1.0 release or use at your own discretion.
+
+Built with ❤️ by the OvenJS Team
