@@ -87,7 +87,7 @@ export class EventHandler extends EventEmitter {
       type: eventType,
       data: eventData,
       shardId,
-      sequence: payload.s || undefined,
+      sequence: payload.s ?? undefined,
       timestamp: new Date(),
     };
 
