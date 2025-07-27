@@ -39,3 +39,30 @@ export type JSONSerializable =
   | null 
   | JSONSerializable[] 
   | { [key: string]: JSONSerializable };
+
+/**
+ * Utility function to check if a value is an object
+ * @param value - Value to check
+ * @returns True if the value is an object
+ */
+export const isObject = (value: unknown): value is Record<string, unknown> => {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+};
+
+/**
+ * Utility function to check if a value is a string
+ * @param value - Value to check
+ * @returns True if the value is a string
+ */
+export const isString = (value: unknown): value is string => {
+  return typeof value === 'string';
+};
+
+/**
+ * Utility function to check if a value is a number
+ * @param value - Value to check
+ * @returns True if the value is a number
+ */
+export const isNumber = (value: unknown): value is number => {
+  return typeof value === 'number' && !isNaN(value);
+};
