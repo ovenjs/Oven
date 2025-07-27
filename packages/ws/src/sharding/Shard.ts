@@ -1,6 +1,9 @@
 /**
- * Individual shard implementation
- * Represents a single WebSocket connection to Discord gateway
+ * Individual shard implementation for Discord gateway connections
+ * Represents a single WebSocket connection to Discord with full lifecycle management
+ * 
+ * @author OvenJS Team
+ * @since 0.1.0
  */
 
 import { EventEmitter } from 'events';
@@ -11,78 +14,70 @@ import {
   GatewayOpcodes, 
   GatewayCloseCodes,
   HeartbeatInterval,
-  BotToken 
+  ShardOptions,
+  ShardStatus,
+  ShardState,
+  ms, 
+  DISCORD_TIMEOUTS 
 } from '@ovenjs/types';
-import { ms, DISCORD_TIMEOUTS } from '@ovenjs/types';
 import { HeartbeatManager } from '../heartbeat/HeartbeatManager.js';
-
-export interface ShardOptions {
-  id: number;
-  count: number;
-  token: BotToken;
-  intents: number;
-  gatewayURL: string | undefined;
-  version?: number | undefined;
-  encoding?: 'json' | 'etf' | undefined;
-  compress?: boolean | undefined;
-  largeThreshold?: number | undefined;
-  presence?: {
-  activities?: any[];
-  status?: 'online' | 'dnd' | 'idle' | 'invisible';
-  afk?: boolean;
-  since?: number | null;
-} | undefined;
-}
-
-export interface ShardStatus {
-  id: number;
-  state: ShardState | undefined;
-  ping: number;
-  lastHeartbeat: Date;
-  sessionId?: string | undefined;
-  resumeGatewayURL?: string | undefined;
-  sequence?: number | undefined;
-  closeCode?: number | undefined;
-  closeReason?: string | undefined;
-}
-
-export enum ShardState {
-  DISCONNECTED = 'disconnected',
-  CONNECTING = 'connecting',
-  CONNECTED = 'connected',
-  IDENTIFYING = 'identifying',
-  READY = 'ready',
-  RESUMING = 'resuming',
-  RECONNECTING = 'reconnecting',
-  ZOMBIE = 'zombie',
-}
 
 /**
  * Represents a single shard connection to Discord gateway
+ * 
+ * Handles:
+ * - WebSocket connection lifecycle
+ * - Discord gateway protocol (identify, resume, heartbeat)
+ * - Automatic reconnection with exponential backoff
+ * - Event processing and forwarding
+ * - Connection health monitoring
+ * 
+ * @example
+ * ```typescript
+ * const shard = new Shard({
+ *   id: 0,
+ *   count: 1,
+ *   token: 'Bot YOUR_BOT_TOKEN' as BotToken,
+ *   intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages
+ * });
+ * 
+ * shard.on('ready', (data) => {
+ *   console.log(`Shard ${shard.getId()} is ready!`);
+ * });
+ * 
+ * await shard.connect();
+ * ```
  */
 export class Shard extends EventEmitter {
   private readonly options: ShardOptions;
-  private ws?: WebSocket | undefined;
-  private heartbeat?: HeartbeatManager | undefined;
+  private ws?: WebSocket;
+  private heartbeat?: HeartbeatManager;
   private state = ShardState.DISCONNECTED;
   private sequence: number | null = null;
-  private sessionId?: string | undefined;
-  private resumeGatewayURL?: string | undefined;
+  private sessionId?: string;
+  private resumeGatewayURL?: string;
   private closeSequence = 0;
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
-  private reconnectTimeout?: NodeJS.Timeout | undefined;
-  private connectTimeout?: NodeJS.Timeout | undefined;
-  private identifyTimeout?: NodeJS.Timeout | undefined;
+  private readonly maxReconnectAttempts = 5;
+  private reconnectTimeout?: NodeJS.Timeout;
+  private connectTimeout?: NodeJS.Timeout;
+  private identifyTimeout?: NodeJS.Timeout;
 
+  /**
+   * Creates a new Shard instance
+   * 
+   * @param options - Configuration options for the shard
+   */
   constructor(options: ShardOptions) {
     super();
     this.options = options;
-    this.setMaxListeners(0); // Remove EventEmitter limit
+    this.setMaxListeners(0); // Remove EventEmitter limit for multiple listeners
   }
 
   /**
-   * Connect to the Discord gateway
+   * Connects to the Discord gateway
+   * 
+   * @throws {Error} If shard is not in DISCONNECTED state
    */
   async connect(): Promise<void> {
     if (this.state !== ShardState.DISCONNECTED) {
@@ -100,7 +95,10 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Disconnect from the gateway
+   * Disconnects from the Discord gateway
+   * 
+   * @param code - WebSocket close code (default: 1000)
+   * @param reason - Reason for disconnection (default: 'Requested')
    */
   async disconnect(code = 1000, reason = 'Requested'): Promise<void> {
     this.clearTimeouts();
@@ -120,7 +118,10 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Send a payload to the gateway
+   * Sends a payload to the Discord gateway
+   * 
+   * @param payload - Gateway payload to send
+   * @throws {Error} If shard is not connected
    */
   send(payload: GatewayPayload): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
@@ -130,11 +131,13 @@ export class Shard extends EventEmitter {
     const data = JSON.stringify(payload);
     this.ws.send(data);
     
-    this.emit('debug', `[Shard ${this.options.id}] Sent: ${payload.op} ${payload.t || ''}`);
+    this.emit('debug', `[Shard ${this.options.id}] Sent: ${payload.op} ${(payload as any).t || ''}`);
   }
 
   /**
-   * Get current shard status
+   * Gets current shard status and health information
+   * 
+   * @returns Comprehensive shard status
    */
   getStatus(): ShardStatus {
     return {
@@ -142,6 +145,7 @@ export class Shard extends EventEmitter {
       state: this.state,
       ping: this.heartbeat?.getHealth().averageLatency || 0,
       lastHeartbeat: this.heartbeat?.getHealth().lastHeartbeat || new Date(),
+      lastHeartbeatAck: this.heartbeat?.getHealth().lastHeartbeatAck || new Date(),
       sessionId: this.sessionId,
       resumeGatewayURL: this.resumeGatewayURL,
       sequence: this.sequence || undefined,
@@ -150,21 +154,27 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Get shard ID
+   * Gets the shard ID
+   * 
+   * @returns Shard identifier
    */
   getId(): number {
     return this.options.id;
   }
 
   /**
-   * Check if shard is connected and ready
+   * Checks if shard is connected and ready to receive events
+   * 
+   * @returns True if shard is in READY state
    */
   isReady(): boolean {
     return this.state === ShardState.READY;
   }
 
   /**
-   * Create WebSocket connection
+   * Creates the WebSocket connection to Discord gateway
+   * 
+   * @private
    */
   private async createConnection(): Promise<void> {
     const url = this.buildGatewayURL();
@@ -172,7 +182,7 @@ export class Shard extends EventEmitter {
     this.ws = new WebSocket(url);
     this.setupWebSocketEvents();
 
-    // Set connection timeout
+    // Set connection timeout to prevent hanging
     this.connectTimeout = setTimeout(() => {
       if (this.state === ShardState.CONNECTING) {
         this.ws?.close(4000, 'Connection timeout');
@@ -181,7 +191,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Setup WebSocket event handlers
+   * Sets up WebSocket event handlers
+   * 
+   * @private
    */
   private setupWebSocketEvents(): void {
     if (!this.ws) return;
@@ -206,13 +218,16 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle incoming WebSocket messages
+   * Handles incoming WebSocket messages and processes gateway payloads
+   * 
+   * @param data - Raw WebSocket message data
+   * @private
    */
   private handleMessage(data: WebSocket.Data): void {
     let payload: GatewayPayload;
 
     try {
-      // Handle compressed data
+      // Handle compressed data if compression is enabled
       let rawData = data;
       if (this.options.compress && data instanceof Buffer) {
         rawData = inflateSync(data).toString();
@@ -224,32 +239,32 @@ export class Shard extends EventEmitter {
       return;
     }
 
-    // Update sequence number
+    // Update sequence number for heartbeat tracking
     if (payload.s !== null && payload.s !== undefined) {
       this.sequence = payload.s;
       this.heartbeat?.updateSequence(payload.s);
     }
 
-    this.emit('debug', `[Shard ${this.options.id}] Received: ${payload.op} ${payload.t || ''}`);
+    this.emit('debug', `[Shard ${this.options.id}] Received: ${payload.op} ${(payload as any).t || ''}`);
 
-    // Handle different opcodes
+    // Handle different gateway opcodes
     switch (payload.op) {
-      case GatewayOpcodes.HELLO:
+      case GatewayOpcodes.Hello:
         this.handleHello(payload.d);
         break;
-      case GatewayOpcodes.HEARTBEAT_ACK:
+      case GatewayOpcodes.HeartbeatAck:
         this.handleHeartbeatAck();
         break;
-      case GatewayOpcodes.HEARTBEAT:
+      case GatewayOpcodes.Heartbeat:
         this.handleHeartbeatRequest();
         break;
-      case GatewayOpcodes.RECONNECT:
+      case GatewayOpcodes.Reconnect:
         this.handleReconnectRequest();
         break;
-      case GatewayOpcodes.INVALID_SESSION:
+      case GatewayOpcodes.InvalidSession:
         this.handleInvalidSession(payload.d);
         break;
-      case GatewayOpcodes.DISPATCH:
+      case GatewayOpcodes.Dispatch:
         this.handleDispatch(payload);
         break;
       default:
@@ -258,12 +273,15 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle HELLO opcode - start heartbeat and identify
+   * Handles HELLO opcode - initializes heartbeat and starts identification
+   * 
+   * @param data - Hello payload data containing heartbeat interval
+   * @private
    */
   private handleHello(data: any): void {
     const interval = ms(data.heartbeat_interval) as HeartbeatInterval;
     
-    // Setup heartbeat
+    // Setup heartbeat manager
     this.heartbeat = new HeartbeatManager({
       interval,
       onHeartbeat: (sequence) => this.sendHeartbeat(sequence),
@@ -273,7 +291,7 @@ export class Shard extends EventEmitter {
 
     this.heartbeat.start();
 
-    // Identify or resume
+    // Identify or resume based on session state
     if (this.sessionId && this.resumeGatewayURL) {
       this.resume();
     } else {
@@ -282,31 +300,40 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Send heartbeat to gateway
+   * Sends heartbeat to maintain connection
+   * 
+   * @param sequence - Current sequence number
+   * @private
    */
   private sendHeartbeat(sequence: number | null): void {
     this.send({
-      op: GatewayOpcodes.HEARTBEAT,
+      op: GatewayOpcodes.Heartbeat,
       d: sequence,
     });
   }
 
   /**
-   * Handle heartbeat acknowledgment
+   * Handles heartbeat acknowledgment from Discord
+   * 
+   * @private
    */
   private handleHeartbeatAck(): void {
     this.heartbeat?.ack();
   }
 
   /**
-   * Handle heartbeat request from gateway
+   * Handles heartbeat request from Discord gateway
+   * 
+   * @private
    */
   private handleHeartbeatRequest(): void {
     this.sendHeartbeat(this.sequence);
   }
 
   /**
-   * Handle reconnect request from gateway
+   * Handles reconnect request from Discord
+   * 
+   * @private
    */
   private handleReconnectRequest(): void {
     this.emit('debug', `[Shard ${this.options.id}] Gateway requested reconnect`);
@@ -314,17 +341,21 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle invalid session
+   * Handles invalid session response from Discord
+   * 
+   * @param resumable - Whether the session can be resumed
+   * @private
    */
   private handleInvalidSession(resumable: any): void {
     const canResume = Boolean(resumable);
     if (!canResume) {
+      // Clear session data for fresh identification
       this.sessionId = undefined;
       this.resumeGatewayURL = undefined;
       this.sequence = null;
     }
 
-    // Wait a bit before identifying again
+    // Wait random time before identifying again to prevent rate limits
     setTimeout(() => {
       if (canResume && this.sessionId) {
         this.resume();
@@ -335,10 +366,13 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle dispatch events
+   * Handles dispatch events from Discord
+   * 
+   * @param payload - Dispatch payload
+   * @private
    */
   private handleDispatch(payload: GatewayPayload): void {
-    switch (payload.t) {
+    switch ((payload as any).t) {
       case 'READY':
         this.handleReady(payload.d);
         break;
@@ -346,13 +380,16 @@ export class Shard extends EventEmitter {
         this.handleResumed();
         break;
       default:
-        // Emit the event for the client to handle
+        // Forward event to client for processing
         this.emit('dispatch', payload);
     }
   }
 
   /**
-   * Handle READY event
+   * Handles READY event - shard is now ready to receive events
+   * 
+   * @param data - Ready event data
+   * @private
    */
   private handleReady(data: any): void {
     this.sessionId = data.session_id;
@@ -365,7 +402,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle RESUMED event
+   * Handles RESUMED event - shard has successfully resumed
+   * 
+   * @private
    */
   private handleResumed(): void {
     this.setState(ShardState.READY);
@@ -376,7 +415,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Send identify payload
+   * Sends identify payload to Discord
+   * 
+   * @private
    */
   private identify(): void {
     if (this.state !== ShardState.CONNECTED) {
@@ -386,7 +427,7 @@ export class Shard extends EventEmitter {
     this.setState(ShardState.IDENTIFYING);
 
     const identifyPayload = {
-      op: GatewayOpcodes.IDENTIFY,
+      op: GatewayOpcodes.Identify,
       d: {
         token: this.options.token,
         intents: this.options.intents,
@@ -403,7 +444,7 @@ export class Shard extends EventEmitter {
 
     this.send(identifyPayload);
 
-    // Set identify timeout
+    // Set identify timeout to detect hanging identification
     this.identifyTimeout = setTimeout(() => {
       if (this.state === ShardState.IDENTIFYING) {
         this.emit('error', new Error(`Identify timeout for shard ${this.options.id}`));
@@ -413,7 +454,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Send resume payload
+   * Sends resume payload to Discord
+   * 
+   * @private
    */
   private resume(): void {
     if (!this.sessionId || !this.sequence) {
@@ -424,7 +467,7 @@ export class Shard extends EventEmitter {
     this.setState(ShardState.RESUMING);
 
     const resumePayload = {
-      op: GatewayOpcodes.RESUME,
+      op: GatewayOpcodes.Resume,
       d: {
         token: this.options.token,
         session_id: this.sessionId,
@@ -436,7 +479,11 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle WebSocket close
+   * Handles WebSocket close events
+   * 
+   * @param code - Close code
+   * @param reason - Close reason
+   * @private
    */
   private handleClose(code: number, reason: string): void {
     this.closeSequence = code;
@@ -448,34 +495,40 @@ export class Shard extends EventEmitter {
 
     this.emit('debug', `[Shard ${this.options.id}] Closed: ${code} ${reason}`);
 
-    // Check if we should reconnect
+    // Determine if we should attempt reconnection
     if (this.shouldReconnect(code)) {
       this.reconnect();
     } else {
       this.setState(ShardState.DISCONNECTED);
-      this.emit('close', code, reason);
+      this.emit('disconnect', code, reason);
     }
   }
 
   /**
-   * Check if shard should reconnect based on close code
+   * Determines if shard should reconnect based on close code
+   * 
+   * @param code - WebSocket close code
+   * @returns True if reconnection should be attempted
+   * @private
    */
   private shouldReconnect(code: number): boolean {
-    // Don't reconnect on these codes
+    // Don't reconnect on these fatal codes
     const noReconnectCodes = [
-      GatewayCloseCodes.AUTHENTICATION_FAILED,
-      GatewayCloseCodes.INVALID_INTENTS,
-      GatewayCloseCodes.DISALLOWED_INTENTS,
-      GatewayCloseCodes.INVALID_API_VERSION,
-      GatewayCloseCodes.INVALID_SHARD,
-      GatewayCloseCodes.SHARDING_REQUIRED,
+      GatewayCloseCodes.AuthenticationFailed,
+      GatewayCloseCodes.InvalidIntents,
+      GatewayCloseCodes.DisallowedIntents,
+      GatewayCloseCodes.InvalidAPIVersion,
+      GatewayCloseCodes.InvalidShard,
+      GatewayCloseCodes.ShardingRequired,
     ];
 
     return !noReconnectCodes.includes(code) && this.reconnectAttempts < this.maxReconnectAttempts;
   }
 
   /**
-   * Reconnect to the gateway
+   * Attempts to reconnect with exponential backoff
+   * 
+   * @private
    */
   private async reconnect(): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
@@ -487,7 +540,7 @@ export class Shard extends EventEmitter {
     this.setState(ShardState.RECONNECTING);
     this.reconnectAttempts++;
 
-    // Calculate backoff delay
+    // Calculate exponential backoff delay with maximum cap
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts - 1), 30000);
     
     this.emit('debug', `[Shard ${this.options.id}] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
@@ -503,7 +556,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Handle zombie connection
+   * Handles zombie connection detection
+   * 
+   * @private
    */
   private handleZombieConnection(): void {
     this.setState(ShardState.ZOMBIE);
@@ -512,7 +567,10 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Build gateway URL with query parameters
+   * Builds the complete gateway URL with query parameters
+   * 
+   * @returns Complete gateway URL
+   * @private
    */
   private buildGatewayURL(): string {
     const params = new URLSearchParams({
@@ -528,7 +586,10 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Set shard state
+   * Sets shard state and emits state change event
+   * 
+   * @param state - New shard state
+   * @private
    */
   private setState(state: ShardState): void {
     if (this.state !== state) {
@@ -539,7 +600,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Clear all timeouts
+   * Clears all active timeouts
+   * 
+   * @private
    */
   private clearTimeouts(): void {
     this.clearTimeout('connect');
@@ -548,7 +611,10 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Clear specific timeout
+   * Clears a specific timeout by type
+   * 
+   * @param type - Type of timeout to clear
+   * @private
    */
   private clearTimeout(type: 'connect' | 'identify' | 'reconnect'): void {
     switch (type) {
@@ -574,7 +640,9 @@ export class Shard extends EventEmitter {
   }
 
   /**
-   * Destroy the shard
+   * Destroys the shard and cleans up all resources
+   * 
+   * After calling this method, the shard cannot be reused.
    */
   destroy(): void {
     this.removeAllListeners();
