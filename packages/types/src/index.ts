@@ -88,7 +88,8 @@ export type {
 
 export type {
   Milliseconds,
-  Seconds
+  Seconds,
+  HeartbeatInterval
 } from './primitives/time.js';
 
 export { s, ms, m, h, d } from './primitives/time.js';
