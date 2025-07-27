@@ -33,7 +33,7 @@ export class RateLimitBucket {
   private resetAfter = -1;
   private queue: QueuedRequest[] = [];
   private processing = false;
-  private globalTimeout?: NodeJS.Timeout;
+  private globalTimeout: NodeJS.Timeout | undefined = undefined;
 
   constructor(id: string) {
     this.id = id;
