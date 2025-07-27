@@ -281,7 +281,6 @@ export class Shard extends EventEmitter {
   private handleHello(data: any): void {
     const interval = ms(data.heartbeat_interval) as HeartbeatInterval;
     
-    // Setup heartbeat manager
     this.heartbeat = new HeartbeatManager({
       interval,
       onHeartbeat: (sequence) => this.sendHeartbeat(sequence),
