@@ -8,6 +8,7 @@ import type {
   RequestOptions,
   APIResponse,
   Milliseconds,
+  RequestConfig,
 } from '@ovenjs/types';
 import { ms, API_BASE_URL, API_VERSION } from '@ovenjs/types';
 
