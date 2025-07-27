@@ -51,7 +51,9 @@ export type {
   ProcessedEvent,
   HeartbeatOptions,
   ConnectionHealth,
-  PresenceUpdateData
+  PresenceUpdateData,
+  WebSocketClientOptions,
+  WebSocketClientStatus
 } from './ws/index.js';
 
 export type {
