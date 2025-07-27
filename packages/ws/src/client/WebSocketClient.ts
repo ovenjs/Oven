@@ -1,63 +1,150 @@
 /**
- * Main WebSocket client for Discord gateway
- * Orchestrates sharding, event handling, and connection management
+ * Main WebSocket client for Discord gateway connections
+ * Orchestrates sharding, event handling, and connection management with comprehensive features
+ * 
+ * @author OvenJS Team
+ * @since 0.1.0
  */
 
 import { EventEmitter } from 'events';
-import type { BotToken, GatewayInfo } from '@ovenjs/types';
-import { ShardManager, ShardManagerOptions, ShardManagerStatus } from '../sharding/index.js';
-import { EventHandler, EventHandlerOptions, ProcessedEvent } from '../handlers/index.js';
+import type { 
+  GatewayInfo,
+  WebSocketClientOptions,
+  WebSocketClientStatus,
+  ShardManagerOptions,
+  ShardManagerStatus,
+  EventHandlerOptions,
+  ProcessedEvent 
+} from '@ovenjs/types';
+import { ShardManager } from '../sharding/index.js';
+import { EventHandler } from '../handlers/index.js';
 
-export interface WebSocketClientOptions {
-  token: BotToken;
-  intents: number;
-  shardCount?: number | 'auto';
-  shardIds?: number[];
-  gatewayURL?: string;
-  version?: number;
-  encoding?: 'json' | 'etf';
-  compress?: boolean;
-  largeThreshold?: number;
-  presence?: {
-    activities?: any[];
-    status?: 'online' | 'dnd' | 'idle' | 'invisible';
-    afk?: boolean;
-    since?: number | null;
-  };
-  spawnDelay?: number;
-  spawnTimeout?: number;
-  validateEvents?: boolean;
-  debugMode?: boolean;
-  restClient?: any; // Will be typed when REST client is available
-}
-
-export interface WebSocketClientStatus {
-  connected: boolean;
-  ready: boolean;
-  shardManager: ShardManagerStatus;
-  eventStats: Record<string, number>;
-  totalEvents: number;
-  eventsPerSecond: number;
+/**
+ * Event interface for WebSocket client with comprehensive Discord event coverage
+ */
+export interface WebSocketClientEvents {
+  // Connection events
+  connect: () => void;
+  disconnect: () => void;
+  ready: () => void;
+  
+  // Shard management events
+  shardReady: (shardId: number, data: any) => void;
+  shardResumed: (shardId: number) => void;
+  shardDisconnect: (shardId: number, code: number, reason: string) => void;
+  shardError: (shardId: number, error: Error) => void;
+  shardStateChange: (shardId: number, newState: string, oldState: string) => void;
+  
+  // Event processing
+  event: (event: ProcessedEvent) => void;
+  error: (error: Error) => void;
+  debug: (message: string) => void;
+  
+  // Discord gateway events (lowercase for consistency)
+  resumed: (event: ProcessedEvent) => void;
+  guild_create: (event: ProcessedEvent) => void;
+  guild_update: (event: ProcessedEvent) => void;
+  guild_delete: (event: ProcessedEvent) => void;
+  guild_ban_add: (event: ProcessedEvent) => void;
+  guild_ban_remove: (event: ProcessedEvent) => void;
+  guild_emojis_update: (event: ProcessedEvent) => void;
+  guild_integrations_update: (event: ProcessedEvent) => void;
+  guild_member_add: (event: ProcessedEvent) => void;
+  guild_member_remove: (event: ProcessedEvent) => void;
+  guild_member_update: (event: ProcessedEvent) => void;
+  guild_members_chunk: (event: ProcessedEvent) => void;
+  guild_role_create: (event: ProcessedEvent) => void;
+  guild_role_update: (event: ProcessedEvent) => void;
+  guild_role_delete: (event: ProcessedEvent) => void;
+  invite_create: (event: ProcessedEvent) => void;
+  invite_delete: (event: ProcessedEvent) => void;
+  message_create: (event: ProcessedEvent) => void;
+  message_update: (event: ProcessedEvent) => void;
+  message_delete: (event: ProcessedEvent) => void;
+  message_delete_bulk: (event: ProcessedEvent) => void;
+  message_reaction_add: (event: ProcessedEvent) => void;
+  message_reaction_remove: (event: ProcessedEvent) => void;
+  message_reaction_remove_all: (event: ProcessedEvent) => void;
+  message_reaction_remove_emoji: (event: ProcessedEvent) => void;
+  presence_update: (event: ProcessedEvent) => void;
+  typing_start: (event: ProcessedEvent) => void;
+  user_update: (event: ProcessedEvent) => void;
+  voice_state_update: (event: ProcessedEvent) => void;
+  voice_server_update: (event: ProcessedEvent) => void;
+  webhooks_update: (event: ProcessedEvent) => void;
+  channel_create: (event: ProcessedEvent) => void;
+  channel_update: (event: ProcessedEvent) => void;
+  channel_delete: (event: ProcessedEvent) => void;
+  channel_pins_update: (event: ProcessedEvent) => void;
+  thread_create: (event: ProcessedEvent) => void;
+  thread_update: (event: ProcessedEvent) => void;
+  thread_delete: (event: ProcessedEvent) => void;
+  thread_list_sync: (event: ProcessedEvent) => void;
+  thread_member_update: (event: ProcessedEvent) => void;
+  thread_members_update: (event: ProcessedEvent) => void;
+  stage_instance_create: (event: ProcessedEvent) => void;
+  stage_instance_update: (event: ProcessedEvent) => void;
+  stage_instance_delete: (event: ProcessedEvent) => void;
+  interaction_create: (event: ProcessedEvent) => void;
+  application_command_permissions_update: (event: ProcessedEvent) => void;
+  auto_moderation_rule_create: (event: ProcessedEvent) => void;
+  auto_moderation_rule_update: (event: ProcessedEvent) => void;
+  auto_moderation_rule_delete: (event: ProcessedEvent) => void;
+  auto_moderation_action_execution: (event: ProcessedEvent) => void;
 }
 
 /**
  * Main WebSocket client for Discord gateway connections
+ * 
+ * This class provides:
+ * - Comprehensive shard management with automatic scaling
+ * - Event processing and validation
+ * - Connection health monitoring
+ * - Broadcasting capabilities
+ * - Presence and voice state management
+ * - Guild member requesting
+ * - Detailed statistics and monitoring
+ * 
+ * @example
+ * ```typescript
+ * import { WebSocketClient } from '@ovenjs/ws';
+ * import { GatewayIntentBits } from 'discord-api-types/v10';
+ * 
+ * const client = new WebSocketClient({
+ *   token: 'Bot YOUR_BOT_TOKEN' as BotToken,
+ *   intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages,
+ *   shardCount: 'auto'
+ * });
+ * 
+ * client.on('ready', () => {
+ *   console.log('All shards ready!');
+ * });
+ * 
+ * client.on('guild_create', (event) => {
+ *   console.log(`Joined guild: ${event.data.name}`);
+ * });
+ * 
+ * await client.connect();
+ * ```
  */
 export class WebSocketClient extends EventEmitter {
   private readonly options: WebSocketClientOptions;
   private readonly shardManager: ShardManager;
   private readonly eventHandler: EventHandler;
-  //private readonly restClient?: any;
   private connected = false;
   private ready = false;
 
+  /**
+   * Creates a new WebSocketClient instance
+   * 
+   * @param options - Configuration options for the WebSocket client
+   */
   constructor(options: WebSocketClientOptions) {
     super();
     
     this.options = options;
-    //this.restClient = options.restClient;
 
-    // Initialize shard manager
+    // Initialize shard manager with appropriate options
     const shardManagerOptions: ShardManagerOptions = {
       token: this.options.token,
       intents: this.options.intents,
@@ -88,7 +175,9 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Connect to Discord gateway
+   * Connects to Discord gateway and spawns all shards
+   * 
+   * @throws {Error} If client is already connected
    */
   async connect(): Promise<void> {
     if (this.connected) {
@@ -96,7 +185,7 @@ export class WebSocketClient extends EventEmitter {
     }
 
     try {
-      // Fetch gateway info and spawn shards
+      // Fetch gateway information and spawn all shards
       await this.shardManager.fetchGatewayInfo();
       await this.shardManager.spawnAll();
       
@@ -110,7 +199,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Disconnect from Discord gateway
+   * Disconnects from Discord gateway and stops all shards
    */
   async disconnect(): Promise<void> {
     if (!this.connected) {
@@ -131,21 +220,27 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Check if client is connected
+   * Checks if the client is connected to Discord
+   * 
+   * @returns True if connected to Discord
    */
   isConnected(): boolean {
     return this.connected;
   }
 
   /**
-   * Check if client is ready (all shards ready)
+   * Checks if all shards are ready and receiving events
+   * 
+   * @returns True if all shards are ready
    */
   isReady(): boolean {
     return this.ready;
   }
 
   /**
-   * Get client status
+   * Gets comprehensive client status including shard and event statistics
+   * 
+   * @returns Complete client status information
    */
   getStatus(): WebSocketClientStatus {
     return {
@@ -159,28 +254,39 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Get shard manager
+   * Gets the underlying shard manager instance
+   * 
+   * @returns ShardManager instance for advanced shard operations
    */
   getShardManager(): ShardManager {
     return this.shardManager;
   }
 
   /**
-   * Get event handler
+   * Gets the event handler instance
+   * 
+   * @returns EventHandler instance for event processing control
    */
   getEventHandler(): EventHandler {
     return this.eventHandler;
   }
 
   /**
-   * Send payload to all shards
+   * Broadcasts a payload to all ready shards
+   * 
+   * @param payload - Gateway payload to broadcast
+   * @returns Number of shards that received the payload
    */
   broadcast(payload: any): number {
     return this.shardManager.broadcast(payload);
   }
 
   /**
-   * Send payload to specific shard
+   * Sends a payload to a specific shard
+   * 
+   * @param shardId - Target shard ID
+   * @param payload - Gateway payload to send
+   * @throws {Error} If shard is not found
    */
   sendToShard(shardId: number, payload: any): void {
     const shard = this.shardManager.getShard(shardId);
@@ -192,7 +298,10 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Update presence on all shards
+   * Updates presence (status and activities) on all shards
+   * 
+   * @param presence - New presence data
+   * @returns Number of shards that received the update
    */
   updatePresence(presence: {
     activities?: any[];
@@ -201,7 +310,7 @@ export class WebSocketClient extends EventEmitter {
     since?: number | null;
   }): number {
     const payload = {
-      op: 3, // PRESENCE_UPDATE
+      op: 3, // PRESENCE_UPDATE opcode
       d: presence,
     };
 
@@ -209,17 +318,28 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Request guild members for a guild
+   * Requests guild members for a specific guild
+   * 
+   * Useful for getting member information when intents are limited
+   * or for large guilds where not all members are initially provided.
+   * 
+   * @param guildId - Guild ID to request members for
+   * @param options - Request options
    */
   requestGuildMembers(guildId: string, options: {
+    /** Query string to match usernames against (leave empty for all) */
     query?: string;
+    /** Maximum number of members to return (0 for all) */
     limit?: number;
+    /** Whether to include presence data */
     presences?: boolean;
+    /** Specific user IDs to request */
     user_ids?: string[];
+    /** Nonce for request tracking */
     nonce?: string;
   } = {}): void {
     const payload = {
-      op: 8, // REQUEST_GUILD_MEMBERS
+      op: 8, // REQUEST_GUILD_MEMBERS opcode
       d: {
         guild_id: guildId,
         query: options.query || '',
@@ -230,19 +350,25 @@ export class WebSocketClient extends EventEmitter {
       },
     };
 
-    // Send to all shards that might have this guild
+    // Broadcast to all shards since we don't know which has the guild
     this.broadcast(payload);
   }
 
   /**
-   * Update voice state
+   * Updates voice state for joining/leaving voice channels
+   * 
+   * @param guildId - Guild ID where the voice channel is located
+   * @param channelId - Voice channel ID (null to disconnect)
+   * @param options - Voice state options
    */
   updateVoiceState(guildId: string, channelId: string | null, options: {
+    /** Whether to mute microphone */
     selfMute?: boolean;
+    /** Whether to deafen audio */
     selfDeaf?: boolean;
   } = {}): void {
     const payload = {
-      op: 4, // VOICE_STATE_UPDATE
+      op: 4, // VOICE_STATE_UPDATE opcode
       d: {
         guild_id: guildId,
         channel_id: channelId,
@@ -255,21 +381,25 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Get gateway information
+   * Gets cached gateway information
+   * 
+   * @returns Gateway information including recommended shard count
    */
   async getGatewayInfo(): Promise<GatewayInfo> {
     return this.shardManager.fetchGatewayInfo();
   }
 
   /**
-   * Restart a specific shard
+   * Restarts a specific shard with graceful reconnection
+   * 
+   * @param shardId - Shard ID to restart
    */
   async restartShard(shardId: number): Promise<void> {
     await this.shardManager.restartShard(shardId);
   }
 
   /**
-   * Restart all shards
+   * Restarts all shards with staggered timing to prevent rate limits
    */
   async restartAll(): Promise<void> {
     this.emit('debug', 'Restarting all shards');
@@ -278,13 +408,15 @@ export class WebSocketClient extends EventEmitter {
     
     for (const shardId of shards) {
       await this.restartShard(shardId);
-      // Add delay between restarts
+      // Add delay between restarts to prevent overwhelming Discord
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
 
   /**
-   * Get detailed statistics
+   * Gets detailed statistics including top events and shard information
+   * 
+   * @returns Comprehensive statistics object
    */
   getDetailedStats(): {
     client: WebSocketClientStatus;
@@ -303,7 +435,9 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Setup event handlers for shard manager and event handler
+   * Sets up event forwarding between components
+   * 
+   * @private
    */
   private setupEventHandlers(): void {
     // Shard manager events
@@ -364,28 +498,42 @@ export class WebSocketClient extends EventEmitter {
   }
 
   /**
-   * Add event listener with type safety
+   * Type-safe event listener registration
+   * 
+   * @param event - Event name to listen for
+   * @param listener - Event handler function
+   * @returns This instance for chaining
    */
   override on<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
     return super.on(event as string, listener);
   }
 
   /**
-   * Add one-time event listener with type safety
+   * Type-safe one-time event listener registration
+   * 
+   * @param event - Event name to listen for once
+   * @param listener - Event handler function
+   * @returns This instance for chaining
    */
   override once<T extends keyof WebSocketClientEvents>(event: T, listener: WebSocketClientEvents[T]): this {
     return super.once(event as string, listener);
   }
 
   /**
-   * Emit event with type safety
+   * Type-safe event emission
+   * 
+   * @param event - Event name to emit
+   * @param args - Event arguments
+   * @returns True if event had listeners
    */
   override emit<T extends keyof WebSocketClientEvents>(event: T, ...args: Parameters<WebSocketClientEvents[T]>): boolean {
     return super.emit(event as string, ...args);
   }
 
   /**
-   * Destroy the WebSocket client
+   * Destroys the WebSocket client and cleans up all resources
+   * 
+   * After calling this method, the client cannot be reused.
    */
   async destroy(): Promise<void> {
     await this.disconnect();
@@ -395,31 +543,4 @@ export class WebSocketClient extends EventEmitter {
     
     this.emit('debug', 'WebSocket client destroyed');
   }
-}
-
-/**
- * WebSocket client event interface for type safety
- */
-export interface WebSocketClientEvents {
-  connect: () => void;
-  disconnect: () => void;
-  ready: () => void;
-  shardReady: (shardId: number, data: any) => void;
-  shardResumed: (shardId: number) => void;
-  shardDisconnect: (shardId: number, code: number, reason: string) => void;
-  shardError: (shardId: number, error: Error) => void;
-  shardStateChange: (shardId: number, newState: string, oldState: string) => void;
-  event: (event: ProcessedEvent) => void;
-  error: (error: Error) => void;
-  debug: (message: string) => void;
-  
-  // Discord events (lowercase)
-  resumed: (event: ProcessedEvent) => void;
-  guild_create: (event: ProcessedEvent) => void;
-  guild_update: (event: ProcessedEvent) => void;
-  guild_delete: (event: ProcessedEvent) => void;
-  message_create: (event: ProcessedEvent) => void;
-  message_update: (event: ProcessedEvent) => void;
-  message_delete: (event: ProcessedEvent) => void;
-  // ... add more Discord events as needed
 }
