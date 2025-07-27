@@ -9,9 +9,9 @@
 import type { 
   HeartbeatInterval, 
   HeartbeatOptions, 
-  ConnectionHealth,
-  DISCORD_TIMEOUTS 
+  ConnectionHealth
 } from '@ovenjs/types';
+import { DISCORD_TIMEOUTS } from '@ovenjs/types';
 
 /**
  * Manages heartbeat protocol for Discord gateway connection
