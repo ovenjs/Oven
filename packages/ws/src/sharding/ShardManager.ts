@@ -11,9 +11,9 @@ import type {
   GatewayInfo,
   ShardManagerOptions,
   ShardManagerStatus,
-  ShardOptions,
-  ShardState 
+  ShardOptions
 } from '@ovenjs/types';
+import { ShardState } from '@ovenjs/types';
 import { Shard } from './Shard.js';
 
 /**
