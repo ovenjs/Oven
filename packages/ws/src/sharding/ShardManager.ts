@@ -1,43 +1,45 @@
 /**
  * Shard manager for handling multiple WebSocket connections
- * Manages Discord gateway sharding with automatic scaling
+ * Manages Discord gateway sharding with automatic scaling and health monitoring
+ * 
+ * @author OvenJS Team
+ * @since 0.1.0
  */
 
 import { EventEmitter } from 'events';
-import type { BotToken, GatewayInfo } from '@ovenjs/types';
-import { Shard, ShardOptions, ShardState, ShardStatus } from './Shard.js';
-
-export interface ShardManagerOptions {
-  token: BotToken;
-  intents: number;
-  shardCount?: number | 'auto' | undefined;
-  shardIds?: number[] | undefined;
-  gatewayURL?: string | undefined;
-  version?: number | undefined;
-  encoding?: 'json' | 'etf' | undefined;
-  compress?: boolean | undefined;
-  largeThreshold?: number | undefined;
-  presence?: {
-    activities?: any[];
-    status?: 'online' | 'dnd' | 'idle' | 'invisible';
-    afk?: boolean;
-    since?: number | null;
-  } | undefined;
-  spawnDelay?: number | undefined
-  spawnTimeout?: number | undefined;
-}
-
-export interface ShardManagerStatus {
-  totalShards: number;
-  readyShards: number;
-  connectingShards: number;
-  disconnectedShards: number;
-  shards: ShardStatus[];
-  averagePing: number;
-}
+import type { 
+  GatewayInfo,
+  ShardManagerOptions,
+  ShardManagerStatus,
+  ShardOptions,
+  ShardState 
+} from '@ovenjs/types';
+import { Shard } from './Shard.js';
 
 /**
- * Manages multiple Discord gateway shards
+ * Manages multiple Discord gateway shards with intelligent spawning and health monitoring
+ * 
+ * Features:
+ * - Automatic shard count detection
+ * - Rate-limited shard spawning
+ * - Health monitoring and reconnection
+ * - Broadcasting to all shards
+ * - Individual shard management
+ * 
+ * @example
+ * ```typescript
+ * const manager = new ShardManager({
+ *   token: 'Bot YOUR_BOT_TOKEN' as BotToken,
+ *   intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages,
+ *   shardCount: 'auto'
+ * });
+ * 
+ * manager.on('ready', () => {
+ *   console.log('All shards are ready!');
+ * });
+ * 
+ * await manager.spawnAll();
+ * ```
  */
 export class ShardManager extends EventEmitter {
   private readonly options: Required<Omit<ShardManagerOptions, 'shardCount' | 'shardIds' | 'presence'>> & 
@@ -47,6 +49,11 @@ export class ShardManager extends EventEmitter {
   private spawnQueue: number[] = [];
   private spawning = false;
 
+  /**
+   * Creates a new ShardManager instance
+   * 
+   * @param options - Configuration options for shard management
+   */
   constructor(options: ShardManagerOptions) {
     super();
     
@@ -69,7 +76,10 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Calculate the recommended number of shards
+   * Calculates the recommended number of shards based on Discord's recommendation
+   * 
+   * @returns Recommended shard count
+   * @throws {Error} If gateway info is not available
    */
   async calculateShards(): Promise<number> {
     if (!this.gatewayInfo) {
@@ -80,18 +90,20 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Fetch gateway information from Discord
+   * Fetches gateway information from Discord API
+   * 
+   * @returns Gateway information including recommended shard count
    */
   async fetchGatewayInfo(): Promise<GatewayInfo> {
-    // This would typically use the REST client to fetch /gateway/bot
-    // For now, we'll simulate the response
+    // TODO: This should use the REST client to fetch /gateway/bot
+    // For now, we'll simulate the response based on typical Discord values
     this.gatewayInfo = {
       url: this.options.gatewayURL,
-      shards: 1, // Would be fetched from Discord
+      shards: 1, // Would be fetched from Discord's API
       session_start_limit: {
         total: 1000,
         remaining: 1000,
-        reset_after: 86400000,
+        reset_after: 86400000, // 24 hours in milliseconds
         max_concurrency: 1,
       },
     };
@@ -100,19 +112,21 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Spawn all shards
+   * Spawns all configured shards with rate limiting and error handling
+   * 
+   * @throws {Error} If shards are already being spawned
    */
   async spawnAll(): Promise<void> {
     if (this.spawning) {
       throw new Error('Shards are already being spawned');
     }
 
-    // Fetch gateway info if not already available
+    // Ensure we have gateway info
     if (!this.gatewayInfo) {
       await this.fetchGatewayInfo();
     }
 
-    // Determine shard count
+    // Determine final shard count
     let shardCount: number;
     if (this.options.shardCount === 'auto') {
       shardCount = await this.calculateShards();
@@ -120,10 +134,10 @@ export class ShardManager extends EventEmitter {
       shardCount = this.options.shardCount || 1;
     }
 
-    // Determine which shards to spawn
+    // Determine which specific shards to spawn
     const shardIds = this.options.shardIds || Array.from({ length: shardCount }, (_, i) => i);
 
-    // Queue shards for spawning
+    // Prepare spawn queue
     this.spawnQueue = [...shardIds];
     this.spawning = true;
 
@@ -137,7 +151,12 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Spawn a specific shard
+   * Spawns a specific shard with proper configuration
+   * 
+   * @param id - Shard ID to spawn
+   * @param totalShards - Total number of shards (for shard array)
+   * @returns The created shard instance
+   * @throws {Error} If shard already exists
    */
   async spawnShard(id: number, totalShards?: number): Promise<Shard> {
     if (this.shards.has(id)) {
@@ -170,7 +189,10 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Kill a specific shard
+   * Terminates and removes a specific shard
+   * 
+   * @param id - Shard ID to kill
+   * @throws {Error} If shard doesn't exist
    */
   async killShard(id: number): Promise<void> {
     const shard = this.shards.get(id);
@@ -187,7 +209,10 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Restart a specific shard
+   * Restarts a specific shard with graceful reconnection
+   * 
+   * @param id - Shard ID to restart
+   * @throws {Error} If shard doesn't exist
    */
   async restartShard(id: number): Promise<void> {
     const shard = this.shards.get(id);
@@ -203,21 +228,26 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Get a specific shard
+   * Gets a specific shard by ID
+   * 
+   * @param id - Shard ID to retrieve
+   * @returns Shard instance or undefined if not found
    */
   getShard(id: number): Shard | undefined {
     return this.shards.get(id);
   }
 
   /**
-   * Get all shards
+   * Gets all managed shards
+   * 
+   * @returns Map of all shard instances
    */
   getShards(): Map<number, Shard> {
     return new Map(this.shards);
   }
 
   /**
-   * Connect all shards
+   * Connects all spawned shards to Discord
    */
   async connectAll(): Promise<void> {
     const promises = Array.from(this.shards.values()).map(shard => shard.connect());
@@ -225,7 +255,7 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Disconnect all shards
+   * Disconnects all shards gracefully
    */
   async disconnectAll(): Promise<void> {
     const promises = Array.from(this.shards.values()).map(shard => shard.disconnect());
@@ -233,7 +263,9 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Get manager status
+   * Gets comprehensive status of shard manager and all shards
+   * 
+   * @returns Complete status information
    */
   getStatus(): ShardManagerStatus {
     const shardStatuses = Array.from(this.shards.values()).map(shard => shard.getStatus());
@@ -260,7 +292,10 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Broadcast a payload to all ready shards
+   * Broadcasts a payload to all ready shards
+   * 
+   * @param payload - Gateway payload to broadcast
+   * @returns Number of shards that received the payload
    */
   broadcast(payload: any): number {
     let sentTo = 0;
@@ -280,7 +315,9 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Check if all shards are ready
+   * Checks if all shards are ready and operational
+   * 
+   * @returns True if all shards are ready
    */
   isReady(): boolean {
     if (this.shards.size === 0) return false;
@@ -288,14 +325,19 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Get the first ready shard (for single-shard operations)
+   * Gets the first ready shard (useful for single-shard operations)
+   * 
+   * @returns First ready shard or undefined
    */
   getFirstShard(): Shard | undefined {
     return Array.from(this.shards.values()).find(shard => shard.isReady());
   }
 
   /**
-   * Process the spawn queue with proper rate limiting
+   * Processes the spawn queue with proper rate limiting and error handling
+   * 
+   * @param totalShards - Total number of shards for configuration
+   * @private
    */
   private async processSpawnQueue(totalShards: number): Promise<void> {
     while (this.spawnQueue.length > 0) {
@@ -308,7 +350,7 @@ export class ShardManager extends EventEmitter {
         // Wait for the shard to be ready or timeout
         await this.waitForShardReady(shard);
         
-        // Add delay between spawning shards to avoid rate limits
+        // Add delay between spawning shards to respect rate limits
         if (this.spawnQueue.length > 0) {
           await new Promise(resolve => setTimeout(resolve, this.options.spawnDelay));
         }
@@ -320,7 +362,11 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Wait for a shard to become ready
+   * Waits for a shard to become ready with timeout handling
+   * 
+   * @param shard - Shard to wait for
+   * @returns Promise that resolves when shard is ready
+   * @private
    */
   private async waitForShardReady(shard: Shard): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -351,10 +397,13 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Setup event handlers for a shard
+   * Sets up event forwarding and handling for a shard
+   * 
+   * @param shard - Shard to setup events for
+   * @private
    */
   private setupShardEvents(shard: Shard): void {
-    // Forward shard events
+    // Forward shard events to manager listeners
     shard.on('ready', (data) => {
       this.emit('shardReady', shard.getId(), data);
       
@@ -390,7 +439,10 @@ export class ShardManager extends EventEmitter {
   }
 
   /**
-   * Destroy the shard manager
+   * Destroys the shard manager and all managed shards
+   * 
+   * Cleans up all resources and connections. After calling this method,
+   * the manager cannot be reused.
    */
   async destroy(): Promise<void> {
     this.spawning = false;
