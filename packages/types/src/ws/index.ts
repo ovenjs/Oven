@@ -4,7 +4,6 @@
  */
 
 import type { 
-  GatewayPresenceUpdateData,
   GatewayActivity 
 } from 'discord-api-types/v10';
 import type { BotToken, HeartbeatInterval } from '../primitives/index.js';
