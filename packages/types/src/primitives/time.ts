@@ -15,6 +15,11 @@ export type Milliseconds = Brand<number, 'Milliseconds'>;
 export type Seconds = Brand<number, 'Seconds'>;
 
 /**
+ * Heartbeat interval type for Discord gateway
+ */
+export type HeartbeatInterval = Milliseconds;
+
+/**
  * Convert seconds to milliseconds
  */
 export const s = (seconds: number): Milliseconds => (seconds * 1000) as Milliseconds;
