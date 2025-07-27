@@ -1,6 +1,6 @@
 /**
  * WebSocket handlers exports
+ * @deprecated Use types from @ovenjs/types instead
  */
 
 export { EventHandler } from './EventHandler.js';
-export type { EventHandlerOptions, ProcessedEvent } from './EventHandler.js';
