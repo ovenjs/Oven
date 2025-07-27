@@ -1,32 +1,41 @@
 /**
  * Heartbeat manager for WebSocket connection health monitoring
- * Handles Discord gateway heartbeat protocol
+ * Handles Discord gateway heartbeat protocol with comprehensive health tracking
+ * 
+ * @author OvenJS Team
+ * @since 0.1.0
  */
 
-import type { HeartbeatInterval } from '@ovenjs/types';
-import { DISCORD_TIMEOUTS } from '@ovenjs/types';
-
-export interface HeartbeatOptions {
-  interval: HeartbeatInterval;
-  onHeartbeat: (sequence: number | null) => void;
-  onHeartbeatAck: () => void;
-  onZombieConnection: () => void;
-}
-
-export interface ConnectionHealth {
-  isAlive: boolean;
-  lastHeartbeat: Date;
-  lastHeartbeatAck: Date;
-  missedAcks: number;
-  averageLatency: number;
-  latencyHistory: number[];
-}
+import type { 
+  HeartbeatInterval, 
+  HeartbeatOptions, 
+  ConnectionHealth,
+  DISCORD_TIMEOUTS 
+} from '@ovenjs/types';
 
 /**
  * Manages heartbeat protocol for Discord gateway connection
+ * 
+ * This class handles:
+ * - Sending periodic heartbeats to Discord
+ * - Tracking heartbeat acknowledgments
+ * - Monitoring connection health
+ * - Detecting zombie connections
+ * 
+ * @example
+ * ```typescript
+ * const heartbeat = new HeartbeatManager({
+ *   interval: ms(41250) as HeartbeatInterval,
+ *   onHeartbeat: (seq) => shard.send({ op: 1, d: seq }),
+ *   onHeartbeatAck: () => console.log('Heartbeat acknowledged'),
+ *   onZombieConnection: () => shard.reconnect()
+ * });
+ * 
+ * heartbeat.start();
+ * ```
  */
 export class HeartbeatManager {
-  private interval?: NodeJS.Timeout | undefined;
+  private interval?: NodeJS.Timeout;
   private lastSequence: number | null = null;
   private lastHeartbeat = new Date();
   private lastHeartbeatAck = new Date();
@@ -35,12 +44,19 @@ export class HeartbeatManager {
   private readonly options: HeartbeatOptions;
   private isActive = false;
 
+  /**
+   * Creates a new HeartbeatManager instance
+   * 
+   * @param options - Configuration options for the heartbeat manager
+   */
   constructor(options: HeartbeatOptions) {
     this.options = options;
   }
 
   /**
-   * Start the heartbeat interval
+   * Starts the heartbeat interval with jitter to prevent thundering herd
+   * 
+   * @throws {Error} If heartbeat is already active
    */
   start(): void {
     if (this.isActive) {
@@ -52,7 +68,7 @@ export class HeartbeatManager {
     this.lastHeartbeat = new Date();
     this.lastHeartbeatAck = new Date();
 
-    // Start heartbeat interval with jitter to avoid thundering herd
+    // Add jitter to prevent thundering herd effect
     const jitter = Math.random() * 1000;
     const intervalMs = this.options.interval + jitter;
 
@@ -60,12 +76,12 @@ export class HeartbeatManager {
       this.sendHeartbeat();
     }, intervalMs);
 
-    // Send initial heartbeat
+    // Send initial heartbeat immediately
     this.sendHeartbeat();
   }
 
   /**
-   * Stop the heartbeat interval
+   * Stops the heartbeat interval
    */
   stop(): void {
     if (this.interval) {
@@ -76,14 +92,19 @@ export class HeartbeatManager {
   }
 
   /**
-   * Update the last sequence number received
+   * Updates the last sequence number received from Discord
+   * 
+   * @param sequence - The sequence number from the last received event
    */
   updateSequence(sequence: number | null): void {
     this.lastSequence = sequence;
   }
 
   /**
-   * Acknowledge a heartbeat response
+   * Acknowledges a heartbeat response from Discord
+   * 
+   * This method should be called when receiving a HEARTBEAT_ACK opcode.
+   * It calculates latency and updates connection health metrics.
    */
   ack(): void {
     const now = new Date();
@@ -92,7 +113,7 @@ export class HeartbeatManager {
     this.lastHeartbeatAck = now;
     this.missedAcks = 0;
     
-    // Track latency history (keep last 10 measurements)
+    // Track latency history (keep last 10 measurements for averaging)
     this.latencyHistory.push(latency);
     if (this.latencyHistory.length > 10) {
       this.latencyHistory.shift();
@@ -102,7 +123,9 @@ export class HeartbeatManager {
   }
 
   /**
-   * Get current connection health status
+   * Gets comprehensive connection health information
+   * 
+   * @returns Current connection health status and statistics
    */
   getHealth(): ConnectionHealth {
     const averageLatency = this.latencyHistory.length > 0
@@ -120,7 +143,9 @@ export class HeartbeatManager {
   }
 
   /**
-   * Check if connection is considered alive
+   * Checks if the connection is considered alive based on heartbeat timing
+   * 
+   * @returns True if connection is healthy, false if potentially dead
    */
   isAlive(): boolean {
     if (!this.isActive) return false;
@@ -128,14 +153,16 @@ export class HeartbeatManager {
     const now = Date.now();
     const timeSinceLastAck = now - this.lastHeartbeatAck.getTime();
     
-    // Consider dead if we haven't received an ack in 2 intervals
+    // Consider connection dead if no ACK received in 2 intervals
     return timeSinceLastAck < (this.options.interval * 2);
   }
 
   /**
-   * Get current heartbeat statistics
+   * Gets current heartbeat statistics for monitoring
+   * 
+   * @returns Object containing current heartbeat statistics
    */
-  getStatistics() {
+  getStats() {
     return {
       isActive: this.isActive,
       missedAcks: this.missedAcks,
@@ -147,18 +174,23 @@ export class HeartbeatManager {
   }
 
   /**
-   * Send a heartbeat to the gateway
+   * Sends a heartbeat to Discord gateway
+   * 
+   * This method tracks missed ACKs and detects zombie connections.
+   * If too many ACKs are missed, it triggers the zombie connection callback.
+   * 
+   * @private
    */
   private sendHeartbeat(): void {
     const now = new Date();
     
-    // Check if we missed too many acks (zombie connection)
+    // Check if we've missed too many ACKs (zombie connection)
     if (this.missedAcks >= 3) {
       this.options.onZombieConnection();
       return;
     }
 
-    // Check if we haven't received an ack from the last heartbeat
+    // Check if we haven't received an ACK from the last heartbeat
     const timeSinceLastAck = now.getTime() - this.lastHeartbeatAck.getTime();
     if (timeSinceLastAck > DISCORD_TIMEOUTS.HEARTBEAT_ACK) {
       this.missedAcks++;
@@ -169,7 +201,9 @@ export class HeartbeatManager {
   }
 
   /**
-   * Reset heartbeat state
+   * Resets all heartbeat state to initial values
+   * 
+   * Useful when reconnecting or resuming a session.
    */
   reset(): void {
     this.lastSequence = null;
@@ -180,7 +214,9 @@ export class HeartbeatManager {
   }
 
   /**
-   * Update heartbeat interval
+   * Updates the heartbeat interval and restarts if active
+   * 
+   * @param interval - New heartbeat interval from Discord
    */
   updateInterval(interval: HeartbeatInterval): void {
     const wasActive = this.isActive;
@@ -189,7 +225,7 @@ export class HeartbeatManager {
       this.stop();
     }
 
-    // Update options with new interval
+    // Update the interval in options
     (this.options as any).interval = interval;
 
     if (wasActive) {
@@ -198,7 +234,9 @@ export class HeartbeatManager {
   }
 
   /**
-   * Destroy the heartbeat manager
+   * Destroys the heartbeat manager and cleans up resources
+   * 
+   * After calling this method, the manager cannot be reused.
    */
   destroy(): void {
     this.stop();
