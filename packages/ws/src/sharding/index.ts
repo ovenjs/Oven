@@ -1,8 +1,7 @@
 /**
  * Sharding exports
+ * @deprecated Use types from @ovenjs/types instead
  */
 
-export { Shard, ShardState } from './Shard.js';
+export { Shard } from './Shard.js';
 export { ShardManager } from './ShardManager.js';
-export type { ShardOptions, ShardStatus } from './Shard.js';
-export type { ShardManagerOptions, ShardManagerStatus } from './ShardManager.js';
