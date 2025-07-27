@@ -5,9 +5,7 @@
 
 import type { 
   APIResponse, 
-  APIErrorResponse, 
-  RateLimitData,
-  RateLimitHeaders 
+  RateLimitData
 } from '@ovenjs/types';
 
 export class DiscordAPIError extends Error {
