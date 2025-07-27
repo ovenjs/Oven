@@ -7,7 +7,6 @@ import type {
   RESTOptions,
   RequestOptions,
   APIResponse,
-  BotToken,
   Milliseconds,
 } from '@ovenjs/types';
 import { ms, API_BASE_URL, API_VERSION } from '@ovenjs/types';
