@@ -441,7 +441,7 @@ export class Shard extends EventEmitter {
       },
     };
 
-    this.send(identifyPayload);
+    this.send(identifyPayload as any);
 
     // Set identify timeout to detect hanging identification
     this.identifyTimeout = setTimeout(() => {
