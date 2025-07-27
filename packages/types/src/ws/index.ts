@@ -132,48 +132,8 @@ export interface ConnectionHealth {
  * Presence update data
  */
 export interface PresenceUpdateData {
-  activities?: ActivityData[];
+  activities?: any[]; // Use discord-api-types ActivityData
   status?: 'online' | 'dnd' | 'idle' | 'invisible';
   afk?: boolean;
   since?: number | null;
-}
-
-/**
- * Activity data
- */
-export interface ActivityData {
-  name: string;
-  type: number;
-  url?: string;
-  created_at?: number;
-  timestamps?: {
-    start?: number;
-    end?: number;
-  };
-  application_id?: string;
-  details?: string;
-  state?: string;
-  emoji?: {
-    name: string;
-    id?: string;
-    animated?: boolean;
-  };
-  party?: {
-    id?: string;
-    size?: [number, number];
-  };
-  assets?: {
-    large_image?: string;
-    large_text?: string;
-    small_image?: string;
-    small_text?: string;
-  };
-  secrets?: {
-    join?: string;
-    spectate?: string;
-    match?: string;
-  };
-  instance?: boolean;
-  flags?: number;
-  buttons?: string[];
 }
