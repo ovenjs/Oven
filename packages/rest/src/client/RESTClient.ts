@@ -150,12 +150,20 @@ export class RESTClient {
     Object.assign(this.options, options);
     
     // Update request handler config
-    if (options.timeout || options.retries || options.userAgent) {
-      this.requestHandler.updateConfig({
-        timeout: options.timeout ? ms(options.timeout as number) : undefined,
-        retries: options.retries,
-        userAgent: options.userAgent,
-      });
+    if (options.timeout !== undefined || options.retries !== undefined || options.userAgent !== undefined) {
+      const updateConfig: Partial<RequestConfig> = {};
+      
+      if (options.timeout !== undefined) {
+        updateConfig.timeout = ms(options.timeout as number);
+      }
+      if (options.retries !== undefined) {
+        updateConfig.retries = options.retries;
+      }
+      if (options.userAgent !== undefined) {
+        updateConfig.userAgent = options.userAgent;
+      }
+      
+      this.requestHandler.updateConfig(updateConfig);
     }
   }
 
