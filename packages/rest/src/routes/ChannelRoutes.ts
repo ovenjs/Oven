@@ -6,13 +6,11 @@
 import { BaseRoute } from './BaseRoute.js';
 import type {
   RequestOptions,
-  Channel,
-  Message,
-  MessageCreateOptions,
-  MessageEditOptions,
-  ChannelCreateOptions,
-  ChannelEditOptions,
 } from '@ovenjs/types';
+import type {
+  APIChannel,
+  APIMessage,
+} from 'discord-api-types/v10';
 
 /**
  * Channel API routes implementation
