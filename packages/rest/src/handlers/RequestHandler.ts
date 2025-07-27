@@ -6,9 +6,6 @@
 import { request } from 'undici';
 import type { 
   RequestOptions, 
-  HTTPMethod, 
-  FileData, 
-  APIErrorResponse,
   Milliseconds 
 } from '@ovenjs/types';
 import { ms } from '@ovenjs/types';
