@@ -102,15 +102,13 @@ export class RESTClient {
 
     const results = await this.requestHandler.batchRequests<T>(batchData);
     
-    return results.map((result, index) => {
-      const request = requests[index];
-      
+    return results.map((result, _index) => {
       if (result.success) {
         return {
           data: result.data!,
           status: result.status,
           headers: result.headers,
-          rateLimit: this.extractRateLimitFromHeaders(result.headers),
+          rateLimit: this.extractRateLimitFromHeaders(result.headers) || undefined,
         };
       } else {
         throw result.error;
