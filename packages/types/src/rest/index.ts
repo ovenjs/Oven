@@ -145,6 +145,19 @@ export interface APIErrorDetail {
 }
 
 /**
+ * Rate limit headers
+ */
+export interface RateLimitHeaders {
+  'x-ratelimit-limit'?: string;
+  'x-ratelimit-remaining'?: string;
+  'x-ratelimit-reset'?: string;
+  'x-ratelimit-reset-after'?: string;
+  'x-ratelimit-bucket'?: string;
+  'x-ratelimit-global'?: string;
+  'x-ratelimit-scope'?: string;
+}
+
+/**
  * Queued request
  */
 export interface QueuedRequest {
