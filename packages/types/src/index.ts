@@ -60,7 +60,10 @@ export type {
   PartialBy,
   RequiredBy,
   PropertyType,
-  JSONSerializable
+  JSONSerializable,
+  isObject,
+  isString,
+  isNumber
 } from './utils/index.js';
 
 // Constants
