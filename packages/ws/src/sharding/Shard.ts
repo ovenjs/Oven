@@ -308,7 +308,7 @@ export class Shard extends EventEmitter {
     this.send({
       op: GatewayOpcodes.Heartbeat,
       d: sequence,
-    });
+    } as any);
   }
 
   /**
