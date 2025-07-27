@@ -29,7 +29,10 @@ export type {
   BatchRequestResult,
   RouteOptions,
   BucketInfo,
-  QueuedRequest
+  QueuedRequest,
+  APIErrorResponse,
+  APIErrorDetail,
+  RateLimitHeaders
 } from './rest/index.js';
 
 export type {
