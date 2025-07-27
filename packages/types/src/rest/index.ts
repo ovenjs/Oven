@@ -69,7 +69,7 @@ export interface APIResponse<T = unknown> {
   data: T;
   status: number;
   headers: Record<string, string>;
-  rateLimit?: RateLimitData;
+  rateLimit?: RateLimitData | undefined;
 }
 
 /**
