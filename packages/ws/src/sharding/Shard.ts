@@ -474,7 +474,7 @@ export class Shard extends EventEmitter {
       },
     };
 
-    this.send(resumePayload);
+    this.send(resumePayload as any);
   }
 
   /**
