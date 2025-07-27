@@ -1,33 +1,52 @@
 /**
  * Gateway event handler for processing Discord events
- * Parses and validates incoming gateway events
+ * Parses, validates, and processes incoming Discord gateway events
+ * 
+ * @author OvenJS Team
+ * @since 0.1.0
  */
 
 import { EventEmitter } from 'events';
-import type { GatewayPayload } from '@ovenjs/types';
+import type { 
+  GatewayPayload, 
+  EventHandlerOptions, 
+  ProcessedEvent 
+} from '@ovenjs/types';
 import { isObject, isString, isNumber } from '@ovenjs/types';
 
-export interface EventHandlerOptions {
-  validateEvents?: boolean | undefined;
-  debugMode?: boolean | undefined;
-}
-
-export interface ProcessedEvent {
-  type: string;
-  data: any;
-  shardId: number;
-  sequence?: number | undefined;
-  timestamp: Date;
-}
-
 /**
- * Handles and processes Discord gateway events
+ * Handles and processes Discord gateway events with validation and statistics
+ * 
+ * This class provides:
+ * - Event validation and filtering
+ * - Event processing statistics
+ * - Type-safe event transformation
+ * - Performance monitoring
+ * 
+ * @example
+ * ```typescript
+ * const handler = new EventHandler({
+ *   validateEvents: true,
+ *   debugMode: false
+ * });
+ * 
+ * handler.on('event', (event) => {
+ *   console.log(`Received ${event.type} from shard ${event.shardId}`);
+ * });
+ * 
+ * const processed = handler.processEvent(0, gatewayPayload);
+ * ```
  */
 export class EventHandler extends EventEmitter {
   private readonly options: Required<EventHandlerOptions>;
   private eventCounts = new Map<string, number>();
   private lastEventTime = new Date();
 
+  /**
+   * Creates a new EventHandler instance
+   * 
+   * @param options - Configuration options for event handling
+   */
   constructor(options: EventHandlerOptions = {}) {
     super();
     
@@ -40,7 +59,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Process a gateway event payload
+   * Processes a Discord gateway event payload
+   * 
+   * @param shardId - ID of the shard that received the event
+   * @param payload - Gateway payload from Discord
+   * @returns Processed event object or null if invalid/non-dispatch event
    */
   processEvent(shardId: number, payload: GatewayPayload): ProcessedEvent | null {
     if (!payload.t || !payload.d) {
@@ -80,21 +103,25 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Get event statistics
+   * Gets event processing statistics
+   * 
+   * @returns Record of event types and their counts
    */
   getEventStats(): Record<string, number> {
     return Object.fromEntries(this.eventCounts);
   }
 
   /**
-   * Get total events processed
+   * Gets the total number of events processed
+   * 
+   * @returns Total event count across all types
    */
   getTotalEvents(): number {
     return Array.from(this.eventCounts.values()).reduce((sum, count) => sum + count, 0);
   }
 
   /**
-   * Reset event statistics
+   * Resets all event statistics
    */
   resetStats(): void {
     this.eventCounts.clear();
@@ -102,7 +129,10 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Get most common events
+   * Gets the most frequently occurring events
+   * 
+   * @param limit - Maximum number of events to return (default: 10)
+   * @returns Array of events sorted by frequency
    */
   getTopEvents(limit = 10): Array<{ type: string; count: number }> {
     return Array.from(this.eventCounts.entries())
@@ -112,7 +142,9 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Get events per second (rough estimate)
+   * Gets rough estimate of events processed per second
+   * 
+   * @returns Events per second rate
    */
   getEventsPerSecond(): number {
     const totalEvents = this.getTotalEvents();
@@ -121,7 +153,47 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate event data (basic validation)
+   * Creates a filter function for specific event types
+   * 
+   * @param eventTypes - Array of event type names to filter for
+   * @returns Filter function that returns true for matching events
+   */
+  createEventFilter(eventTypes: string[]): (event: ProcessedEvent) => boolean {
+    const lowerCaseTypes = eventTypes.map(type => type.toLowerCase());
+    return (event: ProcessedEvent) => lowerCaseTypes.includes(event.type.toLowerCase());
+  }
+
+  /**
+   * Creates a transformer function for a specific event type
+   * 
+   * @param eventType - Event type to transform
+   * @param transformer - Function to transform the event data
+   * @returns Transformer function that returns transformed data or null
+   */
+  createEventTransformer<T>(
+    eventType: string,
+    transformer: (data: any) => T
+  ): (event: ProcessedEvent) => T | null {
+    return (event: ProcessedEvent) => {
+      if (event.type.toLowerCase() === eventType.toLowerCase()) {
+        try {
+          return transformer(event.data);
+        } catch (error) {
+          this.emit('error', new Error(`Event transformation failed for ${eventType}: ${error}`));
+          return null;
+        }
+      }
+      return null;
+    };
+  }
+
+  /**
+   * Validates event data based on Discord API specifications
+   * 
+   * @param type - Event type name
+   * @param data - Event data payload
+   * @returns True if event data is valid
+   * @private
    */
   private validateEvent(type: string, data: any): boolean {
     if (!isObject(data)) {
@@ -151,7 +223,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate READY event
+   * Validates READY event data
+   * 
+   * @param data - Event data to validate
+   * @returns True if valid READY event
+   * @private
    */
   private validateReadyEvent(data: any): boolean {
     return (
@@ -163,7 +239,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate guild events
+   * Validates guild event data
+   * 
+   * @param data - Event data to validate
+   * @returns True if valid guild event
+   * @private
    */
   private validateGuildEvent(data: any): boolean {
     return (
@@ -176,7 +256,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate message events
+   * Validates message event data
+   * 
+   * @param data - Event data to validate
+   * @returns True if valid message event
+   * @private
    */
   private validateMessageEvent(data: any): boolean {
     return (
@@ -190,7 +274,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate channel events
+   * Validates channel event data
+   * 
+   * @param data - Event data to validate
+   * @returns True if valid channel event
+   * @private
    */
   private validateChannelEvent(data: any): boolean {
     return (
@@ -200,7 +288,11 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Validate member events
+   * Validates member event data
+   * 
+   * @param data - Event data to validate
+   * @returns True if valid member event
+   * @private
    */
   private validateMemberEvent(data: any): boolean {
     return (
@@ -212,7 +304,10 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Update event statistics
+   * Updates event processing statistics
+   * 
+   * @param eventType - Type of event to increment
+   * @private
    */
   private updateEventStats(eventType: string): void {
     const current = this.eventCounts.get(eventType) || 0;
@@ -220,35 +315,7 @@ export class EventHandler extends EventEmitter {
   }
 
   /**
-   * Filter events by type
-   */
-  createEventFilter(eventTypes: string[]): (event: ProcessedEvent) => boolean {
-    const lowerCaseTypes = eventTypes.map(type => type.toLowerCase());
-    return (event: ProcessedEvent) => lowerCaseTypes.includes(event.type.toLowerCase());
-  }
-
-  /**
-   * Create event transformer
-   */
-  createEventTransformer<T>(
-    eventType: string,
-    transformer: (data: any) => T
-  ): (event: ProcessedEvent) => T | null {
-    return (event: ProcessedEvent) => {
-      if (event.type.toLowerCase() === eventType.toLowerCase()) {
-        try {
-          return transformer(event.data);
-        } catch (error) {
-          this.emit('error', new Error(`Event transformation failed for ${eventType}: ${error}`));
-          return null;
-        }
-      }
-      return null;
-    };
-  }
-
-  /**
-   * Destroy the event handler
+   * Destroys the event handler and cleans up resources
    */
   destroy(): void {
     this.removeAllListeners();
