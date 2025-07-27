@@ -123,7 +123,7 @@ export class Shard extends EventEmitter {
    * @param payload - Gateway payload to send
    * @throws {Error} If shard is not connected
    */
-  send(payload: GatewayPayload): void {
+  send(payload: any): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error(`Cannot send payload - shard ${this.options.id} not connected`);
     }
