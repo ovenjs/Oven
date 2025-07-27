@@ -60,6 +60,16 @@ export type {
   JSONSerializable
 } from './utils/index.js';
 
+// Constants
+export {
+  API_VERSION,
+  API_BASE_URL,
+  CDN_BASE_URL,
+  GATEWAY_VERSION,
+  DISCORD_TIMEOUTS,
+  RATE_LIMIT
+} from './constants/index.js';
+
 export { ShardState } from './ws/index.js';
 
 // Internal primitives (using aliases to avoid conflicts)
