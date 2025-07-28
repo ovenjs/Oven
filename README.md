@@ -6,7 +6,7 @@ OvenJS is a modern, TypeScript-first Discord API wrapper for Node.js, designed t
 
 - 🚀 **Modern TypeScript** - Built with TypeScript 5.0+ with full type safety using discord-api-types
 - 📦 **Modular Architecture** - Clean monorepo structure with specialized packages
-- 🔌 **Plugin System** - Extensible architecture for custom functionality  
+- 🔌 **Plugin System** - Extensible architecture for custom functionality
 - ⚡ **Performance Focused** - Optimized for speed and memory efficiency
 - 🛡️ **Built-in Rate Limiting** - Automatic rate limit handling with intelligent bucketing
 - 🔄 **Auto-Reconnection** - Robust WebSocket connection management with sharding support
@@ -43,15 +43,15 @@ const client = new OvenClient({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
-client.on('ready', (user) => {
+client.on('ready', user => {
   console.log(`Logged in as ${user.username}!`);
 });
 
-client.on('messageCreate', async (message) => {
+client.on('messageCreate', async message => {
   if (message.content === '!ping') {
     await message.channel.send('Pong!');
   }
@@ -71,16 +71,16 @@ const client = new OvenClient({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
-client.on('messageCreate', async (message) => {
+client.on('messageCreate', async message => {
   if (message.content === '!interactive') {
     const embed = new EmbedBuilder()
       .setTitle('Interactive Example')
       .setDescription('Click the button below!')
-      .setColor(0x5865F2)
+      .setColor(0x5865f2)
       .setTimestamp();
 
     const button = new ButtonBuilder()
@@ -88,18 +88,17 @@ client.on('messageCreate', async (message) => {
       .setLabel('Click Me!')
       .setStyle(ButtonStyle.Primary);
 
-    const actionRow = new ActionRowBuilder()
-      .addComponents(button);
+    const actionRow = new ActionRowBuilder().addComponents(button);
 
     await message.channel.send({
       embeds: [embed.toJSON()],
-      components: [actionRow.toJSON()]
+      components: [actionRow.toJSON()],
     });
   }
 });
 
 // Handle button interactions
-client.on('interactionCreate', async (interaction) => {
+client.on('interactionCreate', async interaction => {
   if (interaction.isButton() && interaction.customId === 'example_button') {
     await interaction.reply('Button clicked!');
   }
@@ -120,16 +119,16 @@ import { Routes } from 'discord-api-types/v10';
 const rest = new RESTClient({ token: 'YOUR_BOT_TOKEN' });
 const user = await rest.request({
   method: 'GET',
-  path: Routes.user()
+  path: Routes.user(),
 });
 
-// WebSocket-only usage  
+// WebSocket-only usage
 import { WebSocketClient } from '@ovenjs/ws';
 import { GatewayIntentBits } from 'discord-api-types/v10';
 
 const ws = new WebSocketClient({
   token: 'YOUR_BOT_TOKEN',
-  intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages
+  intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages,
 });
 
 ws.on('ready', () => console.log('WebSocket ready!'));
@@ -165,7 +164,7 @@ OvenJS follows a clean, modular architecture:
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - Yarn (package manager)
 - TypeScript 5.0+
 
@@ -192,6 +191,7 @@ yarn test
 ### Package Scripts
 
 Each package supports these scripts:
+
 - `yarn build` - Build the package with tsup
 - `yarn dev` - Build in watch mode
 - `yarn typecheck` - Run TypeScript type checking

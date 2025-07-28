@@ -1,43 +1,41 @@
 {
   "compilerOptions": {
-    // Environment
-    "lib": ["ESNext", "ESNext.Disposable"],
-    "target": "ES2023",
-    "experimentalDecorators": true,
-    "useDefineForClassFields": true,
+    // Basic settings
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2022"],
 
-    // Modules
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "allowArbitraryExtensions": false,
-    "allowImportingTsExtensions": false,
+    // Strictness
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": false,
+
+    // Type checking
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Module resolution
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
-    "resolvePackageJsonImports": true,
-    "resolvePackageJsonExports": true,
 
-    // Emit
+    // Output
     "declaration": true,
     "declarationMap": true,
-    "importHelpers": false,
-    "newLine": "lf",
-    "noEmitHelpers": true,
-    "removeComments": false,
     "sourceMap": true,
-    "outDir": ".dist",
-    
-    // Type Checking
-		"allowUnreachableCode": false,
-		"allowUnusedLabels": false,
-		"exactOptionalPropertyTypes": true,
-		"noFallthroughCasesInSwitch": true,
-		"noImplicitOverride": true,
-		"noImplicitReturns": true,
-		"noPropertyAccessFromIndexSignature": false,
-		"noUncheckedIndexedAccess": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		"strict": true,
-  },
+    "outDir": "./dist",
 
-  "include": ["packages/*/src/**/*"]
+    // Other
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true
+  },
+  "include": ["packages/*/src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }
