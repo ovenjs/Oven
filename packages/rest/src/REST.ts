@@ -7,10 +7,52 @@ import { RESTError } from './utils/errors/RESTError';
 import { ValidationError } from './utils/errors/ValidationError';
 import { DiscordTokenSchema, RESTOptionsSchema } from './utils/zod';
 
+/**
+ * REST client for interacting with the Discord API.
+ *
+ * @remarks
+ * This class provides a structured, event-driven interface for making HTTP requests
+ * to the Discord API. It handles authentication, URL construction, error parsing,
+ * and emits debug/response events for observability.
+ *
+ * @example
+ * ```ts
+ * const rest = new REST({ version: 10 })
+ *  .setToken('your-token');
+ *
+ * rest.on('restDebug', (info) => console.log(info));
+ *
+ * const user = await rest.get('/users/@me');
+ * console.log(user.username);
+ * ```
+ */
 export class REST extends AsyncEventEmitter<RESTEvents> {
+  /**
+   * The finalized REST options after validation.
+   *
+   * @internal
+   */
   private readonly options: RESTOptions;
+
+  /**
+   * The base URL used for all API requests (e.g., `https://discord.com/api`).
+   *
+   * @internal
+   * @see API_BASE_URL
+   */
   private readonly baseURL: string = API_BASE_URL;
 
+  /**
+   * Creates a new instance of the REST client.
+   *
+   * @param options - Configuration options for the REST client.
+   * @throws {ValidationError} If the provided options fail schema validation.
+   *
+   * @example
+   * ```ts
+   * new REST({ token: 'abc123', version: 10, timeout: 15000 });
+   * ```
+   */
   constructor(options?: RESTOptions) {
     super();
 
@@ -20,6 +62,22 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     this.options = res.data;
   }
 
+  /**
+   * Sets the bot token used for authentication.
+   *
+   * @remarks
+   * The token is automatically prefixed with `Bot ` when used in requests.
+   * This method is chainable.
+   *
+   * @param token - The Discord bot token.
+   * @returns The current instance for method chaining.
+   * @throws {ValidationError} If the token format is invalid.
+   *
+   * @example
+   * ```ts
+   * rest.setToken('my-secret-token');
+   * ```
+   */
   setToken(token: string): this {
     const res = DiscordTokenSchema.safeParse(token);
     if (!res.success) throw new ValidationError(res.error);
@@ -28,17 +86,44 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     return this;
   }
 
+  /**
+   * Gets the full API endpoint root (including version).
+   *
+   * @returns The base URL with API version, e.g., `https://discord.com/api/v10`
+   *
+   * @example
+   * ```ts
+   * console.log(rest.endpoint); // "https://discord.com/api/v10"
+   * ```
+   */
   get endpoint(): string {
     return `${this.baseURL}/v${this.options.version}`;
   }
 
+  /**
+   * Makes a raw HTTP request to the Discord API.
+   *
+   * @remarks
+   * This is the core method used by all higher-level methods (`get`, `post`, etc.).
+   * It emits debug events, constructs headers, handles errors, and parses responses.
+   *
+   * @template T - The expected type of the response body.
+   * @param data - The request configuration.
+   * @returns A promise that resolves to the parsed response body.
+   * @throws {DiscordAPIError} If the API returns an error status (4xx/5xx).
+   * @throws {RESTError} If an internal/network error occurs.
+   *
+   * @example
+   * ```ts
+   * const user = await rest.request<User>({ method: 'GET', path: '/users/@me' });
+   * ```
+   */
   async request<T = any>(data: RESTRequest): Promise<T> {
     const { method, path, data: body, options } = data;
 
     this.emit('restDebug', `[REST]: REST.request(): ${method} ${path}`);
 
     const _url = `${this.endpoint}${path.startsWith('/') ? path : `/${path}`}`;
-
     this.emit('restDebug', `[REST]: REST.request(): URL -> ${_url}`);
 
     const _headers = {
@@ -46,14 +131,12 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
       ...options?.headers,
     };
 
-    // If a token is present in the REST options,
-    // Add the Authorization header.
+    // Add Authorization header if token is available
     if (this.options.token) {
       _headers['Authorization'] = `Bot ${this.options.token}`;
     }
 
-    // If a body is present and content-type header,
-    // Is missing then set the content-type header.
+    // Set Content-Type to JSON if body is present and no Content-Type is set
     if (body && !_headers['Content-Type']) {
       _headers['Content-Type'] = 'application/json';
     }
@@ -66,7 +149,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         signal: AbortSignal.timeout((this.options.timeout ??= 15000)),
       });
 
-      // Handle Discord API errors
+      // Handle non-2xx responses as API errors
       if (!response.statusCode.toString().startsWith('2')) {
         const _res_error = (await response.body.json()) as {
           message: string;
@@ -82,7 +165,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         );
       }
 
-      // Parse the response body.
+      // Parse and return the JSON response body
       const responseBody = await response.body.json();
 
       return responseBody as T;
@@ -95,10 +178,20 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     }
   }
 
-  async get<T = any>(
-    route: string,
-    options?: Omit<RESTRequest, 'method' | 'path'>
-  ): Promise<T> {
+  /**
+   * Sends a GET request to the specified route.
+   *
+   * @template T - Expected response type.
+   * @param route - The API endpoint path (e.g., `/users/@me`).
+   * @param options - Optional request overrides.
+   * @returns The parsed response body.
+   *
+   * @example
+   * ```ts
+   * const guild = await rest.get<Guild>('/guilds/123456789');
+   * ```
+   */
+  async get<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
     return this.request({
       ...options,
       method: 'GET',
@@ -106,10 +199,20 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     });
   }
 
-  async post<T = any>(
-    route: string,
-    options?: Omit<RESTRequest, 'method' | 'path'>
-  ): Promise<T> {
+  /**
+   * Sends a POST request to the specified route.
+   *
+   * @template T - Expected response type.
+   * @param route - The API endpoint path.
+   * @param options - Optional request overrides.
+   * @returns The parsed response body.
+   *
+   * @example
+   * ```ts
+   * await rest.post('/channels/123456789/messages', { data: { content: 'Hello!' } });
+   * ```
+   */
+  async post<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
     return this.request({
       ...options,
       method: 'POST',
@@ -117,10 +220,21 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     });
   }
 
-  async put<T = any>(
-    route: string,
-    options?: Omit<RESTRequest, 'method' | 'path'>
-  ): Promise<T> {
+  /**
+   * Sends a PUT request to the specified route.
+   *
+   * @template T - Expected response type.
+   * @param route - The API endpoint path.
+   * @param options - Optional request overrides.
+   * @returns The parsed response body.
+   *
+   * @example
+   * ```ts
+   * // Used for upsert-style operations
+   * await rest.put('/guilds/123456789/channels', { data: [...] });
+   * ```
+   */
+  async put<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
     return this.request({
       ...options,
       method: 'PUT',
@@ -128,10 +242,20 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     });
   }
 
-  async patch<T = any>(
-    route: string,
-    options?: Omit<RESTRequest, 'method' | 'path'>
-  ): Promise<T> {
+  /**
+   * Sends a PATCH request to the specified route.
+   *
+   * @template T - Expected response type.
+   * @param route - The API endpoint path.
+   * @param options - Optional request overrides.
+   * @returns The parsed response body.
+   *
+   * @example
+   * ```ts
+   * await rest.patch('/users/@me', { data: { username: 'NewName' } });
+   * ```
+   */
+  async patch<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
     return this.request({
       ...options,
       method: 'PATCH',
@@ -139,10 +263,20 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     });
   }
 
-  async delete<T = any>(
-    route: string,
-    options?: Omit<RESTRequest, 'method' | 'path'>
-  ): Promise<T> {
+  /**
+   * Sends a DELETE request to the specified route.
+   *
+   * @template T - Expected response type.
+   * @param route - The API endpoint path.
+   * @param options - Optional request overrides.
+   * @returns The parsed response body.
+   *
+   * @example
+   * ```ts
+   * await rest.delete('/channels/123456789');
+   * ```
+   */
+  async delete<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
     return this.request({
       ...options,
       method: 'DELETE',
