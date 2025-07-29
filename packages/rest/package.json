@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@vladfrangu/async_event_emitter": "^2.4.6",
-    "undici": "^7.12.0"
+    "undici": "^7.12.0",
+    "zod": "^4.0.13"
   },
   "keywords": [
     "discord",

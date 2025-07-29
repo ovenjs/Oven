@@ -3,9 +3,14 @@ import { RequestInit } from 'undici';
 // Constant Variable.
 export const API_BASE_URL = 'https://discord.com/api';
 
-export interface RestEvents {
+export interface RESTEvents {
   restDebug: [debug: string];
   restResponse: [response: string];
+}
+
+export enum RestEvents {
+  debug = 'restDebug',
+  response = 'restResponse',
 }
 
 export interface RESTOptions {

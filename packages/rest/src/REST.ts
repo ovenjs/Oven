@@ -1,19 +1,29 @@
 import { AsyncEventEmitter } from '@vladfrangu/async_event_emitter';
 import { request } from 'undici';
 
-import { API_BASE_URL, RESTOptions, RESTRequest } from './types';
+import { API_BASE_URL, RESTEvents, RESTOptions, RESTRequest } from './types';
+import { DiscordAPIError } from './utils/errors/DiscordAPIError';
+import { RESTError } from './utils/errors/RESTError';
+import { ValidationError } from './utils/errors/ValidationError';
+import { DiscordTokenSchema, RESTOptionsSchema } from './utils/zod';
 
-export class REST extends AsyncEventEmitter {
+export class REST extends AsyncEventEmitter<RESTEvents> {
   private readonly options: RESTOptions;
   private readonly baseURL: string = API_BASE_URL;
 
   constructor(options?: RESTOptions) {
     super();
-    options ??= { version: 10, timeout: 15000 };
-    this.options = options;
+
+    const res = RESTOptionsSchema.safeParse(options);
+    if (!res.success) throw new ValidationError(res.error);
+
+    this.options = res.data;
   }
 
   setToken(token: string): this {
+    const res = DiscordTokenSchema.safeParse(token);
+    if (!res.success) throw new ValidationError(res.error);
+
     this.options.token = token;
     return this;
   }
@@ -24,7 +34,12 @@ export class REST extends AsyncEventEmitter {
 
   async request<T = any>(data: RESTRequest): Promise<T> {
     const { method, path, data: body, options } = data;
+
+    this.emit('restDebug', `[REST]: REST.request(): ${method} ${path}`);
+
     const _url = `${this.endpoint}${path.startsWith('/') ? path : `/${path}`}`;
+
+    this.emit('restDebug', `[REST]: REST.request(): URL -> ${_url}`);
 
     const _headers = {
       'User-Agent': 'OvenJS (https://github.com/ovenjs, 0.0.0)',
@@ -51,9 +66,20 @@ export class REST extends AsyncEventEmitter {
         signal: AbortSignal.timeout((this.options.timeout ??= 15000)),
       });
 
-      // Handle empty responses
-      if (response.statusCode === 204) {
-        return undefined as T;
+      // Handle Discord API errors
+      if (!response.statusCode.toString().startsWith('2')) {
+        const _res_error = (await response.body.json()) as {
+          message: string;
+          code: number;
+        };
+
+        throw new DiscordAPIError(
+          _res_error.message,
+          _res_error.code ?? response.statusCode,
+          response.statusCode,
+          method,
+          path
+        );
       }
 
       // Parse the response body.
@@ -61,7 +87,11 @@ export class REST extends AsyncEventEmitter {
 
       return responseBody as T;
     } catch (error) {
-      throw Error(`REST.request(): Error`, { cause: error });
+      if (error instanceof DiscordAPIError) {
+        throw error;
+      }
+
+      throw new RESTError(`[REST] Error -> ${error}`);
     }
   }
 
