@@ -59,6 +59,9 @@ importers:
       undici:
         specifier: ^7.12.0
         version: 7.12.0
+      zod:
+        specifier: ^4.0.13
+        version: 4.0.13
 
 packages:
   '@esbuild/aix-ppc64@0.25.8':
@@ -2953,6 +2956,12 @@ packages:
       }
     engines: { node: '>=10' }
 
+  zod@4.0.13:
+    resolution:
+      {
+        integrity: sha512-jv+zRxuZQxTrFHzxZ46ezL2FtnE+M4HIJHJEwLsZ7UjrXHltdG6HrxvqM0twoVCWxJiYf8WqKjAcjztegpkB+Q==,
+      }
+
 snapshots:
   '@esbuild/aix-ppc64@0.25.8':
     optional: true
@@ -4816,3 +4825,5 @@ snapshots:
       strip-ansi: 7.1.0
 
   yocto-queue@0.1.0: {}
+
+  zod@4.0.13: {}
