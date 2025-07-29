@@ -1,3 +1,3 @@
 export { REST } from './REST';
 
-export { RESTOptions, RateLimitInfo } from './types';
+export { RESTOptions, RestEvents, RateLimitInfo } from './types';
