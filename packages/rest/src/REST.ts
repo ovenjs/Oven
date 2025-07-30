@@ -1,10 +1,12 @@
 import { AsyncEventEmitter } from '@vladfrangu/async_event_emitter';
 import { request } from 'undici';
 
+import { BucketManager } from './bucket/BucketManager';
 import { API_BASE_URL, RESTEvents, RESTOptions, RESTRequest } from './types';
 import { DiscordAPIError } from './utils/errors/DiscordAPIError';
 import { RESTError } from './utils/errors/RESTError';
 import { ValidationError } from './utils/errors/ValidationError';
+import { normalizeHeaders } from './utils/util';
 import { DiscordTokenSchema, RESTOptionsSchema } from './utils/zod';
 
 /**
@@ -42,6 +44,8 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    */
   private readonly baseURL: string = API_BASE_URL;
 
+  private bucket: BucketManager;
+
   /**
    * Creates a new instance of the REST client.
    *
@@ -60,6 +64,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     if (!res.success) throw new ValidationError(res.error);
 
     this.options = res.data;
+    this.bucket = new BucketManager();
   }
 
   /**
@@ -124,7 +129,15 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
     this.emit('restDebug', `[REST]: REST.request(): ${method} ${path}`);
 
     const _url = `${this.endpoint}${path.startsWith('/') ? path : `/${path}`}`;
+
     this.emit('restDebug', `[REST]: REST.request(): URL -> ${_url}`);
+
+    if (this.bucket.isGlobalRateLimited()) {
+      this.emit('restDebug', `[REST]: REST.request(): Hit global rate-limit. Waiting...`);
+    }
+
+    const bucket = this.bucket.getBucket(path, method);
+    await bucket.wait();
 
     const _headers = {
       'User-Agent': 'OvenJS (https://github.com/ovenjs, 0.0.0)',
@@ -148,6 +161,38 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         body: body ? JSON.stringify(body) : undefined,
         signal: AbortSignal.timeout((this.options.timeout ??= 15000)),
       });
+
+      const headers = normalizeHeaders(response.headers);
+      this.bucket.updateFromHeaders(path, method, headers);
+
+      if (headers['x-ratelimit-global']) {
+        const tryAfter = parseFloat(headers['retry-after'] || '0');
+        this.emit(
+          'restDebug',
+          `[REST]: REST.request(): Global Ratelimit hit. Try Again After: ${tryAfter}s`
+        );
+        await this.bucket.handleGlobalRateLimit(tryAfter);
+        return this.request(data);
+      }
+
+      if (response.statusCode === 429) {
+        const responseBody = (await response.body.json()) as { retry_after?; code? };
+        const tryAfter =
+          responseBody.retry_after || parseFloat(headers['retry-after'] || '0');
+        this.emit(
+          'restDebug',
+          `[REST]: REST.request(): Ratelimit hit on ${method}:/${path}. Try After: ${tryAfter}s`
+        );
+
+        throw new DiscordAPIError(
+          `Ratelimit hit on ${method}:/${path}`,
+          responseBody.code ?? response.statusCode,
+          response.statusCode,
+          method,
+          path,
+          `Try Again After: ${tryAfter}s`
+        );
+      }
 
       // Handle non-2xx responses as API errors
       if (!response.statusCode.toString().startsWith('2')) {
@@ -191,7 +236,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * const guild = await rest.get<Guild>('/guilds/123456789');
    * ```
    */
-  async get<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
+  async get<T = any>(
+    route: string,
+    options?: Omit<RESTRequest, 'method' | 'path'>
+  ): Promise<T> {
     return this.request({
       ...options,
       method: 'GET',
@@ -212,7 +260,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * await rest.post('/channels/123456789/messages', { data: { content: 'Hello!' } });
    * ```
    */
-  async post<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
+  async post<T = any>(
+    route: string,
+    options?: Omit<RESTRequest, 'method' | 'path'>
+  ): Promise<T> {
     return this.request({
       ...options,
       method: 'POST',
@@ -234,7 +285,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * await rest.put('/guilds/123456789/channels', { data: [...] });
    * ```
    */
-  async put<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
+  async put<T = any>(
+    route: string,
+    options?: Omit<RESTRequest, 'method' | 'path'>
+  ): Promise<T> {
     return this.request({
       ...options,
       method: 'PUT',
@@ -255,7 +309,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * await rest.patch('/users/@me', { data: { username: 'NewName' } });
    * ```
    */
-  async patch<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
+  async patch<T = any>(
+    route: string,
+    options?: Omit<RESTRequest, 'method' | 'path'>
+  ): Promise<T> {
     return this.request({
       ...options,
       method: 'PATCH',
@@ -276,7 +333,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * await rest.delete('/channels/123456789');
    * ```
    */
-  async delete<T = any>(route: string, options?: Omit<RESTRequest, 'method' | 'path'>): Promise<T> {
+  async delete<T = any>(
+    route: string,
+    options?: Omit<RESTRequest, 'method' | 'path'>
+  ): Promise<T> {
     return this.request({
       ...options,
       method: 'DELETE',

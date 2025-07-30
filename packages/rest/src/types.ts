@@ -87,7 +87,7 @@ export interface RESTOptions {
    * @example
    * ```ts
    * const options = { token: 'your-bot-token' };
-   * // or 
+   * // or
    * <REST>.setToken("your-bot-token");
    * ```
    */
@@ -191,53 +191,108 @@ export interface RESTRequest {
 }
 
 /**
- * Information about a rate limit encountered during a request.
- *
- * @remarks
- * Populated when a 429 Too Many Requests response is received,
- * or when bucket metadata is parsed from response headers.
+ * Interface representing the headers related to rate limiting.
+ */
+export interface RateLimitHeaders {
+  /**
+   * The maximum number of requests that can be made in a given time frame.
+   */
+  'x-ratelimit-limit'?: string;
+
+  /**
+   * The number of requests remaining in the current time frame.
+   */
+  'x-ratelimit-remaining'?: string;
+
+  /**
+   * The time at which the current rate limit resets, in epoch time.
+   */
+  'x-ratelimit-reset'?: string;
+
+  /**
+   * The time remaining until the rate limit resets, in seconds.
+   */
+  'x-ratelimit-reset-after'?: string;
+
+  /**
+   * The identifier for the rate limit bucket.
+   */
+  'x-ratelimit-bucket'?: string;
+
+  /**
+   * Indicates whether the rate limit is global across all endpoints.
+   */
+  'x-ratelimit-global'?: string;
+
+  /**
+   * The time to wait before making another request, in seconds.
+   */
+  'retry-after'?: string;
+}
+
+/**
+ * Interface representing the information about rate limits.
  */
 export interface RateLimitInfo {
   /**
-   * The total number of requests allowed per reset period.
+   * The maximum number of requests allowed in the current time frame.
    */
   limit: number;
 
   /**
-   * The number of requests remaining before hitting the limit.
+   * The number of requests remaining in the current time frame.
    */
   remaining: number;
 
   /**
-   * Unix timestamp (in milliseconds) when the rate limit resets.
+   * The time at which the current rate limit resets, in epoch time.
    */
   reset: number;
 
   /**
-   * Number of milliseconds until the rate limit resets.
+   * The time remaining until the rate limit resets, in seconds.
    */
   resetAfter: number;
 
   /**
-   * Unique identifier for the rate limit bucket, if available.
-   *
-   * @remarks
-   * Used internally to manage per-route ratelimiting.
+   * The identifier for the rate limit bucket, if applicable.
    */
   bucket?: string;
 
   /**
-   * Whether this rate limit applies globally to all requests.
-   *
-   * @remarks
-   * Global rate limits are rare but require special handling.
+   * Indicates whether the rate limit is global across all endpoints.
    */
   global?: boolean;
 
   /**
-   * How long (in milliseconds) to wait before retrying.
+   * The time to wait before making another request, in seconds.
    */
   retryAfter?: number;
+}
+
+/**
+ * Interface representing information about a specific rate limit bucket.
+ */
+export interface BucketInfo {
+  /**
+   * The unique identifier for the bucket.
+   */
+  id: string;
+
+  /**
+   * The maximum number of requests allowed in the current time frame for this bucket.
+   */
+  limit: number;
+
+  /**
+   * The number of requests remaining in the current time frame for this bucket.
+   */
+  remaining: number;
+
+  /**
+   * The time at which the current rate limit for this bucket resets, in epoch time.
+   */
+  reset: number;
 }
 
 /**
