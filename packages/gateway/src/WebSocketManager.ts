@@ -12,20 +12,18 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
 
   constructor(options: WebSocketManagerOptions) {
     super();
+
     this.options = options;
-    this.shardCount = options.totalShards ?? options.shardCount ?? 1;
+    this.shardCount = options.shardCount ??= 1;
   }
 
   async connect(): Promise<void> {
-    if (this.connecting) {
-      return;
-    }
+    if (this.connecting) return;
 
     this.connecting = true;
     this.emit('debug', `[GATEWAY]: Connecting ${this.shardCount} shards`);
 
     try {
-      // Create and connect all shards
       for (let shardId = 0; shardId < this.shardCount; shardId++) {
         await this.createShard(shardId);
       }
@@ -44,7 +42,7 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
     // Forward events from shard to manager
     shard.on('ready', _data => {
       this.readyShards.add(shardId);
-      this.emit('debug', `[GATEWAY] Shard ${shardId} ready`);
+      this.emit('debug', `[GATEWAY]: Shard ${shardId} ready`);
 
       if (this.readyShards.size === this.shardCount) {
         this.emit('ready');
@@ -53,7 +51,7 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
 
     shard.on('resumed', () => {
       this.readyShards.add(shardId);
-      this.emit('debug', `Shard ${shardId} resumed`);
+      this.emit('debug', `[GATEWAY]: Shard ${shardId} resumed`);
     });
 
     shard.on('error', error => {
@@ -61,14 +59,14 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
     });
 
     shard.on('close', ({ code, reason }) => {
-      this.emit('debug', `Shard ${shardId} closed: ${code} ${reason}`);
+      this.emit('debug', `[GATEWAY] Shard ${shardId} closed: ${code} ${reason}`);
     });
 
     shard.on('dispatch', payload => {
-      // Forward all dispatch events
       this.emit('dispatch', payload);
+
       if (payload.t) {
-        this.emit(payload.t.toLowerCase(), payload.d);
+        this.emit(payload.t, payload.d);
       }
     });
 
@@ -77,7 +75,7 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
   }
 
   async disconnect(): Promise<void> {
-    this.emit('debug', 'Disconnecting all shards');
+    this.emit('debug', '[GATEWAY]: Disconnecting all shards');
 
     for (const shard of this.shards.values()) {
       shard.destroy();
