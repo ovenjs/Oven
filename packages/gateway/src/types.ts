@@ -7,7 +7,7 @@ import type {
 } from 'discord-api-types/v10';
 
 export const GATEWAY_VERSION = 10;
-export const GATEWAY_ENCODING = "json";
+export const GATEWAY_ENCODING = 'json';
 
 export interface WebSocketManagerOptions {
   token: string;
@@ -32,6 +32,19 @@ export interface WebSocketManagerOptions {
    * @default false
    */
   compress?: boolean;
+}
+
+export interface WebSocketManagerEvents {
+  ready: [];
+  resumed: [];
+  error: [Error];
+  disconnect: [];
+  reconnecting: [];
+  debug: [string];
+
+  // Dispatch events
+  dispatch: [any];
+  [event: string]: any[];
 }
 
 export interface WebSocketShardEvents {

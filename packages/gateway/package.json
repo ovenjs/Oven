@@ -30,5 +30,10 @@
   ],
   "author": "OvenJS",
   "license": "MIT",
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "@vladfrangu/async_event_emitter": "^2.4.6",
+    "ws": "^8.18.3"
+  }
 }
