@@ -1,3 +1,4 @@
+// packages/rest/src/bucket/BucketManager.ts
 import type { RateLimitHeaders } from '../types';
 
 import { Bucket } from './Bucket';
@@ -7,11 +8,10 @@ export class BucketManager {
   private globalReset: number = 0;
 
   getBucket(route: string, method: string): Bucket {
-    // Simple route-based bucketing for now
-    const bucketId = this.hashRoute(route, method);
+    const bucketId = this.generateBucketId(route, method);
 
     if (!this.buckets.has(bucketId)) {
-      // Default values, will be updated from headers
+      // Default values - will be updated from actual rate limit headers
       this.buckets.set(bucketId, new Bucket(bucketId, 1, 1, Date.now() + 1000));
     }
 
@@ -23,7 +23,10 @@ export class BucketManager {
     const remaining = parseInt(headers['x-ratelimit-remaining'] || '1');
     const resetAfter = parseFloat(headers['x-ratelimit-reset-after'] || '0');
     const reset = Date.now() + resetAfter * 1000;
-    const bucketId = headers['x-ratelimit-bucket'] || this.hashRoute(route, method);
+
+    // Use the bucket ID from headers if provided, otherwise generate from route
+    const bucketId =
+      headers['x-ratelimit-bucket'] || this.generateBucketId(route, method);
 
     if (!this.buckets.has(bucketId)) {
       this.buckets.set(bucketId, new Bucket(bucketId, limit, remaining, reset));
@@ -41,19 +44,52 @@ export class BucketManager {
     await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
   }
 
-  private hashRoute(route: string, method: string): string {
-    // Simple route hashing - major parameters matter for bucketing
+  private generateBucketId(route: string, method: string): string {
+    // Extract major parameters that affect rate limiting
     const majorParams = this.extractMajorParameters(route);
-    return `${method}:${route
-      .split('/')
-      .filter(part => !part.startsWith(':') && !/^\d+$/.test(part))
-      .join('/')}:${majorParams}`;
+
+    // Create bucket key based on method and major parameters
+    // This ensures routes with same major params share buckets
+    const basePath = this.getBaseRoute(route);
+
+    return `${method}:${basePath}${majorParams ? `:${majorParams}` : ''}`;
+  }
+
+  private getBaseRoute(route: string): string {
+    // Remove IDs and other variable parts to get the base route
+    return route
+      .replace(/\/\d+/g, '/:id')
+      .replace(/\/channels\/:id/, '/channels/:id')
+      .replace(/\/guilds\/:id/, '/guilds/:id')
+      .replace(/\/users\/:id/, '/users/:id');
   }
 
   private extractMajorParameters(route: string): string {
-    // Extract major parameters that affect rate limiting
-    // e.g., /channels/{channel.id}/messages -> channel.id matters
-    const matches = route.match(/\/(\d+)\/(?:messages|members|channels|roles|emojis)/g);
-    return matches ? matches.join(':') : '';
+    // Extract actual IDs that are major rate limit parameters
+    const majorParamRegex = /\/(\d+)\//g;
+    const matches = [];
+    let match;
+
+    while ((match = majorParamRegex.exec(route)) !== null) {
+      // Only consider certain IDs as major parameters
+      const fullPath = route.substring(0, match.index + match[0].length);
+      if (this.isMajorParameterPath(fullPath)) {
+        matches.push(match[1] as never);
+      }
+    }
+
+    return matches.join(':');
+  }
+
+  private isMajorParameterPath(path: string): boolean {
+    // These paths have major parameters that affect rate limiting
+    const majorParameterPaths = [
+      '/channels/', // channel ID is major
+      '/guilds/', // guild ID is major
+      '/users/', // user ID is major
+      '/webhooks/', // webhook ID is major
+    ];
+
+    return majorParameterPaths.some(majorPath => path.includes(majorPath));
   }
 }

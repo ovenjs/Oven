@@ -15,6 +15,7 @@ export default tseslint.config(
       'tsup.config.ts',
       'packages/*/tsup.config.ts',
       'packages/*/dist',
+      'tests/*',
     ],
   },
 
