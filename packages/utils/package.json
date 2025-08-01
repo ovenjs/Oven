@@ -1,6 +1,6 @@
 {
   "name": "@ovendjs/utils",
-  "version": "0.21.7",
+  "version": "0.22.1",
   "description": "Utiliy package for ovenjs",
   "type": "module",
   "main": "./dist/index.js",
@@ -36,5 +36,8 @@
   ],
   "author": "OvenJS",
   "license": "ISC",
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "esbuild-plugin-version-injector": "^1.2.1"
+  }
 }

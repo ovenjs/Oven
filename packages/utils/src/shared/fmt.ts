@@ -36,35 +36,35 @@ export function fmtDebug(options: FmtDebugOptions): string | Error {
   }
 
   if (options.array) {
-    options.array.formatted ??= "exclusive";
-    
-    const top = " _".repeat(10);
-    const empty_space = "\n|\n"
+    options.array.formatted ??= 'exclusive';
+
+    const top = ' _'.repeat(10);
+    const empty_space = '\n|\n';
     const starting_point = `| ${fmtColors.GREEN}@ovenjs${fmtColors.NC}/${fmtColors.RED}${options.package.name}${fmtColors.NC} ~ v${fmtColors.YELLOW}${options.package.version}${fmtColors.NC}\n`;
-    let lines = "";
-    if (options.array.formatted === "exclusive")
-      lines = `| [${options.package.name.toUpperCase()}]:\n`
+    let lines = '';
+    if (options.array.formatted === 'exclusive')
+      lines = `| [${options.package.name.toUpperCase()}]:\n`;
 
     for (let i = 0; i < options.array.input.length; i++) {
-        if (options.array.formatted === "exclusive") {
-            lines += `|       [${i}]: ${options.array.input[i]}\n`;
-        } else {
-            lines += `| [${options.package.name.toUpperCase()}]: ${options.array.input[i]}\n`
-        }
+      if (options.array.formatted === 'exclusive') {
+        lines += `|       [${i}]: ${options.array.input[i]}\n`;
+      } else {
+        lines += `| [${options.package.name.toUpperCase()}]: ${options.array.input[i]}\n`;
+      }
     }
 
-    const bottom = " _".repeat(10)
+    const bottom = ' _'.repeat(10);
     const combined_all = top + empty_space + starting_point + lines + bottom;
     const combined_clean = combined_all
-    .split("\n")
-    .map(line => `- ${line}`)
-    .join("\n")
+      .split('\n')
+      .map(line => `- ${line}`)
+      .join('\n');
 
-    const combined = combined_clean
+    const combined = combined_clean;
     return combined;
   }
 
-  throw new Error("Unknown Input. Must be either a String or an Array");
+  throw new Error('Unknown Input. Must be either a String or an Array');
 }
 
 export function fmtGroup(group: Array<string>) {
@@ -72,6 +72,6 @@ export function fmtGroup(group: Array<string>) {
     _: group.length,
     add: (text: string) => group.push(text),
     fmt: () => group.join('\n'),
-    fmtArray: () => group
+    fmtArray: () => group,
   };
 }

@@ -22,7 +22,7 @@ pnpm add @ovendjs/utils
 npm install @ovendjs/utils
 # or
 yarn add @ovendjs/utils
-````
+```
 
 ---
 
@@ -33,7 +33,7 @@ import { fmtDebug, fmtGroup } from '@ovendjs/utils';
 
 const output = fmtDebug({
   package: { name: 'utils', version: '0.21.7' },
-  string: 'Hello from utils!'
+  string: 'Hello from utils!',
 });
 
 console.log(output);
@@ -46,8 +46,8 @@ const output = fmtDebug({
   package: { name: 'utils', version: '0.21.7' },
   array: {
     input: ['Log message 1', 'Log message 2'],
-    formatted: 'exclusive'
-  }
+    formatted: 'exclusive',
+  },
 });
 
 console.log(output);
@@ -70,17 +70,21 @@ console.log(group.fmtArray());
 
 ## API
 
+### `fmt(meta: FmtPackage): { debug(input): string }`
+
+Utility method for making it easier to repeat fmtDebug.
+
 ### `fmtDebug(options: FmtDebugOptions): string | Error`
 
 Formats a debug message with color-coded output. Accepts either a `string` or `array` input.
 
 #### Options:
 
-* `package.name` – name of the calling package
-* `package.version` – version of the calling package
-* `string` – plain string to format
-* `array.input` – list of lines to format
-* `array.formatted` – `"exclusive"` (default) or `"unique"`
+- `package.name` – name of the calling package
+- `package.version` – version of the calling package
+- `string` – plain string to format
+- `array.input` – list of lines to format
+- `array.formatted` – `"exclusive"` (default) or `"unique"`
 
 ---
 
@@ -90,14 +94,14 @@ Creates a utility object to manage and format a collection of messages.
 
 #### Returns:
 
-* `_.add(string)` – adds an item to the group
-* `_.fmt()` – returns a newline-separated string
-* `_.fmtArray()` – returns the array as-is
+- `_.add(string)` – adds an item to the group
+- `_.fmt()` – returns a newline-separated string
+- `_.fmtArray()` – returns the array as-is
 
 ---
 
 ## License
 
-ISC — [OvenJS](https://github.com/OnORayan/Oven)
+ISC — [OvenJS](https://github.com/ovenjs/Oven)
 
 ---
