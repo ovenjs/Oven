@@ -1,16 +1,17 @@
-process.loadEnvFile(".env");
+process.loadEnvFile('.env');
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { WebSocketShard } from '../../packages/gateway/src/shard/WebSocketShard';
-import { WebSocketManagerOptions } from "../../packages/gateway/src/types"
+import { WebSocketManagerOptions } from '../../packages/gateway/src/types';
 import { GatewayIntentBits } from 'discord-api-types/v10';
 
 describe('WebSocketShard', () => {
   let shard: WebSocketShard;
   const mockOptions: WebSocketManagerOptions = {
     token: process.env.TOKEN as string,
-    intents: GatewayIntentBits.Guilds | 
-             GatewayIntentBits.GuildMessages |
-             GatewayIntentBits.MessageContent
+    intents:
+      GatewayIntentBits.Guilds |
+      GatewayIntentBits.GuildMessages |
+      GatewayIntentBits.MessageContent,
   };
 
   beforeEach(() => {

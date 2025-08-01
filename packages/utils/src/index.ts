@@ -1,3 +1,2 @@
-
-export * from "./shared/types";
-export { fmtDebug } from "./shared/fmt";
+export * from './shared/types';
+export { fmtDebug, fmtGroup } from './shared/fmt';
