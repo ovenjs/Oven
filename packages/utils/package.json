@@ -17,6 +17,9 @@
       }
     }
   },
+  "directories": {
+    "lib": "./dist"
+  },
   "scripts": {
     "build": "tsc --noEmit && tsup",
     "dev": "tsup --watch",
