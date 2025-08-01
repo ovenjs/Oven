@@ -5,7 +5,7 @@ export interface FmtPackage {
 
 export interface FmtDebugArray {
   input: Array<string>;
-  spacing?: 'as-is' | 'lined-up';
+  formatted?: 'unique' | 'exclusive';
 }
 
 export interface FmtDebugOptions {

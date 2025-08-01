@@ -8,7 +8,7 @@ export const fmtColors = {
   NC: '\x1b[0m',
 };
 
-export function fmtDebug(options: FmtDebugOptions): string {
+export function fmtDebug(options: FmtDebugOptions): string | Error {
   if (options.string) {
     const prepre_point = ` _`.repeat(10);
     const pre_point = `\n|\n`;
@@ -36,16 +36,18 @@ export function fmtDebug(options: FmtDebugOptions): string {
   }
 
   if (options.array) {
-    options.array.spacing ??= "lined-up";
+    options.array.formatted ??= "exclusive";
     
     const top = " _".repeat(10);
     const empty_space = "\n|\n"
     const starting_point = `| ${fmtColors.GREEN}@ovenjs${fmtColors.NC}/${fmtColors.RED}${options.package.name}${fmtColors.NC} ~ v${fmtColors.YELLOW}${options.package.version}${fmtColors.NC}\n`;
     let lines = "";
+    if (options.array.formatted === "exclusive")
+      lines = `| [${options.package.name.toUpperCase()}]:\n`
 
     for (let i = 0; i < options.array.input.length; i++) {
-        if (options.array.spacing === "lined-up") {
-            lines += `| [${options.package.name.toUpperCase()}]: ${options.array.input[i]}\n`;
+        if (options.array.formatted === "exclusive") {
+            lines += `|       [${i}]: ${options.array.input[i]}\n`;
         } else {
             lines += `| [${options.package.name.toUpperCase()}]: ${options.array.input[i]}\n`
         }
@@ -62,7 +64,7 @@ export function fmtDebug(options: FmtDebugOptions): string {
     return combined;
   }
 
-  return "unknown-input";
+  throw new Error("Unknown Input. Must be either a String or an Array");
 }
 
 export function fmtGroup(group: Array<string>) {

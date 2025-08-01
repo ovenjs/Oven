@@ -1,6 +1,6 @@
 {
   "name": "@ovenjs/utils",
-  "version": "0.0.1",
+  "version": "0.21.7",
   "description": "Utiliy package for ovenjs",
   "type": "module",
   "main": "./dist/index.js",
