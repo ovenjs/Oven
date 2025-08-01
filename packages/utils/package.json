@@ -1,5 +1,5 @@
 {
-  "name": "@ovenjs/utils",
+  "name": "@ovendjs/utils",
   "version": "0.21.7",
   "description": "Utiliy package for ovenjs",
   "type": "module",

@@ -1,5 +1,5 @@
 {
-  "name": "@ovenjs/rest",
+  "name": "@ovendjs/rest",
   "version": "0.0.1",
   "description": "Discord REST API client with request handling.",
   "type": "module",
