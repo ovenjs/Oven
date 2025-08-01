@@ -17,9 +17,10 @@
       }
     }
   },
-  "directories": {
-    "lib": "./dist"
-  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc --noEmit && tsup",
     "dev": "tsup --watch",
