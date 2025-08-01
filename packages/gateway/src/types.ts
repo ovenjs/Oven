@@ -1,3 +1,4 @@
+import { FmtPackage } from '@ovendjs/utils';
 import type {
   GatewayDispatchPayload,
   GatewayPresenceUpdateData,
@@ -8,6 +9,10 @@ import type {
 
 export const GATEWAY_VERSION = 10;
 export const GATEWAY_ENCODING = 'json';
+export const PACKAGE_META: FmtPackage = {
+  name: 'gateway',
+  version: '[VI]{{inject}}[/VI]',
+};
 
 export interface WebSocketManagerOptions {
   token: string;
