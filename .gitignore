@@ -1,6 +1,8 @@
 pnpm-lock.yaml
-# Quickie
+
+# Quickie (Internal Testing)
 quickie.ts
+disposable/*
 
 # Logs
 logs
