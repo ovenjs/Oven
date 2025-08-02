@@ -1,23 +1,29 @@
 {
-  "name": "@ovenjs/utils",
-  "version": "0.0.1",
+  "name": "@ovendjs/utils",
+  "version": "0.22.1",
   "description": "Utiliy package for ovenjs",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "require": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
-
       "import": {
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
     }
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc --noEmit && tsup",
     "dev": "tsup --watch",
@@ -30,5 +36,8 @@
   ],
   "author": "OvenJS",
   "license": "ISC",
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "esbuild-plugin-version-injector": "^1.2.1"
+  }
 }

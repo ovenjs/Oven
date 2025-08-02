@@ -1,15 +1,15 @@
 export interface FmtPackage {
-    name: string;
-    version: string;
+  name: string;
+  version: string;
 }
 
 export interface FmtDebugArray {
-    input: Array<string>;
-    spacing?: "as-is" | "lined-up";
+  input: Array<string>;
+  formatted?: 'unique' | 'exclusive';
 }
 
 export interface FmtDebugOptions {
-    package: FmtPackage;
-    string?: string;
-    array?: FmtDebugArray;
+  package: FmtPackage;
+  string?: string;
+  array?: FmtDebugArray;
 }
