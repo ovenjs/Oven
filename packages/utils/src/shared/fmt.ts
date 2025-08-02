@@ -31,8 +31,8 @@ export function fmtDebug(options: FmtDebugOptions): string | Error {
       prepre_point + pre_point + starting_point + middle_point + ending_point;
     const combined_lines = combined.split('\n');
     const combined_nl = combined_lines.map(line => `- ${line}`);
-    const combined_clean = combined_nl.join('\n');
-    return combined_clean;
+    return combined_nl.join('\n');
+
   }
 
   if (options.array) {
