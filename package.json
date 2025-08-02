@@ -13,8 +13,8 @@
     "clean": "pnpm -r run clean",
     "test:run": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint . --ext .ts,.js",
-    "lint:fix": "eslint --ext .ts,.js --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier . --write"
   },
   "dependencies": {
@@ -23,13 +23,10 @@
   "devDependencies": {
     "@eslint/js": "^9.32.0",
     "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vitest/coverage-istanbul": "3.2.4",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0",
-    "jiti": "^2.5.1",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "typescript": "^5.0.0",

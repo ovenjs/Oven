@@ -11,6 +11,7 @@ export default defineConfig([
     'node_modules/',
     'coverage/',
     'tests/',
+    'disposable',
     'quickie.ts',
   ]),
   eslint.configs.recommended,
