@@ -60,8 +60,8 @@ export function fmtDebug(options: FmtDebugOptions): string | Error {
       .map(line => `- ${line}`)
       .join('\n');
 
-    const combined = combined_clean;
-    return combined;
+    return combined_clean;
+
   }
 
   throw new Error('Unknown Input. Must be either a String or an Array');
