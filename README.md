@@ -20,7 +20,7 @@ OvenJS follows a monorepo structure with several specialized packages:
 | Package | Version | Description |
 |---------|---------|-------------|
 | [`@ovendjs/gateway`](./packages/gateway) | 0.5.3 | WebSocket gateway management for real-time events |
-| [`@ovendjs/rest`](./packages/rest) | 0.0.1 | REST API client with automatic rate limiting |
+| [`@ovendjs/rest`](./packages/rest) | 0.10.7 | REST API client with automatic rate limiting |
 | [`@ovendjs/utils`](./packages/utils) | 0.22.1 | Shared utilities and formatting functions |
 
 ## 🚀 Features
