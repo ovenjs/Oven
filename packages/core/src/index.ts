@@ -55,6 +55,14 @@ export { Bot } from './Bot';
 export type { BotOptions } from './types';
 
 /**
+ * Discord data structures and transformers.
+ *
+ * @remarks
+ * These classes represent Discord API objects and provide methods for interacting with them.
+ */
+export * from './structures';
+
+/**
  * Re-exported GatewayIntentBits from discord-api-types for convenience.
  *
  * @remarks
