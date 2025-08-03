@@ -215,8 +215,9 @@ export class WebSocketShard extends AsyncEventEmitter<WebSocketShardEvents> {
     // Emit the general dispatch event
     this.emit('dispatch', payload);
 
-    // Emit specific event
-    this.emit(payload.t.toLowerCase(), payload.d);
+    // Emit specific event with original casing for consistency
+    // Cast to unknown first, then to the specific event type to satisfy TypeScript
+    this.emit(payload.t, payload.d as never);
   }
 
   private onHeartbeatAck(): void {

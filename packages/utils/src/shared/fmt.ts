@@ -32,7 +32,6 @@ export function fmtDebug(options: FmtDebugOptions): string | Error {
     const combined_lines = combined.split('\n');
     const combined_nl = combined_lines.map(line => `- ${line}`);
     return combined_nl.join('\n');
-
   }
 
   if (options.array) {
@@ -61,7 +60,6 @@ export function fmtDebug(options: FmtDebugOptions): string | Error {
       .join('\n');
 
     return combined_clean;
-
   }
 
   throw new Error('Unknown Input. Must be either a String or an Array');

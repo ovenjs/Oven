@@ -10,6 +10,13 @@ export {
   WebSocketManagerOptions,
   WebSocketManagerEvents,
   WebSocketShardEvents,
+  EventHandler,
+  GatewayEventPayload,
+  WebSocketManagerEventHandler,
+  WebSocketShardEventHandler,
+  EventNames,
+  EventPayload,
+  isGatewayEvent,
 } from './types';
 
 /**

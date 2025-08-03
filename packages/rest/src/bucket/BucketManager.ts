@@ -6,6 +6,7 @@ import { Bucket } from './Bucket';
 export class BucketManager {
   private buckets: Map<string, Bucket> = new Map();
   private globalReset: number = 0;
+  private cleanupInterval?: NodeJS.Timeout;
 
   getBucket(route: string, method: string): Bucket {
     const bucketId = this.generateBucketId(route, method);
@@ -59,6 +60,7 @@ export class BucketManager {
     // Remove IDs and other variable parts to get the base route
     return route
       .replace(/\/\d+/g, '/:id')
+      .replace(/\/channels\/:id\/messages\/:id/, '/channels/:id/messages') // Special case for channel messages
       .replace(/\/channels\/:id/, '/channels/:id')
       .replace(/\/guilds\/:id/, '/guilds/:id')
       .replace(/\/users\/:id/, '/users/:id');
@@ -91,5 +93,54 @@ export class BucketManager {
     ];
 
     return majorParameterPaths.some(majorPath => path.includes(majorPath));
+  }
+
+  /**
+   * Clean up expired buckets to prevent memory leaks
+   */
+  private cleanupExpiredBuckets(): void {
+    const now = Date.now();
+    const expiredBuckets: string[] = [];
+
+    for (const [id, bucket] of this.buckets) {
+      // Remove buckets that have been inactive for more than 5 minutes
+      if (now - bucket.reset > 300000) {
+        expiredBuckets.push(id);
+      }
+    }
+
+    for (const id of expiredBuckets) {
+      this.buckets.delete(id);
+    }
+  }
+
+  /**
+   * Start the automatic cleanup interval
+   */
+  public startCleanup(): void {
+    if (this.cleanupInterval) return;
+
+    // Run cleanup every 5 minutes
+    this.cleanupInterval = setInterval(() => {
+      this.cleanupExpiredBuckets();
+    }, 300000);
+  }
+
+  /**
+   * Stop the automatic cleanup interval
+   */
+  public stopCleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = undefined;
+    }
+  }
+
+  /**
+   * Get the global reset timestamp
+   * @returns The timestamp when the global rate limit resets
+   */
+  public getGlobalResetTime(): number {
+    return this.globalReset;
   }
 }
