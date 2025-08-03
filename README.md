@@ -89,19 +89,19 @@ await manager.connect();
 
 ```mermaid
 graph TD
-    root[OvenJS Root] --> gateway[@ovenjs/gateway]
-    root --> rest[@ovenjs/rest]
-    root --> utils[@ovenjs/utils]
+    root["OvenJS Root"] --> gateway["@ovenjs/gateway"]
+    root --> rest["@ovenjs/rest"]
+    root --> utils["@ovenjs/utils"]
     
     gateway --> utils
     rest --> utils
     
-    gateway --> wsManager[WebSocket Manager]
-    gateway --> wsShards[WebSocket Shards]
+    gateway --> wsManager["WebSocket Manager"]
+    gateway --> wsShards["WebSocket Shards"]
     
-    rest --> restClient[REST Client]
-    rest --> bucketManager[Bucket Manager]
-    rest --> rateLimitBuckets[Rate Limit Buckets]
+    rest --> restClient["REST Client"]
+    rest --> bucketManager["Bucket Manager"]
+    rest --> rateLimitBuckets["Rate Limit Buckets"]
     
     wsManager --> wsShards
     bucketManager --> rateLimitBuckets
