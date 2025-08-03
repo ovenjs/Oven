@@ -1,6 +1,6 @@
 {
   "name": "@ovendjs/gateway",
-  "version": "0.0.1",
+  "version": "0.5.3",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
@@ -32,7 +32,7 @@
   "license": "MIT",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "@ovendjs/utils": "^0.21.7",
+    "@ovendjs/utils": "^0.22.1",
     "@types/ws": "^8.18.1",
     "@vladfrangu/async_event_emitter": "^2.4.6",
     "ws": "^8.18.3"
