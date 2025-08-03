@@ -485,13 +485,12 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         lastError = error as Error;
         
         // Only retry on rate limit errors
-        if (error instanceof DiscordAPIError && error.httpStatus === 429) {
-          if (attempt < maxRetries) {
-            debugEmit(`REST.requestWithRetry(): Rate limited, retrying in ${retryDelay}ms (attempt ${attempt + 1}/${maxRetries})`);
-            await new Promise(resolve => setTimeout(resolve, retryDelay));
-            continue;
-          }
+        if (error instanceof DiscordAPIError && error.httpStatus === 429 && attempt < maxRetries) {
+              debugEmit(`REST.requestWithRetry(): Rate limited, retrying in ${retryDelay}ms (attempt ${attempt + 1}/${maxRetries})`);
+              await new Promise(resolve => setTimeout(resolve, retryDelay));
+              continue;
         }
+
         
         // Re-throw if it's not a rate limit error or we've exhausted retries
         throw error;
