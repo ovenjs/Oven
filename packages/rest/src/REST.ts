@@ -8,6 +8,7 @@ import { RESTError } from './utils/errors/RESTError';
 import { ValidationError } from './utils/errors/ValidationError';
 import { normalizeHeaders } from './utils/util';
 import { DiscordTokenSchema, RESTOptionsSchema } from './utils/zod';
+import { fmt } from '@ovendjs/utils';
 
 /**
  * REST client for interacting with the Discord API.
@@ -47,6 +48,13 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   private bucket: BucketManager;
 
   /**
+   * Debug formatter using @ovendjs/utils
+   *
+   * @internal
+   */
+  private readonly debug = fmt({ name: 'rest', version: '0.0.1' });
+
+  /**
    * Creates a new instance of the REST client.
    *
    * @param options - Configuration options for the REST client.
@@ -65,6 +73,9 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
 
     this.options = res.data;
     this.bucket = new BucketManager();
+    
+    // Start automatic cleanup of expired buckets
+    this.bucket.startCleanup();
   }
 
   /**
@@ -126,14 +137,19 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   async request<T = any>(data: RESTRequest): Promise<T> {
     const { method, path, data: body, options } = data;
 
-    this.emit('restDebug', `[REST]: REST.request(): ${method} ${path}`);
+    const debugEmit = (message: string) => {
+      const formatted = this.debug.debug(message);
+      this.emit('restDebug', typeof formatted === 'string' ? formatted : String(formatted));
+    };
+
+    debugEmit(`REST.request(): ${method} ${path}`);
 
     const _url = `${this.endpoint}${path.startsWith('/') ? path : `/${path}`}`;
 
-    this.emit('restDebug', `[REST]: REST.request(): URL -> ${_url}`);
+    debugEmit(`REST.request(): URL -> ${_url}`);
 
     if (this.bucket.isGlobalRateLimited()) {
-      this.emit('restDebug', `[REST]: REST.request(): Hit global rate-limit. Waiting...`);
+      debugEmit(`REST.request(): Hit global rate-limit. Waiting...`);
     }
 
     const bucket = this.bucket.getBucket(path, method);
@@ -167,10 +183,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
 
       if (headers['x-ratelimit-global']) {
         const tryAfter = parseFloat(headers['retry-after'] || '0');
-        this.emit(
-          'restDebug',
-          `[REST]: REST.request(): Global Ratelimit hit. Try Again After: ${tryAfter}s`
-        );
+        debugEmit(`REST.request(): Global Ratelimit hit. Try Again After: ${tryAfter}s`);
         await this.bucket.handleGlobalRateLimit(tryAfter);
         return this.request(data);
       }
@@ -179,10 +192,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         const responseBody = (await response.body.json()) as { retry_after?; code? };
         const tryAfter =
           responseBody.retry_after || parseFloat(headers['retry-after'] || '0');
-        this.emit(
-          'restDebug',
-          `[REST]: REST.request(): Ratelimit hit on ${method}:/${path}. Try After: ${tryAfter}s`
-        );
+        debugEmit(`REST.request(): Ratelimit hit on ${method}:/${path}. Try After: ${tryAfter}s`);
 
         throw new DiscordAPIError(
           `Ratelimit hit on ${method}:/${path}`,
@@ -213,13 +223,19 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
       // Parse and return the JSON response body
       const responseBody = await response.body.json();
 
+      // Emit response event for successful requests
+      this.emit('restResponse', `${method} ${path} - ${response.statusCode}`);
+
       return responseBody as T;
     } catch (error) {
       if (error instanceof DiscordAPIError) {
         throw error;
       }
 
-      throw new RESTError(`[REST] Error -> ${error}`);
+      // Emit debug event for non-DiscordAPI errors
+      debugEmit(`REST.request(): Error occurred - ${error instanceof Error ? error.message : String(error)}`);
+
+      throw new RESTError(`[REST] Error -> ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -342,5 +358,147 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
       method: 'DELETE',
       path: route,
     });
+  }
+
+  /**
+   * Clean up resources and stop any running processes
+   *
+   * @remarks
+   * This method should be called when the REST client is no longer needed
+   * to prevent memory leaks and ensure proper cleanup.
+   *
+   * @example
+   * ```ts
+   * const rest = new REST({ token: 'abc123' });
+   * // ... use the rest client
+   * rest.destroy();
+   * ```
+   */
+  public destroy(): void {
+    // Stop the bucket cleanup interval
+    this.bucket.stopCleanup();
+    
+    // Remove all event listeners
+    this.removeAllListeners();
+  }
+
+  /**
+   * Get the current rate limit status for a specific route
+   *
+   * @param route - The API endpoint path
+   * @param method - The HTTP method
+   * @returns Rate limit information including remaining requests, reset time, etc.
+   *
+   * @example
+   * ```ts
+   * const rateLimit = rest.getRateLimitStatus('/channels/123/messages', 'POST');
+   * console.log(`Remaining requests: ${rateLimit.remaining}`);
+   * console.log(`Resets at: ${new Date(rateLimit.reset)}`);
+   * ```
+   */
+  public getRateLimitStatus(route: string, method: string): {
+    remaining: number;
+    limit: number;
+    reset: number;
+    resetAfter: number;
+    isRateLimited: boolean;
+  } {
+    const bucket = this.bucket.getBucket(route, method);
+    const now = Date.now();
+    
+    return {
+      remaining: bucket.remaining,
+      limit: bucket.limit,
+      reset: bucket.reset,
+      resetAfter: Math.max(0, bucket.reset - now),
+      isRateLimited: bucket.remaining <= 0 && now < bucket.reset,
+    };
+  }
+
+  /**
+   * Check if the client is currently globally rate limited
+   *
+   * @returns Global rate limit status
+   *
+   * @example
+   * ```ts
+   * const globalStatus = rest.getGlobalRateLimitStatus();
+   * if (globalStatus.isRateLimited) {
+   *   console.log(`Globally rate limited for ${globalStatus.resetAfter}ms`);
+   * }
+   * ```
+   */
+  public getGlobalRateLimitStatus(): {
+    isRateLimited: boolean;
+    resetAfter: number;
+  } {
+    const now = Date.now();
+    const isRateLimited = this.bucket.isGlobalRateLimited();
+    
+    return {
+      isRateLimited,
+      resetAfter: isRateLimited ? this.bucket.getGlobalResetTime() - now : 0,
+    };
+  }
+
+  /**
+   * Make a request with automatic retry on rate limits
+   *
+   * @template T - The expected type of the response body
+   * @param data - The request configuration
+   * @param options - Retry options
+   * @returns A promise that resolves to the parsed response body
+   *
+   * @example
+   * ```ts
+   * const user = await rest.requestWithRetry<User>({
+   *   method: 'GET',
+   *   path: '/users/@me'
+   * }, {
+   *   maxRetries: 3,
+   *   retryDelay: 1000
+   * });
+   * ```
+   */
+  public async requestWithRetry<T = any>(
+    data: RESTRequest,
+    options?: {
+      maxRetries?: number;
+      retryDelay?: number;
+    }
+  ): Promise<T> {
+    const maxRetries = options?.maxRetries ?? 3;
+    const retryDelay = options?.retryDelay ?? 1000;
+    
+    let lastError: Error | null = null;
+    
+    // Create debug emitter for this method
+    const debugEmit = (message: string) => {
+      const formatted = this.debug.debug(message);
+      this.emit('restDebug', typeof formatted === 'string' ? formatted : String(formatted));
+    };
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.request<T>(data);
+      } catch (error) {
+        lastError = error as Error;
+        
+        // Only retry on rate limit errors
+        if (error instanceof DiscordAPIError && error.httpStatus === 429) {
+          if (attempt < maxRetries) {
+            debugEmit(`REST.requestWithRetry(): Rate limited, retrying in ${retryDelay}ms (attempt ${attempt + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+            continue;
+          }
+        }
+        
+        // Re-throw if it's not a rate limit error or we've exhausted retries
+        throw error;
+      }
+    }
+    
+    // This should never be reached, but TypeScript needs it
+    throw lastError || new Error('Unknown error occurred');
   }
 }
