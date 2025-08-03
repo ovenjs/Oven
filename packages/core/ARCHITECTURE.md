@@ -95,22 +95,23 @@ Discord API objects are represented as structured classes with methods for manip
 
 ```typescript
 abstract class BaseStructure {
-  protected client: Bot;
+  protected bot: Bot;
   public id: string;
   public createdAt: Date;
   
-  constructor(client: Bot, data: any);
+  constructor(bot: Bot, data: any);
   abstract _patch(data: any): this;
   
   toJSON(): any;
   toString(): string;
+  static extractTimestamp(id: string): Date;
 }
 
 class User extends BaseStructure {
   public username: string;
   public discriminator: string;
   public avatar: string | null;
-  public bot: boolean;
+  public isBot: boolean;
   public system: boolean;
   public flags: UserFlags;
   
@@ -125,15 +126,160 @@ class Guild extends BaseStructure {
   public name: string;
   public icon: string | null;
   public owner: User | null;
-  public members: Collection<string, GuildMember>;
+  public members: Collection<string, Member>;
   public channels: Collection<string, Channel>;
   public roles: Collection<string, Role>;
+  public emojis: Collection<string, Emoji>;
   
   // Methods
   get iconURL(): string;
   get splashURL(): string;
+  get partnered(): boolean;
+  get verified(): boolean;
   leave(): Promise<Guild>;
   delete(): Promise<Guild>;
+  edit(options: GuildEditOptions): Promise<Guild>;
+  fetchChannels(): Promise<Collection<string, Channel>>;
+  // ... other methods
+}
+
+class Member extends BaseStructure {
+  public guildId: string;
+  public user: User;
+  public nickname: string | null;
+  public roles: Collection<string, Role>;
+  public joinedAt: Date;
+  public premiumSince: Date | null;
+  public deaf: boolean;
+  public mute: boolean;
+  public pending: boolean;
+  
+  // Methods
+  get displayName(): string;
+  get displayColor(): number;
+  get highestRole(): Role | null;
+  get isOwner(): boolean;
+  kick(reason?: string): Promise<void>;
+  ban(options?: BanOptions): Promise<void>;
+  edit(options: MemberEditOptions, reason?: string): Promise<Member>;
+  addRole(roleId: string, reason?: string): Promise<void>;
+  removeRole(roleId: string, reason?: string): Promise<void>;
+  setRoles(roleIds: string[], reason?: string): Promise<void>;
+  // ... other methods
+}
+
+class Emoji extends BaseStructure {
+  public guildId: string;
+  public name: string;
+  public animated: boolean;
+  public available: boolean;
+  public roles: Collection<string, Role>;
+  
+  // Methods
+  get url(): string;
+  get identifier(): string;
+  delete(reason?: string): Promise<void>;
+  edit(options: EmojiEditOptions, reason?: string): Promise<Emoji>;
+  // ... other methods
+}
+
+class Channel extends BaseStructure {
+  public type: ChannelType;
+  public guildId?: string;
+  public name?: string;
+  public topic?: string;
+  public nsfw: boolean;
+  public position?: number;
+  public bitrate?: number;
+  public userLimit?: number;
+  
+  // Methods
+  get isText(): boolean;
+  get isVoice(): boolean;
+  get isCategory(): boolean;
+  get isDM(): boolean;
+  get isNews(): boolean;
+  get isStore(): boolean;
+  delete(reason?: string): Promise<Channel>;
+  edit(options: ChannelEditOptions, reason?: string): Promise<Channel>;
+  // ... other methods
+}
+
+class Message extends BaseStructure {
+  public channelId: string;
+  public guildId?: string;
+  public author: User;
+  public member?: Member;
+  public content: string;
+  public timestamp: Date;
+  public editedTimestamp: Date | null;
+  public tts: boolean;
+  public mentions: MessageMentions;
+  public attachments: Collection<string, Attachment>;
+  public embeds: Embed[];
+  
+  // Methods
+  reply(content: string, options?: MessageReplyOptions): Promise<Message>;
+  react(emoji: string | Emoji): Promise<void>;
+  edit(content: string, options?: MessageEditOptions): Promise<Message>;
+  delete(reason?: string): Promise<void>;
+  pin(): Promise<void>;
+  unpin(): Promise<void>;
+  // ... other methods
+}
+
+class Role extends BaseStructure {
+  public guildId: string;
+  public name: string;
+  public color: number;
+  public hoist: boolean;
+  public position: number;
+  public permissions: Permissions;
+  public managed: boolean;
+  public mentionable: boolean;
+  
+  // Methods
+  get hexColor(): string;
+  get mention(): string;
+  delete(reason?: string): Promise<void>;
+  edit(options: RoleEditOptions, reason?: string): Promise<Role>;
+  // ... other methods
+}
+
+class Attachment extends BaseStructure {
+  public filename: string;
+  public size: number;
+  public url: string;
+  public proxyUrl: string;
+  public width?: number;
+  public height?: number;
+  public contentType?: string;
+  
+  // Methods
+  get isImage(): boolean;
+  get isVideo(): boolean;
+  get isAudio(): boolean;
+  // ... other methods
+}
+
+class Embed {
+  public title?: string;
+  public type?: string;
+  public description?: string;
+  public url?: string;
+  public timestamp?: Date;
+  public color?: number;
+  public footer?: EmbedFooter;
+  public image?: EmbedImage;
+  public thumbnail?: EmbedThumbnail;
+  public video?: EmbedVideo;
+  public provider?: EmbedProvider;
+  public author?: EmbedAuthor;
+  public fields?: EmbedField[];
+  
+  // Methods
+  get hexColor(): string | null;
+  addField(name: string, value: string, inline?: boolean): this;
   // ... other methods
 }
 ```

@@ -19,7 +19,9 @@ graph TD
     Bot --> UserManager
     Bot --> RoleManager
     Bot --> EmojiManager
-    Bot --> UserManager
+    Bot --> MessageManager
+    Bot --> AttachmentManager
+    Bot --> EmbedManager
     
     %% Base Manager
     GuildManager --> BaseManager
@@ -27,22 +29,30 @@ graph TD
     UserManager --> BaseManager
     RoleManager --> BaseManager
     EmojiManager --> BaseManager
+    MessageManager --> BaseManager
+    AttachmentManager --> BaseManager
+    EmbedManager --> BaseManager
     
     %% Structures
     GuildManager --> Guild
     ChannelManager --> Channel
     UserManager --> User
-    UserManager --> GuildMember
+    UserManager --> Member
     RoleManager --> Role
     EmojiManager --> Emoji
+    MessageManager --> Message
+    AttachmentManager --> Attachment
+    EmbedManager --> Embed
     
     %% Base Structure
     Guild --> BaseStructure
     Channel --> BaseStructure
     User --> BaseStructure
-    GuildMember --> BaseStructure
+    Member --> BaseStructure
     Role --> BaseStructure
     Emoji --> BaseStructure
+    Message --> BaseStructure
+    Attachment --> BaseStructure
     
     %% Event System
     EventManager --> EventEmitter
@@ -50,6 +60,9 @@ graph TD
     EventManager --> ChannelEventHandler
     EventManager --> UserEventHandler
     EventManager --> MessageEventHandler
+    EventManager --> MemberEventHandler
+    EventManager --> RoleEventHandler
+    EventManager --> EmojiEventHandler
     
     %% Cache System
     CacheClient --> CacheAdapter
@@ -59,6 +72,9 @@ graph TD
     UserManager --> CacheClient
     RoleManager --> CacheClient
     EmojiManager --> CacheClient
+    MessageManager --> CacheClient
+    AttachmentManager --> CacheClient
+    EmbedManager --> CacheClient
     
     %% Utilities
     Bot --> Utils[Utilities]
@@ -78,9 +94,9 @@ graph TD
     
     class Bot primaryClass
     class GatewayClient,RESTClient,CacheClient clientClass
-    class GuildManager,ChannelManager,UserManager,RoleManager,EmojiManager,BaseManager managerClass
-    class Guild,Channel,User,GuildMember,Role,Emoji,BaseStructure structureClass
-    class EventManager,EventEmitter,GuildEventHandler,ChannelEventHandler,UserEventHandler,MessageEventHandler eventClass
+    class GuildManager,ChannelManager,UserManager,RoleManager,EmojiManager,MessageManager,AttachmentManager,EmbedManager,BaseManager managerClass
+    class Guild,Channel,User,Member,Role,Emoji,Message,Attachment,BaseStructure structureClass
+    class EventManager,EventEmitter,GuildEventHandler,ChannelEventHandler,UserEventHandler,MessageEventHandler,MemberEventHandler,RoleEventHandler,EmojiEventHandler eventClass
     class CacheClient,CacheAdapter,MemoryCache cacheClass
     class Utils,Transformers,Validators,Helpers utilClass
     class GatewayPackage,RESTPackage,UtilsPackage externalClass
@@ -122,12 +138,15 @@ graph TD
 - **Purpose**: Represent Discord API objects with methods and properties
 - **Components**:
   - `BaseStructure`: Abstract base class with common functionality
-  - Specific structures: `Guild`, `Channel`, `User`, `GuildMember`, etc.
+  - Specific structures: `Guild`, `Channel`, `User`, `Member`, `Role`, `Emoji`, `Message`, `Attachment`, `Embed`
 - **Key Features**:
   - Data transformation from API responses
   - Helper methods for common operations
   - Serialization/deserialization support
   - Type-safe property access
+  - Snowflake ID handling and timestamp extraction
+  - Discord API integration methods
+  - Audit log reason support for moderation actions
 
 ### 5. Event System
 - **Purpose**: Handle Discord events and provide clean API for users
