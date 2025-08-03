@@ -1,0 +1,58 @@
+{
+  "name": "@ovendjs/core",
+  "version": "0.1.0",
+  "description": "Core Discord API wrapper with unified client interface for the OvenJS ecosystem",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "import": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "ARCHITECTURE.md",
+    "ARCHITECTURE_DIAGRAM.md"
+  ],
+  "scripts": {
+    "build": "tsc --noEmit && tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ovendjs/gateway": "^0.5.3",
+    "@ovendjs/rest": "^0.10.7",
+    "@ovendjs/utils": "^0.22.1",
+    "@vladfrangu/async_event_emitter": "^2.4.6",
+    "discord-api-types": "^0.37.83"
+  },
+  "devDependencies": {
+    "esbuild-plugin-version-injector": "^1.2.1"
+  },
+  "keywords": [
+    "discord",
+    "api",
+    "wrapper",
+    "bot",
+    "client",
+    "gateway",
+    "rest",
+    "ovenjs"
+  ],
+  "author": "OvenJS Team",
+  "license": "MIT",
+  "packageManager": "pnpm@10.13.1"
+}
