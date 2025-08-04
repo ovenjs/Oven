@@ -63,6 +63,14 @@ export type { BotOptions } from './types';
 export * from './structures';
 
 /**
+ * Event handling system for Discord events.
+ *
+ * @remarks
+ * This includes the EventManager class and BotEvents interface for handling Discord events.
+ */
+export { EventManager, BotEvents } from './events';
+
+/**
  * Re-exported GatewayIntentBits from discord-api-types for convenience.
  *
  * @remarks

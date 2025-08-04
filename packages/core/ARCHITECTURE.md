@@ -59,28 +59,28 @@ The `Bot` class is the primary entry point for users. It integrates all other co
 class Bot {
   // Configuration
   private options: BotOptions;
-  
+
   // Clients
   private gateway: GatewayClient;
   private rest: RESTClient;
   private cache: CacheClient;
-  
+
   // Managers
   public guilds: GuildManager;
   public channels: ChannelManager;
   public users: UserManager;
   public roles: RoleManager;
   // ... other managers
-  
+
   // Event management
   private events: EventManager;
-  
+
   constructor(options: BotOptions);
-  
+
   // Lifecycle methods
   async login(token: string): Promise<void>;
   async destroy(): Promise<void>;
-  
+
   // Utility methods
   on(event: string, listener: Function): this;
   once(event: string, listener: Function): this;
@@ -98,10 +98,10 @@ abstract class BaseStructure {
   protected bot: Bot;
   public id: string;
   public createdAt: Date;
-  
+
   constructor(bot: Bot, data: any);
   abstract _patch(data: any): this;
-  
+
   toJSON(): any;
   toString(): string;
   static extractTimestamp(id: string): Date;
@@ -114,7 +114,7 @@ class User extends BaseStructure {
   public isBot: boolean;
   public system: boolean;
   public flags: UserFlags;
-  
+
   // Methods
   get tag(): string;
   get displayAvatarURL(): string;
@@ -130,7 +130,7 @@ class Guild extends BaseStructure {
   public channels: Collection<string, Channel>;
   public roles: Collection<string, Role>;
   public emojis: Collection<string, Emoji>;
-  
+
   // Methods
   get iconURL(): string;
   get splashURL(): string;
@@ -153,7 +153,7 @@ class Member extends BaseStructure {
   public deaf: boolean;
   public mute: boolean;
   public pending: boolean;
-  
+
   // Methods
   get displayName(): string;
   get displayColor(): number;
@@ -174,7 +174,7 @@ class Emoji extends BaseStructure {
   public animated: boolean;
   public available: boolean;
   public roles: Collection<string, Role>;
-  
+
   // Methods
   get url(): string;
   get identifier(): string;
@@ -192,7 +192,7 @@ class Channel extends BaseStructure {
   public position?: number;
   public bitrate?: number;
   public userLimit?: number;
-  
+
   // Methods
   get isText(): boolean;
   get isVoice(): boolean;
@@ -217,7 +217,7 @@ class Message extends BaseStructure {
   public mentions: MessageMentions;
   public attachments: Collection<string, Attachment>;
   public embeds: Embed[];
-  
+
   // Methods
   reply(content: string, options?: MessageReplyOptions): Promise<Message>;
   react(emoji: string | Emoji): Promise<void>;
@@ -237,7 +237,7 @@ class Role extends BaseStructure {
   public permissions: Permissions;
   public managed: boolean;
   public mentionable: boolean;
-  
+
   // Methods
   get hexColor(): string;
   get mention(): string;
@@ -254,7 +254,7 @@ class Attachment extends BaseStructure {
   public width?: number;
   public height?: number;
   public contentType?: string;
-  
+
   // Methods
   get isImage(): boolean;
   get isVideo(): boolean;
@@ -276,7 +276,7 @@ class Embed {
   public provider?: EmbedProvider;
   public author?: EmbedAuthor;
   public fields?: EmbedField[];
-  
+
   // Methods
   get hexColor(): string | null;
   addField(name: string, value: string, inline?: boolean): this;
@@ -292,9 +292,9 @@ Managers handle CRUD operations for Discord resources and provide a clean API fo
 abstract class BaseManager {
   protected client: Bot;
   public cache: Collection<string, any>;
-  
+
   constructor(client: Bot);
-  
+
   abstract fetch(id: string): Promise<any>;
   abstract add(data: any): Promise<any>;
   abstract update(id: string, data: any): Promise<any>;
@@ -303,7 +303,7 @@ abstract class BaseManager {
 
 class GuildManager extends BaseManager {
   public cache: Collection<string, Guild>;
-  
+
   fetch(id: string): Promise<Guild>;
   create(options: GuildCreateOptions): Promise<Guild>;
   fetchActive(): Promise<Collection<string, Guild>>;
@@ -312,7 +312,7 @@ class GuildManager extends BaseManager {
 
 class ChannelManager extends BaseManager {
   public cache: Collection<string, Channel>;
-  
+
   fetch(id: string): Promise<Channel>;
   create(guildId: string, options: ChannelCreateOptions): Promise<Channel>;
   fetchActive(guildId?: string): Promise<Collection<string, Channel>>;
@@ -327,9 +327,9 @@ The core package integrates with the gateway and rest packages through client ad
 class GatewayClient {
   private manager: WebSocketManager;
   private bot: Bot;
-  
+
   constructor(bot: Bot, options: GatewayOptions);
-  
+
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   on(event: string, listener: Function): this;
@@ -338,9 +338,9 @@ class GatewayClient {
 class RESTClient {
   private rest: REST;
   private bot: Bot;
-  
+
   constructor(bot: Bot, options: RESTOptions);
-  
+
   request(method: string, path: string, options?: any): Promise<any>;
   get(path: string, options?: any): Promise<any>;
   post(path: string, options?: any): Promise<any>;
@@ -358,14 +358,14 @@ The event system provides a clean interface for handling Discord events.
 class EventManager {
   private emitter: EventEmitter;
   private handlers: Map<string, Function[]>;
-  
+
   constructor();
-  
+
   on(event: string, listener: Function): this;
   once(event: string, listener: Function): this;
   off(event: string, listener: Function): this;
   emit(event: string, ...args: any[]): boolean;
-  
+
   registerHandler(event: string, handler: Function): this;
   unregisterHandler(event: string, handler: Function): this;
 }
@@ -393,7 +393,7 @@ interface CacheAdapter {
 
 class MemoryCache implements CacheAdapter {
   private cache: Map<string, { value: any; expires?: number }>;
-  
+
   get(key: string): Promise<any>;
   set(key: string, value: any, ttl?: number): Promise<void>;
   delete(key: string): Promise<void>;
@@ -403,9 +403,9 @@ class MemoryCache implements CacheAdapter {
 
 class CacheClient {
   private adapter: CacheAdapter;
-  
+
   constructor(adapter: CacheAdapter);
-  
+
   get(key: string): Promise<any>;
   set(key: string, value: any, ttl?: number): Promise<void>;
   delete(key: string): Promise<void>;
@@ -417,24 +417,28 @@ class CacheClient {
 ## Implementation Plan
 
 ### Phase 1: Basic Structure
+
 1. Set up package.json, tsconfig.json, and tsup.config.ts
 2. Create the main Bot class with basic structure
 3. Implement base classes for structures and managers
 4. Set up the event system
 
 ### Phase 2: Core Functionality
+
 1. Implement gateway and rest client integration
 2. Create basic data structures (User, Guild, Channel, Message)
 3. Implement basic managers (GuildManager, ChannelManager, UserManager)
 4. Set up the caching system
 
 ### Phase 3: Advanced Features
+
 1. Implement advanced data structures and methods
 2. Create additional managers (RoleManager, EmojiManager, etc.)
 3. Add event handlers for all Discord events
 4. Implement utility methods and helpers
 
 ### Phase 4: Polish and Documentation
+
 1. Add comprehensive type definitions
 2. Write documentation and examples
 3. Add tests for all functionality
@@ -443,6 +447,7 @@ class CacheClient {
 ## Dependencies
 
 The core package will depend on:
+
 - `@ovendjs/gateway` - For WebSocket connections to Discord
 - `@ovendjs/rest` - For HTTP requests to Discord API
 - `@ovendjs/utils` - For shared utilities and formatting
@@ -466,7 +471,7 @@ bot.on('ready', () => {
   console.log(`Logged in as ${bot.user.tag}`);
 });
 
-bot.on('messageCreate', (message) => {
+bot.on('messageCreate', message => {
   if (message.content === '!ping') {
     message.reply('Pong!');
   }

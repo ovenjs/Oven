@@ -135,7 +135,7 @@ export class Emoji extends BaseStructure {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     return this.bot.rest.delete(`/guilds/${this.guildId}/emojis/${this.id}`, options);
   }
 
@@ -147,16 +147,19 @@ export class Emoji extends BaseStructure {
    */
   public async edit(options: EmojiEditOptions): Promise<Emoji> {
     const data: any = {};
-    
+
     if (options.name !== undefined) data.name = options.name;
     if (options.roles !== undefined) data.roles = options.roles;
-    
+
     const requestOptions: any = { data };
     if (options.reason) {
       requestOptions.headers = { 'X-Audit-Log-Reason': options.reason };
     }
-    
-    const emoji = await this.bot.rest.patch(`/guilds/${this.guildId}/emojis/${this.id}`, requestOptions);
+
+    const emoji = await this.bot.rest.patch(
+      `/guilds/${this.guildId}/emojis/${this.id}`,
+      requestOptions
+    );
     return this._patch(emoji);
   }
 

@@ -35,10 +35,10 @@ export class UserManager extends BaseManager {
 
     // Fetch from API
     const user = await this.rest.get(`/users/${id}`);
-    
+
     // Cache the user
     await this.cache.setUser(user);
-    
+
     return user;
   }
 
@@ -59,11 +59,11 @@ export class UserManager extends BaseManager {
 
     // Fetch from API
     const user = await this.rest.get('/users/@me');
-    
+
     // Cache the user
     await this.cache.setUser({ ...user, id: 'current' });
     await this.cache.setUser(user); // Also cache with actual ID
-    
+
     return user;
   }
 
@@ -75,10 +75,10 @@ export class UserManager extends BaseManager {
    */
   public async editCurrentUser(options: UserEditOptions): Promise<any> {
     const user = await this.rest.patch('/users/@me', { data: options });
-    
+
     // Update the cache
     await this.cache.setUser(user);
-    
+
     return user;
   }
 
@@ -101,10 +101,10 @@ export class UserManager extends BaseManager {
 
     // Fetch from API
     const member = await this.rest.get(`/guilds/${guildId}/members/${userId}`);
-    
+
     // Cache the member
     await this.cache.setMember(member);
-    
+
     return member;
   }
 
@@ -115,22 +115,27 @@ export class UserManager extends BaseManager {
    * @param options - The options for fetching members.
    * @returns A promise that resolves with an array of guild members.
    */
-  public async fetchAllMembers(guildId: string, options: FetchMembersOptions = {}): Promise<any[]> {
+  public async fetchAllMembers(
+    guildId: string,
+    options: FetchMembersOptions = {}
+  ): Promise<any[]> {
     const { limit = 1000, after } = options;
-    
+
     const params = new URLSearchParams();
     if (limit) params.append('limit', limit.toString());
     if (after) params.append('after', after);
-    
-    const members = await this.rest.get(`/guilds/${guildId}/members?${params.toString()}`);
-    
+
+    const members = await this.rest.get(
+      `/guilds/${guildId}/members?${params.toString()}`
+    );
+
     // Cache the members
     for (const member of members) {
       await this.cache.setMember(member);
       // Also cache the user
       await this.cache.setUser(member.user);
     }
-    
+
     return members;
   }
 
@@ -142,12 +147,18 @@ export class UserManager extends BaseManager {
    * @param options - The options for editing the guild member.
    * @returns A promise that resolves with the edited guild member.
    */
-  public async editMember(guildId: string, userId: string, options: MemberEditOptions): Promise<any> {
-    const member = await this.rest.patch(`/guilds/${guildId}/members/${userId}`, { data: options });
-    
+  public async editMember(
+    guildId: string,
+    userId: string,
+    options: MemberEditOptions
+  ): Promise<any> {
+    const member = await this.rest.patch(`/guilds/${guildId}/members/${userId}`, {
+      data: options,
+    });
+
     // Update the cache
     await this.cache.setMember(member);
-    
+
     return member;
   }
 
@@ -164,9 +175,9 @@ export class UserManager extends BaseManager {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     await this.rest.delete(`/guilds/${guildId}/members/${userId}`, options);
-    
+
     // Remove from cache
     await this.cache.deleteMember(guildId, userId);
   }
@@ -179,15 +190,19 @@ export class UserManager extends BaseManager {
    * @param options - The options for banning the member.
    * @returns A promise that resolves when the member is banned.
    */
-  public async ban(guildId: string, userId: string, options: BanOptions = {}): Promise<void> {
+  public async ban(
+    guildId: string,
+    userId: string,
+    options: BanOptions = {}
+  ): Promise<void> {
     const requestOptions: any = { data: options };
     if (options.reason) {
       requestOptions.headers = { 'X-Audit-Log-Reason': options.reason };
       delete options.reason;
     }
-    
+
     await this.rest.put(`/guilds/${guildId}/bans/${userId}`, requestOptions);
-    
+
     // Remove from cache
     await this.cache.deleteMember(guildId, userId);
   }
@@ -205,7 +220,7 @@ export class UserManager extends BaseManager {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     await this.rest.delete(`/guilds/${guildId}/bans/${userId}`, options);
   }
 

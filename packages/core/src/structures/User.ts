@@ -93,7 +93,7 @@ export class User extends BaseStructure {
    */
   public get avatarURL(): string | null {
     if (!this.avatar) return null;
-    
+
     const format = this.avatar.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/avatars/${this.id}/${this.avatar}.${format}`;
   }
@@ -119,7 +119,7 @@ export class User extends BaseStructure {
    */
   public get bannerURL(): string | null {
     if (!this.banner) return null;
-    
+
     const format = this.banner.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/banners/${this.id}/${this.banner}.${format}`;
   }

@@ -2,6 +2,7 @@ import { AsyncEventEmitter } from '@vladfrangu/async_event_emitter';
 import type { GatewayDispatchPayload } from 'discord-api-types/v10';
 
 import type { Bot } from '../Bot';
+import type { BotEvents } from './Events';
 
 /**
  * Manager for handling Discord events.
@@ -19,7 +20,7 @@ export class EventManager {
   /**
    * The event emitter for bot events.
    */
-  private readonly emitter: AsyncEventEmitter;
+  private readonly emitter: AsyncEventEmitter<BotEvents>;
 
   /**
    * Creates a new EventManager instance.
@@ -42,10 +43,7 @@ export class EventManager {
     }
 
     // Emit the event with the payload data
-    this.emitter.emit(payload.t, payload.d);
-
-    // Also emit a generic 'dispatch' event
-    this.emitter.emit('dispatch', payload);
+    this.emitter.emit(payload.t as any, payload.d);
   }
 
   /**
@@ -100,7 +98,7 @@ export class EventManager {
    *
    * @returns The event emitter instance.
    */
-  public getEmitter(): AsyncEventEmitter {
+  public getEmitter(): AsyncEventEmitter<BotEvents> {
     return this.emitter;
   }
 

@@ -73,7 +73,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
 
     this.options = res.data;
     this.bucket = new BucketManager();
-    
+
     // Start automatic cleanup of expired buckets
     this.bucket.startCleanup();
   }
@@ -139,7 +139,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
 
     const debugEmit = (message: string) => {
       const formatted = this.debug.debug(message);
-      this.emit('restDebug', typeof formatted === 'string' ? formatted : String(formatted));
+      this.emit(
+        'restDebug',
+        typeof formatted === 'string' ? formatted : String(formatted)
+      );
     };
 
     debugEmit(`REST.request(): ${method} ${path}`);
@@ -192,7 +195,9 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
         const responseBody = (await response.body.json()) as { retry_after?; code? };
         const tryAfter =
           responseBody.retry_after || parseFloat(headers['retry-after'] || '0');
-        debugEmit(`REST.request(): Ratelimit hit on ${method}:/${path}. Try After: ${tryAfter}s`);
+        debugEmit(
+          `REST.request(): Ratelimit hit on ${method}:/${path}. Try After: ${tryAfter}s`
+        );
 
         throw new DiscordAPIError(
           `Ratelimit hit on ${method}:/${path}`,
@@ -233,9 +238,13 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
       }
 
       // Emit debug event for non-DiscordAPI errors
-      debugEmit(`REST.request(): Error occurred - ${error instanceof Error ? error.message : String(error)}`);
+      debugEmit(
+        `REST.request(): Error occurred - ${error instanceof Error ? error.message : String(error)}`
+      );
 
-      throw new RESTError(`[REST] Error -> ${error instanceof Error ? error.message : String(error)}`);
+      throw new RESTError(
+        `[REST] Error -> ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -377,7 +386,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   public destroy(): void {
     // Stop the bucket cleanup interval
     this.bucket.stopCleanup();
-    
+
     // Remove all event listeners
     this.removeAllListeners();
   }
@@ -396,7 +405,10 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
    * console.log(`Resets at: ${new Date(rateLimit.reset)}`);
    * ```
    */
-  public getRateLimitStatus(route: string, method: string): {
+  public getRateLimitStatus(
+    route: string,
+    method: string
+  ): {
     remaining: number;
     limit: number;
     reset: number;
@@ -405,7 +417,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   } {
     const bucket = this.bucket.getBucket(route, method);
     const now = Date.now();
-    
+
     return {
       remaining: bucket.remaining,
       limit: bucket.limit,
@@ -434,7 +446,7 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   } {
     const now = Date.now();
     const isRateLimited = this.bucket.isGlobalRateLimited();
-    
+
     return {
       isRateLimited,
       resetAfter: isRateLimited ? this.bucket.getGlobalResetTime() - now : 0,
@@ -469,34 +481,42 @@ export class REST extends AsyncEventEmitter<RESTEvents> {
   ): Promise<T> {
     const maxRetries = options?.maxRetries ?? 3;
     const retryDelay = options?.retryDelay ?? 1000;
-    
+
     let lastError: Error | null = null;
-    
+
     // Create debug emitter for this method
     const debugEmit = (message: string) => {
       const formatted = this.debug.debug(message);
-      this.emit('restDebug', typeof formatted === 'string' ? formatted : String(formatted));
+      this.emit(
+        'restDebug',
+        typeof formatted === 'string' ? formatted : String(formatted)
+      );
     };
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await this.request<T>(data);
       } catch (error) {
         lastError = error as Error;
-        
+
         // Only retry on rate limit errors
-        if (error instanceof DiscordAPIError && error.httpStatus === 429 && attempt < maxRetries) {
-              debugEmit(`REST.requestWithRetry(): Rate limited, retrying in ${retryDelay}ms (attempt ${attempt + 1}/${maxRetries})`);
-              await new Promise(resolve => setTimeout(resolve, retryDelay));
-              continue;
+        if (
+          error instanceof DiscordAPIError &&
+          error.httpStatus === 429 &&
+          attempt < maxRetries
+        ) {
+          debugEmit(
+            `REST.requestWithRetry(): Rate limited, retrying in ${retryDelay}ms (attempt ${attempt + 1}/${maxRetries})`
+          );
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          continue;
         }
 
-        
         // Re-throw if it's not a rate limit error or we've exhausted retries
         throw error;
       }
     }
-    
+
     // This should never be reached, but TypeScript needs it
     throw lastError || new Error('Unknown error occurred');
   }

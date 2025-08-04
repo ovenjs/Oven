@@ -7,12 +7,12 @@ graph TD
     Bot --> RESTClient
     Bot --> CacheClient
     Bot --> EventManager
-    
+
     %% Client Integration
     GatewayClient --> GatewayPackage["@ovendjs/gateway"]
     RESTClient --> RESTPackage["@ovendjs/rest"]
     Bot --> UtilsPackage["@ovendjs/utils"]
-    
+
     %% Managers
     Bot --> GuildManager
     Bot --> ChannelManager
@@ -22,7 +22,7 @@ graph TD
     Bot --> MessageManager
     Bot --> AttachmentManager
     Bot --> EmbedManager
-    
+
     %% Base Manager
     GuildManager --> BaseManager
     ChannelManager --> BaseManager
@@ -32,7 +32,7 @@ graph TD
     MessageManager --> BaseManager
     AttachmentManager --> BaseManager
     EmbedManager --> BaseManager
-    
+
     %% Structures
     GuildManager --> Guild
     ChannelManager --> Channel
@@ -43,7 +43,7 @@ graph TD
     MessageManager --> Message
     AttachmentManager --> Attachment
     EmbedManager --> Embed
-    
+
     %% Base Structure
     Guild --> BaseStructure
     Channel --> BaseStructure
@@ -53,7 +53,7 @@ graph TD
     Emoji --> BaseStructure
     Message --> BaseStructure
     Attachment --> BaseStructure
-    
+
     %% Event System
     EventManager --> EventEmitter
     EventManager --> GuildEventHandler
@@ -63,7 +63,7 @@ graph TD
     EventManager --> MemberEventHandler
     EventManager --> RoleEventHandler
     EventManager --> EmojiEventHandler
-    
+
     %% Cache System
     CacheClient --> CacheAdapter
     CacheClient --> MemoryCache
@@ -75,13 +75,13 @@ graph TD
     MessageManager --> CacheClient
     AttachmentManager --> CacheClient
     EmbedManager --> CacheClient
-    
+
     %% Utilities
     Bot --> Utils[Utilities]
     Utils --> Transformers
     Utils --> Validators
     Utils --> Helpers
-    
+
     %% Styling
     classDef primaryClass fill:#4a86e8,stroke:#2d5b9e,stroke-width:2px,color:#fff
     classDef clientClass fill:#6aa84f,stroke:#38761d,stroke-width:2px,color:#fff
@@ -91,7 +91,7 @@ graph TD
     classDef cacheClass fill:#45818e,stroke:#134f5c,stroke-width:2px,color:#fff
     classDef utilClass fill:#f1c232,stroke:#bf9000,stroke-width:2px,color:#fff
     classDef externalClass fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
-    
+
     class Bot primaryClass
     class GatewayClient,RESTClient,CacheClient clientClass
     class GuildManager,ChannelManager,UserManager,RoleManager,EmojiManager,MessageManager,AttachmentManager,EmbedManager,BaseManager managerClass
@@ -105,15 +105,17 @@ graph TD
 ## Component Relationships
 
 ### 1. Bot Class (Primary Entry Point)
+
 - **Purpose**: Main entry point that integrates all components
 - **Dependencies**: GatewayClient, RESTClient, CacheClient, EventManager, all Managers
-- **Key Features**: 
+- **Key Features**:
   - Unified interface for all bot operations
   - Event delegation to EventManager
   - Manager initialization and access
   - Lifecycle management (login, destroy)
 
 ### 2. Client Integration Layer
+
 - **Purpose**: Bridge between core package and specialized packages
 - **Components**:
   - `GatewayClient`: Wraps `@ovendjs/gateway` for WebSocket connections
@@ -124,6 +126,7 @@ graph TD
   - Handles authentication and connection management
 
 ### 3. Manager Layer
+
 - **Purpose**: Handle CRUD operations for Discord resources
 - **Components**:
   - `BaseManager`: Abstract base class with common functionality
@@ -135,6 +138,7 @@ graph TD
   - Bulk operations support
 
 ### 4. Data Structures
+
 - **Purpose**: Represent Discord API objects with methods and properties
 - **Components**:
   - `BaseStructure`: Abstract base class with common functionality
@@ -149,6 +153,7 @@ graph TD
   - Audit log reason support for moderation actions
 
 ### 5. Event System
+
 - **Purpose**: Handle Discord events and provide clean API for users
 - **Components**:
   - `EventManager`: Central event coordination
@@ -161,6 +166,7 @@ graph TD
   - Error handling for event handlers
 
 ### 6. Cache System
+
 - **Purpose**: Efficient storage and retrieval of Discord objects
 - **Components**:
   - `CacheClient`: Cache management interface
@@ -173,6 +179,7 @@ graph TD
   - Support for multiple cache backends
 
 ### 7. Utilities
+
 - **Purpose**: Provide helper functions and utilities
 - **Components**:
   - `Transformers`: Data transformation utilities
@@ -187,6 +194,7 @@ graph TD
 ## Data Flow
 
 1. **Initialization Flow**:
+
    ```
    Bot Constructor
    ├── Initialize GatewayClient
@@ -197,6 +205,7 @@ graph TD
    ```
 
 2. **Login Flow**:
+
    ```
    Bot.login()
    ├── GatewayClient.connect()
@@ -205,6 +214,7 @@ graph TD
    ```
 
 3. **Event Handling Flow**:
+
    ```
    Gateway Event
    ├── GatewayClient.receive()

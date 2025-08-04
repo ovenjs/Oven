@@ -178,7 +178,10 @@ export class Embed extends BaseStructure {
    * The total length of the embed's fields.
    */
   public get fieldsLength(): number {
-    return this.fields.reduce((acc, field) => acc + field.name.length + field.value.length, 0);
+    return this.fields.reduce(
+      (acc, field) => acc + field.name.length + field.value.length,
+      0
+    );
   }
 
   /**
@@ -271,7 +274,8 @@ export class Embed extends BaseStructure {
         };
         if (this.author.url) embed.author.url = this.author.url;
         if (this.author.iconUrl) embed.author.icon_url = this.author.iconUrl;
-        if (this.author.proxyIconUrl) embed.author.proxy_icon_url = this.author.proxyIconUrl;
+        if (this.author.proxyIconUrl)
+          embed.author.proxy_icon_url = this.author.proxyIconUrl;
       }
     }
     if (this.fields.length > 0) {
@@ -283,14 +287,5 @@ export class Embed extends BaseStructure {
     }
 
     return embed;
-  }
-
-  /**
-   * Returns a string representation of this embed.
-   *
-   * @returns A string representation of this embed.
-   */
-  public toString(): string {
-    return this.title || 'Embed';
   }
 }

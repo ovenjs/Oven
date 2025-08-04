@@ -35,10 +35,10 @@ export class ChannelManager extends BaseManager {
 
     // Fetch from API
     const channel = await this.rest.get(`/channels/${id}`);
-    
+
     // Cache the channel
     await this.cache.setChannel(channel);
-    
+
     return channel;
   }
 
@@ -50,11 +50,13 @@ export class ChannelManager extends BaseManager {
    * @returns A promise that resolves with the created channel.
    */
   public async create(guildId: string, options: ChannelCreateOptions): Promise<any> {
-    const channel = await this.rest.post(`/guilds/${guildId}/channels`, { data: options });
-    
+    const channel = await this.rest.post(`/guilds/${guildId}/channels`, {
+      data: options,
+    });
+
     // Cache the channel
     await this.cache.setChannel(channel);
-    
+
     return channel;
   }
 
@@ -67,10 +69,10 @@ export class ChannelManager extends BaseManager {
    */
   public async edit(id: string, options: ChannelEditOptions): Promise<any> {
     const channel = await this.rest.patch(`/channels/${id}`, { data: options });
-    
+
     // Update the cache
     await this.cache.setChannel(channel);
-    
+
     return channel;
   }
 
@@ -82,10 +84,10 @@ export class ChannelManager extends BaseManager {
    */
   public async delete(id: string): Promise<any> {
     const channel = await this.rest.delete(`/channels/${id}`);
-    
+
     // Remove from cache
     await this.cache.deleteChannel(id);
-    
+
     return channel;
   }
 
@@ -105,12 +107,12 @@ export class ChannelManager extends BaseManager {
 
     // Fetch from API
     const channels = await this.rest.get(`/guilds/${guildId}/channels`);
-    
+
     // Cache the channels
     for (const channel of channels) {
       await this.cache.setChannel(channel);
     }
-    
+
     return channels;
   }
 

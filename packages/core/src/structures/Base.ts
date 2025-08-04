@@ -32,9 +32,10 @@ export abstract class BaseStructure {
   constructor(bot: Bot, id: string) {
     this.bot = bot;
     this.id = id;
-    this.createdAt = this.constructor.name === 'BaseStructure' 
-      ? new Date() 
-      : BaseStructure.extractTimestamp(id);
+    this.createdAt =
+      this.constructor.name === 'BaseStructure'
+        ? new Date()
+        : BaseStructure.extractTimestamp(id);
   }
 
   /**
@@ -65,17 +66,17 @@ export abstract class BaseStructure {
    */
   public toJSON(): any {
     const obj: any = {};
-    
+
     // Get all properties of this instance
     const props = Object.getOwnPropertyNames(this);
-    
+
     // Filter out private properties and methods
     for (const prop of props) {
       if (!prop.startsWith('_') && typeof this[prop as keyof this] !== 'function') {
         obj[prop] = (this as any)[prop];
       }
     }
-    
+
     return obj;
   }
 

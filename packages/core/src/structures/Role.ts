@@ -132,7 +132,9 @@ export class Role extends BaseStructure {
    * @param options - The options for the icon URL
    * @returns The URL of the role's icon
    */
-  public iconURL(options: { size?: number; format?: 'png' | 'jpg' | 'webp' } = {}): string | null {
+  public iconURL(
+    options: { size?: number; format?: 'png' | 'jpg' | 'webp' } = {}
+  ): string | null {
     if (!this.icon) return null;
     const { size = 128, format = 'png' } = options;
     return `https://cdn.discordapp.com/role-icons/${this.id}/${this.icon}.${format}?size=${size}`;

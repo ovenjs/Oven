@@ -30,7 +30,7 @@ export class CacheClient extends BaseClient {
    */
   constructor(bot: Bot, options: CacheOptions = {}) {
     super(bot);
-    
+
     this.options = {
       guilds: true,
       channels: true,
@@ -215,7 +215,11 @@ export class CacheClient extends BaseClient {
    */
   public async setMember(member: any): Promise<void> {
     if (!this.options.members) return;
-    return this.set(`member:${member.guild.id}:${member.user.id}`, member, this.options.ttl);
+    return this.set(
+      `member:${member.guild.id}:${member.user.id}`,
+      member,
+      this.options.ttl
+    );
   }
 
   /**

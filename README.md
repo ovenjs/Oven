@@ -17,11 +17,11 @@
 
 OvenJS follows a monorepo structure with several specialized packages:
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| [`@ovendjs/gateway`](./packages/gateway) | 0.5.3 | WebSocket gateway management for real-time events |
-| [`@ovendjs/rest`](./packages/rest) | 0.10.7 | REST API client with automatic rate limiting |
-| [`@ovendjs/utils`](./packages/utils) | 0.22.1 | Shared utilities and formatting functions |
+| Package                                  | Version | Description                                       |
+| ---------------------------------------- | ------- | ------------------------------------------------- |
+| [`@ovendjs/gateway`](./packages/gateway) | 0.5.3   | WebSocket gateway management for real-time events |
+| [`@ovendjs/rest`](./packages/rest)       | 0.10.7  | REST API client with automatic rate limiting      |
+| [`@ovendjs/utils`](./packages/utils)     | 0.22.1  | Shared utilities and formatting functions         |
 
 ## 🚀 Features
 
@@ -78,7 +78,7 @@ manager.on('ready', () => {
   console.log('Connected to Discord Gateway!');
 });
 
-manager.on('messageCreate', (message) => {
+manager.on('messageCreate', message => {
   console.log(`New message: ${message.content}`);
 });
 
@@ -92,17 +92,17 @@ graph TD
     root["OvenJS Root"] --> gateway["@ovenjs/gateway"]
     root --> rest["@ovenjs/rest"]
     root --> utils["@ovenjs/utils"]
-    
+
     gateway --> utils
     rest --> utils
-    
+
     gateway --> wsManager["WebSocket Manager"]
     gateway --> wsShards["WebSocket Shards"]
-    
+
     rest --> restClient["REST Client"]
     rest --> bucketManager["Bucket Manager"]
     rest --> rateLimitBuckets["Rate Limit Buckets"]
-    
+
     wsManager --> wsShards
     bucketManager --> rateLimitBuckets
 ```

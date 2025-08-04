@@ -36,10 +36,10 @@ export class RoleManager extends BaseManager {
 
     // Fetch from API
     const role = await this.rest.get(`/guilds/${guildId}/roles/${roleId}`);
-    
+
     // Cache the role
     await this.cache.setRole(role);
-    
+
     return role;
   }
 
@@ -52,10 +52,10 @@ export class RoleManager extends BaseManager {
    */
   public async create(guildId: string, options: RoleCreateOptions): Promise<any> {
     const role = await this.rest.post(`/guilds/${guildId}/roles`, { data: options });
-    
+
     // Cache the role
     await this.cache.setRole(role);
-    
+
     return role;
   }
 
@@ -67,12 +67,18 @@ export class RoleManager extends BaseManager {
    * @param options - The options for editing the role.
    * @returns A promise that resolves with the edited role.
    */
-  public async edit(guildId: string, roleId: string, options: RoleEditOptions): Promise<any> {
-    const role = await this.rest.patch(`/guilds/${guildId}/roles/${roleId}`, { data: options });
-    
+  public async edit(
+    guildId: string,
+    roleId: string,
+    options: RoleEditOptions
+  ): Promise<any> {
+    const role = await this.rest.patch(`/guilds/${guildId}/roles/${roleId}`, {
+      data: options,
+    });
+
     // Update the cache
     await this.cache.setRole(role);
-    
+
     return role;
   }
 
@@ -89,9 +95,9 @@ export class RoleManager extends BaseManager {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     await this.rest.delete(`/guilds/${guildId}/roles/${roleId}`, options);
-    
+
     // Remove from cache
     await this.cache.deleteRole(roleId);
   }
@@ -112,12 +118,12 @@ export class RoleManager extends BaseManager {
 
     // Fetch from API
     const roles = await this.rest.get(`/guilds/${guildId}/roles`);
-    
+
     // Cache the roles
     for (const role of roles) {
       await this.cache.setRole(role);
     }
-    
+
     return roles;
   }
 
@@ -130,12 +136,17 @@ export class RoleManager extends BaseManager {
    * @param reason - The reason for adding the role.
    * @returns A promise that resolves when the role is added.
    */
-  public async addRole(guildId: string, userId: string, roleId: string, reason?: string): Promise<void> {
+  public async addRole(
+    guildId: string,
+    userId: string,
+    roleId: string,
+    reason?: string
+  ): Promise<void> {
     const options: any = {};
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     await this.rest.put(`/guilds/${guildId}/members/${userId}/roles/${roleId}`, options);
   }
 
@@ -148,13 +159,21 @@ export class RoleManager extends BaseManager {
    * @param reason - The reason for removing the role.
    * @returns A promise that resolves when the role is removed.
    */
-  public async removeRole(guildId: string, userId: string, roleId: string, reason?: string): Promise<void> {
+  public async removeRole(
+    guildId: string,
+    userId: string,
+    roleId: string,
+    reason?: string
+  ): Promise<void> {
     const options: any = {};
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
-    await this.rest.delete(`/guilds/${guildId}/members/${userId}/roles/${roleId}`, options);
+
+    await this.rest.delete(
+      `/guilds/${guildId}/members/${userId}/roles/${roleId}`,
+      options
+    );
   }
 
   /**

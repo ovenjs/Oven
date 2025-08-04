@@ -1,9 +1,6 @@
 import { AsyncEventEmitter } from '@vladfrangu/async_event_emitter';
 import { fmt } from '@ovendjs/utils';
-import type {
-  GatewayIntentBits,
-  GatewayReadyDispatchData,
-} from 'discord-api-types/v10';
+import type { GatewayReadyDispatchData } from 'discord-api-types/v10';
 
 import { GatewayClient } from './client/GatewayClient';
 import { RESTClient } from './client/RESTClient';
@@ -16,6 +13,7 @@ import { RoleManager } from './managers/RoleManager';
 import { EmojiManager } from './managers/EmojiManager';
 import type { BotOptions } from './types';
 import { PACKAGE_META } from './types';
+import type { BotEvents } from './events/Events';
 
 /**
  * The main Bot class for creating and managing Discord bots.
@@ -49,7 +47,7 @@ import { PACKAGE_META } from './types';
  * bot.login('YOUR_BOT_TOKEN');
  * ```
  */
-export class Bot extends AsyncEventEmitter {
+export class Bot extends AsyncEventEmitter<BotEvents> {
   /**
    * The options used to configure the bot.
    */
@@ -188,22 +186,23 @@ export class Bot extends AsyncEventEmitter {
    */
   private setupEventHandlers(): void {
     // Handle ready event
-    this.gateway.on('ready', (data) => {
+    this.gateway.on('ready', data => {
       this.user = data.user;
       this.application = data.application;
       this.isReady = true;
-      this.emit('ready');
+      this.events.emit('ready');
       this.debug.debug(`Bot ready as ${this.user?.username}`);
     });
 
     // Handle other gateway events
-    this.gateway.on('dispatch', (payload) => {
+    this.gateway.on('dispatch', payload => {
       this.events.handle(payload);
     });
 
     // Handle errors
-    this.gateway.on('error', (error) => {
-      this.emit('error', error);
+    this.gateway.on('error', error => {
+      const err = error instanceof Error ? error : new Error(error.message);
+      this.events.emit('error', err);
       this.debug.debug(`Gateway error: ${error.message}`);
     });
   }

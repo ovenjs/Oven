@@ -102,7 +102,10 @@ export class WebSocketManager extends AsyncEventEmitter<WebSocketManagerEvents> 
       this.emit('dispatch', payload);
 
       // Forward specific gateway events with proper typing
-      if (payload.t && Object.values(GatewayDispatchEvents).includes(payload.t as GatewayDispatchEvents)) {
+      if (
+        payload.t &&
+        Object.values(GatewayDispatchEvents).includes(payload.t as GatewayDispatchEvents)
+      ) {
         this.emit(payload.t as GatewayDispatchEvents, payload.d as never);
       }
     });

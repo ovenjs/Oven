@@ -36,10 +36,10 @@ export class EmojiManager extends BaseManager {
 
     // Fetch from API
     const emoji = await this.rest.get(`/guilds/${guildId}/emojis/${emojiId}`);
-    
+
     // Cache the emoji
     await this.cache.setEmoji(emoji);
-    
+
     return emoji;
   }
 
@@ -54,21 +54,21 @@ export class EmojiManager extends BaseManager {
     const formData = new FormData();
     formData.append('name', options.name);
     formData.append('image', options.image);
-    
+
     if (options.roles) {
       formData.append('roles', JSON.stringify(options.roles));
     }
-    
+
     const emoji = await this.rest.post(`/guilds/${guildId}/emojis`, {
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    
+
     // Cache the emoji
     await this.cache.setEmoji(emoji);
-    
+
     return emoji;
   }
 
@@ -80,12 +80,18 @@ export class EmojiManager extends BaseManager {
    * @param options - The options for editing the emoji.
    * @returns A promise that resolves with the edited emoji.
    */
-  public async edit(guildId: string, emojiId: string, options: EmojiEditOptions): Promise<any> {
-    const emoji = await this.rest.patch(`/guilds/${guildId}/emojis/${emojiId}`, { data: options });
-    
+  public async edit(
+    guildId: string,
+    emojiId: string,
+    options: EmojiEditOptions
+  ): Promise<any> {
+    const emoji = await this.rest.patch(`/guilds/${guildId}/emojis/${emojiId}`, {
+      data: options,
+    });
+
     // Update the cache
     await this.cache.setEmoji(emoji);
-    
+
     return emoji;
   }
 
@@ -102,9 +108,9 @@ export class EmojiManager extends BaseManager {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
+
     await this.rest.delete(`/guilds/${guildId}/emojis/${emojiId}`, options);
-    
+
     // Remove from cache
     await this.cache.deleteEmoji(emojiId);
   }
@@ -125,12 +131,12 @@ export class EmojiManager extends BaseManager {
 
     // Fetch from API
     const emojis = await this.rest.get(`/guilds/${guildId}/emojis`);
-    
+
     // Cache the emojis
     for (const emoji of emojis) {
       await this.cache.setEmoji(emoji);
     }
-    
+
     return emojis;
   }
 

@@ -25,7 +25,7 @@ export class RESTClient extends BaseClient {
    */
   constructor(bot: Bot, options: RESTOptions = {}) {
     super(bot);
-    
+
     // Create the REST instance with the provided options
     this.rest = new REST(options);
   }

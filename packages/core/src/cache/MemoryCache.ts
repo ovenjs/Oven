@@ -28,7 +28,7 @@ export class MemoryCache implements CacheAdapter {
    */
   public async get<T = any>(key: string): Promise<T | null> {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return null;
     }
@@ -78,7 +78,7 @@ export class MemoryCache implements CacheAdapter {
    */
   public async has(key: string): Promise<boolean> {
     const item = this.cache.get(key);
-    
+
     if (!item) {
       return false;
     }

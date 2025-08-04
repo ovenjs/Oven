@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.10.7] - 2025-08-03
 
 ### Added
+
 - Added `@ovendjs/utils` integration for improved debug formatting
 - Added `destroy()` method to REST class for proper resource cleanup
 - Added automatic bucket cleanup to prevent memory leaks
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added response event emissions for successful requests
 
 ### Changed
+
 - Updated all debug events to use `@ovendjs/utils` for consistent formatting
 - Improved bucket ID generation for better rate limit handling
 - Enhanced error handling in Bucket and BucketManager classes
@@ -25,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added maximum wait time to prevent excessively long waits in rate limit scenarios
 
 ### Fixed
+
 - Fixed potential memory leaks from uncleaned buckets
 - Fixed error handling in bucket processing
 - Improved type definitions with proper module declaration for `@ovendjs/utils`
@@ -32,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2025-07-31
 
 ### Added
+
 - Initial release
 - Basic REST client functionality
 - Rate limiting support

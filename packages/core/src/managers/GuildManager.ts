@@ -35,10 +35,10 @@ export class GuildManager extends BaseManager {
 
     // Fetch from API
     const guild = await this.rest.get(`/guilds/${id}`);
-    
+
     // Cache the guild
     await this.cache.setGuild(guild);
-    
+
     return guild;
   }
 
@@ -50,10 +50,10 @@ export class GuildManager extends BaseManager {
    */
   public async create(options: GuildCreateOptions): Promise<any> {
     const guild = await this.rest.post('/guilds', { data: options });
-    
+
     // Cache the guild
     await this.cache.setGuild(guild);
-    
+
     return guild;
   }
 
@@ -66,10 +66,10 @@ export class GuildManager extends BaseManager {
    */
   public async edit(id: string, options: GuildEditOptions): Promise<any> {
     const guild = await this.rest.patch(`/guilds/${id}`, { data: options });
-    
+
     // Update the cache
     await this.cache.setGuild(guild);
-    
+
     return guild;
   }
 
@@ -81,7 +81,7 @@ export class GuildManager extends BaseManager {
    */
   public async delete(id: string): Promise<void> {
     await this.rest.delete(`/guilds/${id}`);
-    
+
     // Remove from cache
     await this.cache.deleteGuild(id);
   }
@@ -94,7 +94,7 @@ export class GuildManager extends BaseManager {
    */
   public async leave(id: string): Promise<void> {
     await this.rest.delete(`/users/@me/guilds/${id}`);
-    
+
     // Remove from cache
     await this.cache.deleteGuild(id);
   }
@@ -107,19 +107,19 @@ export class GuildManager extends BaseManager {
    */
   public async fetchAll(options: FetchGuildsOptions = {}): Promise<any[]> {
     const { limit = 100, before, after } = options;
-    
+
     const params = new URLSearchParams();
     if (limit) params.append('limit', limit.toString());
     if (before) params.append('before', before);
     if (after) params.append('after', after);
-    
+
     const guilds = await this.rest.get(`/users/@me/guilds?${params.toString()}`);
-    
+
     // Cache the guilds
     for (const guild of guilds) {
       await this.cache.setGuild(guild);
     }
-    
+
     return guilds;
   }
 

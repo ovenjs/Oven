@@ -5,7 +5,7 @@ import {
   GatewayDispatchEvents,
   WebSocketManagerEventHandler,
   EventPayload,
-  isGatewayEventFn
+  isGatewayEventFn,
 } from '../../packages/gateway/src/types';
 
 describe('Event Autocompletion', () => {
@@ -20,29 +20,29 @@ describe('Event Autocompletion', () => {
       console.log('Manager is ready');
     });
 
-    manager.on('error', (error) => {
+    manager.on('error', error => {
       console.error('Error occurred:', error.message);
     });
 
-    manager.on('debug', (info) => {
+    manager.on('debug', info => {
       console.debug('Debug info:', info);
     });
 
     // Test Discord Gateway events with autocompletion
-    manager.on('GUILD_CREATE', (guild) => {
+    manager.on('GUILD_CREATE', guild => {
       console.log('Guild created:', guild.name);
       expect(guild.id).toBeDefined();
       expect(guild.name).toBeDefined();
     });
 
-    manager.on('MESSAGE_CREATE', (message) => {
+    manager.on('MESSAGE_CREATE', message => {
       console.log('Message created:', message.content);
       expect(message.id).toBeDefined();
       expect(message.content).toBeDefined();
     });
 
     // Channel events are available for autocompletion
-    manager.on('CHANNEL_CREATE', (channel) => {
+    manager.on('CHANNEL_CREATE', channel => {
       console.log('Channel created');
       expect(channel).toBeDefined();
     });
@@ -55,7 +55,7 @@ describe('Event Autocompletion', () => {
     });
 
     // Type-safe event handler
-    const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = (message) => {
+    const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = message => {
       console.log('Message content:', message.content);
       // TypeScript should know the exact type of message
       const messageId: string = message.id;
@@ -66,7 +66,7 @@ describe('Event Autocompletion', () => {
     manager.on('MESSAGE_CREATE', messageHandler);
 
     // Type-safe guild handler
-    const guildHandler: WebSocketManagerEventHandler<'GUILD_CREATE'> = (guild) => {
+    const guildHandler: WebSocketManagerEventHandler<'GUILD_CREATE'> = guild => {
       console.log('Guild name:', guild.name);
       // TypeScript should know the exact type of guild
       const guildId: string = guild.id;
@@ -80,7 +80,7 @@ describe('Event Autocompletion', () => {
   it('should work with EventPayload utility type', () => {
     type MessagePayload = EventPayload<WebSocketManagerEvents, 'MESSAGE_CREATE'>;
     type GuildPayload = EventPayload<WebSocketManagerEvents, 'GUILD_CREATE'>;
-    
+
     // These should be properly typed
     const handleMessage = (message: MessagePayload) => {
       console.log('Message ID:', message.id);
@@ -98,7 +98,7 @@ describe('Event Autocompletion', () => {
 
   it('should work with isGatewayEvent type guard', () => {
     const eventName = 'MESSAGE_CREATE';
-    
+
     if (isGatewayEventFn(eventName)) {
       // TypeScript should know this is a gateway event
       console.log('This is a gateway event:', eventName);
@@ -116,48 +116,48 @@ describe('Event Autocompletion', () => {
     });
 
     // Test a variety of Gateway events
-    manager.on('GUILD_UPDATE', (guild) => {
+    manager.on('GUILD_UPDATE', guild => {
       console.log('Guild updated:', guild.name);
     });
 
-    manager.on('GUILD_DELETE', (guild) => {
+    manager.on('GUILD_DELETE', guild => {
       console.log('Guild deleted:', guild.id);
     });
 
     // Channel events are available for autocompletion
-    manager.on('CHANNEL_UPDATE', (channel) => {
+    manager.on('CHANNEL_UPDATE', channel => {
       console.log('Channel updated');
     });
 
-    manager.on('CHANNEL_DELETE', (channel) => {
+    manager.on('CHANNEL_DELETE', channel => {
       console.log('Channel deleted');
     });
 
-    manager.on('MESSAGE_UPDATE', (message) => {
+    manager.on('MESSAGE_UPDATE', message => {
       console.log('Message updated:', message.content);
     });
 
-    manager.on('MESSAGE_DELETE', (message) => {
+    manager.on('MESSAGE_DELETE', message => {
       console.log('Message deleted:', message.id);
     });
 
-    manager.on('MESSAGE_REACTION_ADD', (reaction) => {
+    manager.on('MESSAGE_REACTION_ADD', reaction => {
       console.log('Reaction added:', reaction.emoji.name);
     });
 
-    manager.on('PRESENCE_UPDATE', (presence) => {
+    manager.on('PRESENCE_UPDATE', presence => {
       console.log('Presence updated:', presence.user?.username);
     });
 
-    manager.on('VOICE_STATE_UPDATE', (voiceState) => {
+    manager.on('VOICE_STATE_UPDATE', voiceState => {
       console.log('Voice state updated:', voiceState.channel_id);
     });
 
-    manager.on('INTERACTION_CREATE', (interaction) => {
+    manager.on('INTERACTION_CREATE', interaction => {
       console.log('Interaction created:', interaction.id);
     });
 
-    manager.on('READY', (readyData) => {
+    manager.on('READY', readyData => {
       console.log('Ready event received, user:', readyData.user.username);
     });
   });
@@ -168,15 +168,17 @@ describe('Event Autocompletion', () => {
       intents: 1, // Guilds intent
     });
 
-    const messageHandler = (message: EventPayload<WebSocketManagerEvents, 'MESSAGE_CREATE'>) => {
+    const messageHandler = (
+      message: EventPayload<WebSocketManagerEvents, 'MESSAGE_CREATE'>
+    ) => {
       console.log('Message:', message.content);
     };
 
     manager.on('MESSAGE_CREATE', messageHandler);
-    
+
     // Should be able to remove the same handler
     manager.off('MESSAGE_CREATE', messageHandler);
-    
+
     expect(true).toBe(true); // If we get here, types are correct
   });
 
@@ -186,11 +188,11 @@ describe('Event Autocompletion', () => {
       intents: 1, // Guilds intent
     });
 
-    manager.once('READY', (readyData) => {
+    manager.once('READY', readyData => {
       console.log('Ready event received once:', readyData.user.username);
     });
 
-    manager.once('GUILD_CREATE', (guild) => {
+    manager.once('GUILD_CREATE', guild => {
       console.log('Guild created once:', guild.name);
     });
 

@@ -1,4 +1,4 @@
-import type { APIChannel } from 'discord-api-types/v10';
+import { ChannelType, type APIChannel } from 'discord-api-types/v10';
 import { BaseStructure } from './Base';
 import type { Bot } from '../Bot';
 
@@ -190,7 +190,9 @@ export class Channel extends BaseStructure {
     this.ownerId = (data as any).owner_id ?? null;
     this.applicationId = (data as any).application_id ?? null;
     this.parentId = (data as any).parent_id ?? null;
-    this.lastPinTimestamp = (data as any).last_pin_timestamp ? new Date((data as any).last_pin_timestamp) : null;
+    this.lastPinTimestamp = (data as any).last_pin_timestamp
+      ? new Date((data as any).last_pin_timestamp)
+      : null;
     this.rtcRegion = (data as any).rtc_region ?? null;
     this.videoQualityMode = (data as any).video_quality_mode ?? null;
     this.memberCount = (data as any).member_count ?? null;
@@ -212,7 +214,7 @@ export class Channel extends BaseStructure {
    */
   public get iconURL(): string | null {
     if (!this.icon) return null;
-    
+
     const format = this.icon.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/channel-icons/${this.id}/${this.icon}.${format}`;
   }
@@ -228,49 +230,47 @@ export class Channel extends BaseStructure {
    * Whether the channel is a DM channel.
    */
   public get isDM(): boolean {
-    return this.type === 1; // DM
+    return this.type === ChannelType.DM;
   }
 
   /**
    * Whether the channel is a voice channel.
    */
   public get isVoice(): boolean {
-    return this.type === 2; // GUILD_VOICE
+    return this.type === ChannelType.GuildVoice;
   }
 
   /**
    * Whether the channel is a category.
    */
   public get isCategory(): boolean {
-    return this.type === 4; // GUILD_CATEGORY
+    return this.type === ChannelType.GuildCategory;
   }
 
   /**
    * Whether the channel is a news channel.
+   * @deprecated
    */
   public get isNews(): boolean {
-    return this.type === 5; // GUILD_NEWS
-  }
-
-  /**
-   * Whether the channel is a store channel.
-   */
-  public get isStore(): boolean {
-    return this.type === 6; // GUILD_STORE
+    return this.type === ChannelType.GuildNews;
   }
 
   /**
    * Whether the channel is a thread.
    */
   public get isThread(): boolean {
-    return [10, 11, 12].includes(this.type); // GUILD_NEWS_THREAD, GUILD_PUBLIC_THREAD, GUILD_PRIVATE_THREAD
+    return [
+      ChannelType.PublicThread,
+      ChannelType.PrivateThread,
+      ChannelType.AnnouncementThread,
+    ].includes(this.type);
   }
 
   /**
    * Whether the channel is a stage channel.
    */
   public get isStage(): boolean {
-    return this.type === 13; // GUILD_STAGE_VOICE
+    return this.type === ChannelType.GuildStageVoice;
   }
 
   /**
@@ -305,12 +305,12 @@ export class Channel extends BaseStructure {
   }
 
   /**
-   * Returns the URL to this channel in the Discord API.
+   * Returns the URL to this channel in Discord.
    *
-   * @returns The URL to this channel in the Discord API.
+   * @returns The URL to this channel in Discord.
    */
   public get url(): string {
-    return `https://discord.com/api/channels/${this.id}`;
+    return `https://discord.com/@me/channels/${this.id}`;
   }
 
   /**

@@ -1,6 +1,9 @@
 import { AsyncEventEmitter } from '@vladfrangu/async_event_emitter';
 import { WebSocketManager } from '@ovendjs/gateway';
-import type { GatewayDispatchPayload, GatewayReadyDispatchData } from 'discord-api-types/v10';
+import type {
+  GatewayDispatchPayload,
+  GatewayReadyDispatchData,
+} from 'discord-api-types/v10';
 
 import { BaseClient } from './BaseClient';
 import type { Bot } from '../Bot';
@@ -49,7 +52,7 @@ export class GatewayClient extends BaseClient {
     // Create the WebSocketManager with the bot's options
     // Convert intents array to bitmask
     const intents = this.bot.options.intents.reduce((acc, intent) => acc | intent, 0);
-    
+
     this.manager = new WebSocketManager({
       token,
       intents,
@@ -95,7 +98,7 @@ export class GatewayClient extends BaseClient {
     // Forward all dispatch events
     this.manager.on('dispatch', (payload: GatewayDispatchPayload) => {
       this.emitter.emit('dispatch', payload);
-      
+
       // Forward specific events with proper typing
       if (payload.t) {
         this.emitter.emit(payload.t, payload.d);
@@ -103,7 +106,7 @@ export class GatewayClient extends BaseClient {
     });
 
     // Forward error events
-    this.manager.on('error', (error) => {
+    this.manager.on('error', error => {
       this.emitter.emit('error', error);
     });
   }

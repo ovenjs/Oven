@@ -32,12 +32,12 @@ manager.on('ready', () => {
 });
 
 // Listen for message events with full autocompletion
-manager.on('MESSAGE_CREATE', (message) => {
+manager.on('MESSAGE_CREATE', message => {
   console.log(`Message from ${message.author.username}: ${message.content}`);
 });
 
 // Listen for guild events
-manager.on('GUILD_CREATE', (guild) => {
+manager.on('GUILD_CREATE', guild => {
   console.log(`Joined guild: ${guild.name}`);
 });
 
@@ -90,6 +90,7 @@ new WebSocketManager(options: WebSocketManagerOptions)
 ```
 
 **Options:**
+
 - `token` (string): Your bot token
 - `intents` (GatewayIntentBits): The intents to use
 - `shardCount?` (number): Number of shards to use (default: 1)
@@ -122,7 +123,7 @@ await manager.disconnect();
 Listens for an event.
 
 ```typescript
-manager.on('MESSAGE_CREATE', (message) => {
+manager.on('MESSAGE_CREATE', message => {
   console.log(message.content);
 });
 ```
@@ -142,7 +143,7 @@ manager.once('ready', () => {
 Removes a listener.
 
 ```typescript
-const listener = (message) => console.log(message.content);
+const listener = message => console.log(message.content);
 manager.on('MESSAGE_CREATE', listener);
 manager.off('MESSAGE_CREATE', listener);
 ```
@@ -190,7 +191,7 @@ The package provides several utility types for better type safety:
 Type-safe event handler type.
 
 ```typescript
-const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = (message) => {
+const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = message => {
   console.log(message.content);
 };
 ```
@@ -222,14 +223,17 @@ import { WebSocketManager, GatewayIntentBits } from '@ovendjs/gateway';
 
 const manager = new WebSocketManager({
   token: 'YOUR_BOT_TOKEN',
-  intents: GatewayIntentBits.Guilds | GatewayIntentBits.GuildMessages | GatewayIntentBits.MessageContent,
+  intents:
+    GatewayIntentBits.Guilds |
+    GatewayIntentBits.GuildMessages |
+    GatewayIntentBits.MessageContent,
 });
 
 manager.on('ready', () => {
   console.log('Bot is ready!');
 });
 
-manager.on('MESSAGE_CREATE', (message) => {
+manager.on('MESSAGE_CREATE', message => {
   if (message.content === '!ping') {
     // You would typically use the REST package to send messages
     console.log(`Ping received from ${message.author.username}`);
@@ -242,19 +246,19 @@ await manager.connect();
 ### Handling Multiple Events
 
 ```typescript
-manager.on('GUILD_CREATE', (guild) => {
+manager.on('GUILD_CREATE', guild => {
   console.log(`Joined guild: ${guild.name} with ${guild.member_count} members`);
 });
 
-manager.on('GUILD_MEMBER_ADD', (member) => {
+manager.on('GUILD_MEMBER_ADD', member => {
   console.log(`${member.user.username} joined ${member.guild.name}`);
 });
 
-manager.on('CHANNEL_CREATE', (channel) => {
+manager.on('CHANNEL_CREATE', channel => {
   console.log(`Channel created: ${channel.name || 'DM Channel'}`);
 });
 
-manager.on('MESSAGE_REACTION_ADD', (reaction) => {
+manager.on('MESSAGE_REACTION_ADD', reaction => {
   console.log(`${reaction.user_id} reacted with ${reaction.emoji.name}`);
 });
 ```
@@ -264,13 +268,13 @@ manager.on('MESSAGE_REACTION_ADD', (reaction) => {
 ```typescript
 import { WebSocketManagerEventHandler } from '@ovendjs/gateway';
 
-const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = (message) => {
+const messageHandler: WebSocketManagerEventHandler<'MESSAGE_CREATE'> = message => {
   // TypeScript knows the exact type of message
   const messageId: string = message.id;
   const content: string = message.content;
   const channelId: string = message.channel_id;
   const authorName: string = message.author.username;
-  
+
   console.log(`Message ${messageId} from ${authorName}: ${content}`);
 };
 
@@ -280,7 +284,7 @@ manager.on('MESSAGE_CREATE', messageHandler);
 ## Error Handling
 
 ```typescript
-manager.on('error', (error) => {
+manager.on('error', error => {
   console.error('Gateway error:', error);
 });
 
@@ -292,7 +296,7 @@ manager.on('disconnect', () => {
 ## Debug Mode
 
 ```typescript
-manager.on('debug', (info) => {
+manager.on('debug', info => {
   console.debug('[Gateway Debug]', info);
 });
 ```

@@ -195,7 +195,9 @@ export class Message extends BaseStructure {
     this.mentions = data.mentions.map(mention => new User(this.bot, mention));
     this.mentionRoles = data.mention_roles ?? [];
     this.mentionChannels = data.mention_channels ?? [];
-    this.attachments = (data.attachments ?? []).map(attachment => new Attachment(this.bot, attachment));
+    this.attachments = (data.attachments ?? []).map(
+      attachment => new Attachment(this.bot, attachment)
+    );
     this.embeds = (data.embeds ?? []).map(embed => new Embed(this.bot, embed));
     this.reactions = data.reactions ?? [];
     this.nonce = data.nonce ?? null;
@@ -206,7 +208,9 @@ export class Message extends BaseStructure {
     this.application = data.application ?? null;
     this.messageReference = data.message_reference ?? null;
     this.flags = data.flags ?? 0;
-    this.referencedMessage = data.referenced_message ? new Message(this.bot, data.referenced_message) : null;
+    this.referencedMessage = data.referenced_message
+      ? new Message(this.bot, data.referenced_message)
+      : null;
     this.interaction = data.interaction ?? null;
     this.thread = data.thread ? new Channel(this.bot, data.thread) : null;
     this.components = data.components ?? [];
@@ -284,7 +288,9 @@ export class Message extends BaseStructure {
    * @returns A promise that resolves when the message is deleted.
    */
   public async delete(reason?: string): Promise<void> {
-    return this.bot.rest.delete(`/channels/${this.channelId}/messages/${this.id}`, { reason });
+    return this.bot.rest.delete(`/channels/${this.channelId}/messages/${this.id}`, {
+      reason,
+    });
   }
 
   /**
@@ -294,7 +300,10 @@ export class Message extends BaseStructure {
    * @returns A promise that resolves with the edited message.
    */
   public async edit(options: MessageEditOptions): Promise<Message> {
-    const message = await this.bot.rest.patch(`/channels/${this.channelId}/messages/${this.id}`, { data: options });
+    const message = await this.bot.rest.patch(
+      `/channels/${this.channelId}/messages/${this.id}`,
+      { data: options }
+    );
     return this._patch(message);
   }
 
@@ -305,7 +314,10 @@ export class Message extends BaseStructure {
    * @param options - Additional options for the reply.
    * @returns A promise that resolves with the sent message.
    */
-  public async reply(content: string, options: MessageReplyOptions = {}): Promise<Message> {
+  public async reply(
+    content: string,
+    options: MessageReplyOptions = {}
+  ): Promise<Message> {
     const message = await this.bot.rest.post(`/channels/${this.channelId}/messages`, {
       data: {
         content,
@@ -328,7 +340,9 @@ export class Message extends BaseStructure {
    */
   public async react(emoji: string): Promise<void> {
     const encodedEmoji = encodeURIComponent(emoji);
-    return this.bot.rest.put(`/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}/@me`);
+    return this.bot.rest.put(
+      `/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}/@me`
+    );
   }
 
   /**
@@ -355,7 +369,9 @@ export class Message extends BaseStructure {
    * @returns A promise that resolves with the crossposted message.
    */
   public async crosspost(): Promise<Message> {
-    const message = await this.bot.rest.post(`/channels/${this.channelId}/messages/${this.id}/crosspost`);
+    const message = await this.bot.rest.post(
+      `/channels/${this.channelId}/messages/${this.id}/crosspost`
+    );
     return this._patch(message);
   }
 
@@ -378,7 +394,9 @@ export class Message extends BaseStructure {
    */
   public async removeReaction(emoji: string, userId: string = '@me'): Promise<void> {
     const encodedEmoji = encodeURIComponent(emoji);
-    return this.bot.rest.delete(`/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}/${userId}`);
+    return this.bot.rest.delete(
+      `/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}/${userId}`
+    );
   }
 
   /**
@@ -387,7 +405,9 @@ export class Message extends BaseStructure {
    * @returns A promise that resolves when all reactions are removed.
    */
   public async removeAllReactions(): Promise<void> {
-    return this.bot.rest.delete(`/channels/${this.channelId}/messages/${this.id}/reactions`);
+    return this.bot.rest.delete(
+      `/channels/${this.channelId}/messages/${this.id}/reactions`
+    );
   }
 
   /**
@@ -398,7 +418,9 @@ export class Message extends BaseStructure {
    */
   public async removeEmojiReaction(emoji: string): Promise<void> {
     const encodedEmoji = encodeURIComponent(emoji);
-    return this.bot.rest.delete(`/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}`);
+    return this.bot.rest.delete(
+      `/channels/${this.channelId}/messages/${this.id}/reactions/${encodedEmoji}`
+    );
   }
 
   /**

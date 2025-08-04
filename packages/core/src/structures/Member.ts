@@ -97,7 +97,7 @@ export class Member extends BaseStructure {
    */
   public get avatarURL(): string | null {
     if (!this.avatar) return this.user.displayAvatarURL;
-    
+
     const format = this.avatar.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/guilds/${this.id}/users/${this.user.id}/avatars/${this.avatar}.${format}`;
   }
@@ -169,8 +169,11 @@ export class Member extends BaseStructure {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
-    return this.bot.rest.delete(`/guilds/${this.guildId}/members/${this.user.id}`, options);
+
+    return this.bot.rest.delete(
+      `/guilds/${this.guildId}/members/${this.user.id}`,
+      options
+    );
   }
 
   /**
@@ -179,17 +182,24 @@ export class Member extends BaseStructure {
    * @param options - The options for banning the member.
    * @returns A promise that resolves when the member is banned.
    */
-  public async ban(options?: { reason?: string; deleteMessageDays?: number }): Promise<void> {
+  public async ban(options?: {
+    reason?: string;
+    deleteMessageDays?: number;
+  }): Promise<void> {
     const params = new URLSearchParams();
     if (options?.reason) params.append('reason', options.reason);
-    if (options?.deleteMessageDays) params.append('delete_message_days', options.deleteMessageDays.toString());
-    
+    if (options?.deleteMessageDays)
+      params.append('delete_message_days', options.deleteMessageDays.toString());
+
     const requestOptions: any = {};
     if (params.toString()) {
       requestOptions.query = params.toString();
     }
-    
-    return this.bot.rest.put(`/guilds/${this.guildId}/bans/${this.user.id}`, requestOptions);
+
+    return this.bot.rest.put(
+      `/guilds/${this.guildId}/bans/${this.user.id}`,
+      requestOptions
+    );
   }
 
   /**
@@ -200,22 +210,26 @@ export class Member extends BaseStructure {
    */
   public async edit(options: MemberEditOptions): Promise<Member> {
     const data: any = {};
-    
+
     if (options.nick !== undefined) data.nick = options.nick;
     if (options.roles !== undefined) data.roles = options.roles;
     if (options.mute !== undefined) data.mute = options.mute;
     if (options.deaf !== undefined) data.deaf = options.deaf;
     if (options.channelId !== undefined) data.channel_id = options.channelId;
     if (options.communicationDisabledUntil !== undefined) {
-      data.communication_disabled_until = options.communicationDisabledUntil?.toISOString() || null;
+      data.communication_disabled_until =
+        options.communicationDisabledUntil?.toISOString() || null;
     }
-    
+
     const requestOptions: any = { data };
     if (options.reason) {
       requestOptions.headers = { 'X-Audit-Log-Reason': options.reason };
     }
-    
-    const member = await this.bot.rest.patch(`/guilds/${this.guildId}/members/${this.user.id}`, requestOptions);
+
+    const member = await this.bot.rest.patch(
+      `/guilds/${this.guildId}/members/${this.user.id}`,
+      requestOptions
+    );
     return this._patch(member);
   }
 
@@ -231,8 +245,11 @@ export class Member extends BaseStructure {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
-    return this.bot.rest.put(`/guilds/${this.guildId}/members/${this.user.id}/roles/${roleId}`, options);
+
+    return this.bot.rest.put(
+      `/guilds/${this.guildId}/members/${this.user.id}/roles/${roleId}`,
+      options
+    );
   }
 
   /**
@@ -247,8 +264,11 @@ export class Member extends BaseStructure {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
-    return this.bot.rest.delete(`/guilds/${this.guildId}/members/${this.user.id}/roles/${roleId}`, options);
+
+    return this.bot.rest.delete(
+      `/guilds/${this.guildId}/members/${this.user.id}/roles/${roleId}`,
+      options
+    );
   }
 
   /**
@@ -263,8 +283,11 @@ export class Member extends BaseStructure {
     if (reason) {
       options.headers = { 'X-Audit-Log-Reason': reason };
     }
-    
-    return this.bot.rest.patch(`/guilds/${this.guildId}/members/${this.user.id}`, options);
+
+    return this.bot.rest.patch(
+      `/guilds/${this.guildId}/members/${this.user.id}`,
+      options
+    );
   }
 
   /**

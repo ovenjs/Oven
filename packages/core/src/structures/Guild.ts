@@ -276,7 +276,7 @@ export class Guild extends BaseStructure {
         system: false,
         public_flags: undefined,
         banner: null,
-        accent_color: null
+        accent_color: null,
       });
     } else {
       this.owner = null;
@@ -290,7 +290,7 @@ export class Guild extends BaseStructure {
    */
   public get iconURL(): string | null {
     if (!this.icon) return null;
-    
+
     const format = this.icon.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/icons/${this.id}/${this.icon}.${format}`;
   }
@@ -300,7 +300,7 @@ export class Guild extends BaseStructure {
    */
   public get splashURL(): string | null {
     if (!this.splash) return null;
-    
+
     const format = this.splash.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/splashes/${this.id}/${this.splash}.${format}`;
   }
@@ -310,7 +310,7 @@ export class Guild extends BaseStructure {
    */
   public get bannerURL(): string | null {
     if (!this.banner) return null;
-    
+
     const format = this.banner.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/banners/${this.id}/${this.banner}.${format}`;
   }
@@ -320,7 +320,7 @@ export class Guild extends BaseStructure {
    */
   public get discoverySplashURL(): string | null {
     if (!this.discoverySplash) return null;
-    
+
     const format = this.discoverySplash.startsWith('a_') ? 'gif' : 'png';
     return `https://cdn.discordapp.com/discovery-splashes/${this.id}/${this.discoverySplash}.${format}`;
   }
