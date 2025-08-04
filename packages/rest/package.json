@@ -1,7 +1,7 @@
 {
   "name": "@ovendjs/rest",
-  "version": "0.10.7",
-  "description": "Discord REST API client with request handling.",
+  "version": "1.0.0",
+  "description": "Enhanced Discord REST API client with advanced features including intelligent rate limiting, request caching, batching, and comprehensive event handling.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,6 +29,7 @@
   "dependencies": {
     "@ovendjs/utils": "^0.22.1",
     "@vladfrangu/async_event_emitter": "^2.4.6",
+    "discord-api-types": "^0.37.83",
     "undici": "^7.12.0",
     "zod": "^4.0.13"
   },
