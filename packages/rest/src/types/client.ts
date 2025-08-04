@@ -11,15 +11,11 @@ import type {
   APIResponse,
   RateLimitInfo,
   BucketInfo,
-  MiddlewareContext
+  MiddlewareContext,
 } from './api';
 
 // Import common types
-import type {
-  RequestPriority,
-  CacheStrategy,
-  ErrorType
-} from './common';
+import type { RequestPriority, CacheStrategy, ErrorType } from './common';
 
 // REST Client types
 export interface RESTClient {
@@ -36,27 +32,42 @@ export interface RESTClient {
   /**
    * Make a GET request to the Discord API
    */
-  get<T = unknown>(path: string, options?: Omit<APIRequest, 'method' | 'path'>): Promise<APIResponse<T>>;
+  get<T = unknown>(
+    path: string,
+    options?: Omit<APIRequest, 'method' | 'path'>
+  ): Promise<APIResponse<T>>;
 
   /**
    * Make a POST request to the Discord API
    */
-  post<T = unknown>(path: string, options?: Omit<APIRequest, 'method' | 'path'>): Promise<APIResponse<T>>;
+  post<T = unknown>(
+    path: string,
+    options?: Omit<APIRequest, 'method' | 'path'>
+  ): Promise<APIResponse<T>>;
 
   /**
    * Make a PUT request to the Discord API
    */
-  put<T = unknown>(path: string, options?: Omit<APIRequest, 'method' | 'path'>): Promise<APIResponse<T>>;
+  put<T = unknown>(
+    path: string,
+    options?: Omit<APIRequest, 'method' | 'path'>
+  ): Promise<APIResponse<T>>;
 
   /**
    * Make a PATCH request to the Discord API
    */
-  patch<T = unknown>(path: string, options?: Omit<APIRequest, 'method' | 'path'>): Promise<APIResponse<T>>;
+  patch<T = unknown>(
+    path: string,
+    options?: Omit<APIRequest, 'method' | 'path'>
+  ): Promise<APIResponse<T>>;
 
   /**
    * Make a DELETE request to the Discord API
    */
-  delete<T = unknown>(path: string, options?: Omit<APIRequest, 'method' | 'path'>): Promise<APIResponse<T>>;
+  delete<T = unknown>(
+    path: string,
+    options?: Omit<APIRequest, 'method' | 'path'>
+  ): Promise<APIResponse<T>>;
 
   /**
    * Set the authentication token
@@ -96,22 +107,33 @@ export interface RESTClient {
   /**
    * Remove a middleware
    */
-  removeMiddleware(middleware: RequestMiddleware | ResponseMiddleware | ErrorMiddleware): this;
+  removeMiddleware(
+    middleware: RequestMiddleware | ResponseMiddleware | ErrorMiddleware
+  ): this;
 
   /**
    * Add an event listener
    */
-  on<K extends keyof RESTEventMap>(event: K, listener: (...args: RESTEventMap[K]) => void): this;
+  on<K extends keyof RESTEventMap>(
+    event: K,
+    listener: (...args: RESTEventMap[K]) => void
+  ): this;
 
   /**
    * Add a one-time event listener
    */
-  once<K extends keyof RESTEventMap>(event: K, listener: (...args: RESTEventMap[K]) => void): this;
+  once<K extends keyof RESTEventMap>(
+    event: K,
+    listener: (...args: RESTEventMap[K]) => void
+  ): this;
 
   /**
    * Remove an event listener
    */
-  off<K extends keyof RESTEventMap>(event: K, listener: (...args: RESTEventMap[K]) => void): this;
+  off<K extends keyof RESTEventMap>(
+    event: K,
+    listener: (...args: RESTEventMap[K]) => void
+  ): this;
 
   /**
    * Remove all event listeners or listeners for a specific event
@@ -555,43 +577,45 @@ export interface RESTOptions {
   /**
    * Debug mode configuration
    */
-  debug?: boolean | {
-    /**
-     * Enable debug mode
-     * @default false
-     */
-    enabled?: boolean;
+  debug?:
+    | boolean
+    | {
+        /**
+         * Enable debug mode
+         * @default false
+         */
+        enabled?: boolean;
 
-    /**
-     * Debug log level
-     * @default 'info'
-     */
-    level?: 'debug' | 'info' | 'warn' | 'error';
+        /**
+         * Debug log level
+         * @default 'info'
+         */
+        level?: 'debug' | 'info' | 'warn' | 'error';
 
-    /**
-     * Enable detailed request logging
-     * @default false
-     */
-    requests?: boolean;
+        /**
+         * Enable detailed request logging
+         * @default false
+         */
+        requests?: boolean;
 
-    /**
-     * Enable detailed response logging
-     * @default false
-     */
-    responses?: boolean;
+        /**
+         * Enable detailed response logging
+         * @default false
+         */
+        responses?: boolean;
 
-    /**
-     * Enable detailed rate limit logging
-     * @default false
-     */
-    rateLimits?: boolean;
+        /**
+         * Enable detailed rate limit logging
+         * @default false
+         */
+        rateLimits?: boolean;
 
-    /**
-     * Enable detailed cache logging
-     * @default false
-     */
-    cache?: boolean;
-  };
+        /**
+         * Enable detailed cache logging
+         * @default false
+         */
+        cache?: boolean;
+      };
 }
 
 // Request and response types
@@ -622,7 +646,6 @@ export interface RESTResponse<T = unknown> {
 
 // Utility types
 export type RESTRequestOptions = Omit<RESTRequest, 'method' | 'path'>;
-
 
 // Type guards
 export function isRESTRequest(value: any): value is RESTRequest {

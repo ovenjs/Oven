@@ -8,67 +8,64 @@
  * using the enhanced REST client with full type safety and advanced features.
  */
 
-// Main type exports
-export * from './api';
+// Export only common types first
 export * from './common';
 
-// Explicitly export client types to avoid conflicts
+// Export specific types from api.ts to avoid conflicts
 export type {
-  RESTOptions as ClientRESTOptions,
-  RESTRequest,
-  RESTResponse,
-  RESTClient,
-  RESTEventMap as ClientRESTEventMap,
-  RequestEvent as ClientRequestEvent,
-  ResponseEvent as ClientResponseEvent,
-  ErrorEvent as ClientErrorEvent,
-  RateLimitEvent as ClientRateLimitEvent,
-  DebugEvent as ClientDebugEvent,
-  CacheEvent as ClientCacheEvent,
-  QueueEvent as ClientQueueEvent,
-  MetricsEvent as ClientMetricsEvent,
-  ClientMetrics,
-  CacheStats as ClientCacheStats,
-  RequestMiddleware as ClientRequestMiddleware,
-  ResponseMiddleware as ClientResponseMiddleware,
-  ErrorMiddleware as ClientErrorMiddleware,
-} from './client';
-
-// Re-export from api to avoid conflicts
-export type {
+  APIRequest,
+  APIResponse,
+  RequestOptions,
+  RetryOptions,
+  CacheOptions,
   RateLimitInfo,
   BucketInfo,
+  QueuedRequest,
+  RESTEventMap,
+  RequestEvent,
+  ResponseEvent,
+  ErrorEvent,
+  RateLimitEvent,
+  DebugEvent,
+  CacheEvent,
+  QueueEvent,
+  MetricsEvent,
+  RouteData,
+  RESTOptions,
+  RateLimitOptions,
+  EventOptions,
+  MetricsOptions,
+  MiddlewareContext,
+  RequestMiddleware,
+  ResponseMiddleware,
+  ErrorMiddleware,
+  CacheEntry,
+  CacheStats,
+  ConnectionPoolOptions,
+  ConnectionStats,
 } from './api';
 
-// Export the main RESTOptions type from api.ts
-export type { RESTOptions } from './api';
+// Export only specific types from client.ts that don't conflict
+export type { RESTClient, ClientMetrics } from './client';
 
-// Export the main RESTEventMap type from api.ts
-export type { RESTEventMap } from './api';
-
-// TODO: Create these files when implementing those features
-// export * from './events';
-// export * from './middleware';
-// export * from './internal';
-
-// Constants
+// Export constants
 export const API_BASE_URL = 'https://discord.com/api';
 
 // Version information
 export const SUPPORTED_API_VERSIONS = [9, 10] as const;
-export type SupportedAPIVersion = typeof SUPPORTED_API_VERSIONS[number];
+export type SupportedAPIVersion = (typeof SUPPORTED_API_VERSIONS)[number];
 
 // HTTP Methods
 export const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const;
-export type HTTPMethod = typeof HTTP_METHODS[number];
+export type HTTPMethod = (typeof HTTP_METHODS)[number];
 
 // Request priorities
 export const REQUEST_PRIORITIES = ['low', 'normal', 'high', 'critical'] as const;
-export type RequestPriority = typeof REQUEST_PRIORITIES[number];
+export type RequestPriority = (typeof REQUEST_PRIORITIES)[number];
 
 // Cache strategies
 export const CACHE_STRATEGIES = ['memory', 'persistent', 'hybrid'] as const;
-export type CacheStrategy = typeof CACHE_STRATEGIES[number];
+export type CacheStrategy = (typeof CACHE_STRATEGIES)[number];
 
 // Error types
 export const ERROR_TYPES = [
@@ -80,4 +77,4 @@ export const ERROR_TYPES = [
   'RetryError',
   'CacheError',
 ] as const;
-export type ErrorType = typeof ERROR_TYPES[number];
+export type ErrorType = (typeof ERROR_TYPES)[number];

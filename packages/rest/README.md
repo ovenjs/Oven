@@ -55,27 +55,27 @@ const rest = new REST({
   version: '10',
   api: 'https://discord.com/api',
   token: 'YOUR_BOT_TOKEN',
-  
+
   // Rate limiting options
   rateLimit: {
     maxRetries: 3,
     retryInterval: 5000,
     rejectOnRateLimit: true,
   },
-  
+
   // Caching options
   cache: {
     enabled: true,
     ttl: 60 * 1000, // 1 minute
     maxSize: 1000,
   },
-  
+
   // Performance options
   performance: {
     enableMetrics: true,
     enableProfiling: true,
   },
-  
+
   // Connection options
   connection: {
     poolSize: 10,
@@ -93,30 +93,36 @@ import { REST, Middleware } from '@ovendjs/rest';
 const rest = new REST({ token: 'YOUR_BOT_TOKEN' });
 
 // Add request interceptor
-rest.use(Middleware.request({
-  before: (request) => {
-    console.log(`Making ${request.method} request to ${request.url}`);
-    return request;
-  },
-}));
+rest.use(
+  Middleware.request({
+    before: request => {
+      console.log(`Making ${request.method} request to ${request.url}`);
+      return request;
+    },
+  })
+);
 
 // Add response interceptor
-rest.use(Middleware.response({
-  after: (response) => {
-    console.log(`Received response with status ${response.status}`);
-    return response;
-  },
-}));
+rest.use(
+  Middleware.response({
+    after: response => {
+      console.log(`Received response with status ${response.status}`);
+      return response;
+    },
+  })
+);
 
 // Add error interceptor
-rest.use(Middleware.error({
-  onError: (error) => {
-    console.error('Request failed:', error);
-    // Return false to continue error propagation
-    // Return true to stop error propagation
-    return false;
-  },
-}));
+rest.use(
+  Middleware.error({
+    onError: error => {
+      console.error('Request failed:', error);
+      // Return false to continue error propagation
+      // Return true to stop error propagation
+      return false;
+    },
+  })
+);
 ```
 
 ### Event Handling
@@ -127,22 +133,24 @@ import { REST, Events } from '@ovendjs/rest';
 const rest = new REST({ token: 'YOUR_BOT_TOKEN' });
 
 // Listen to request events
-rest.on(Events.Request, (request) => {
+rest.on(Events.Request, request => {
   console.log(`Request: ${request.method} ${request.url}`);
 });
 
 // Listen to response events
-rest.on(Events.Response, (response) => {
+rest.on(Events.Response, response => {
   console.log(`Response: ${response.status} ${response.url}`);
 });
 
 // Listen to rate limit events
-rest.on(Events.RateLimit, (rateLimitData) => {
-  console.log(`Rate limited on ${rateLimitData.route}, resets in ${rateLimitData.resetAfter}ms`);
+rest.on(Events.RateLimit, rateLimitData => {
+  console.log(
+    `Rate limited on ${rateLimitData.route}, resets in ${rateLimitData.resetAfter}ms`
+  );
 });
 
 // Listen to error events
-rest.on(Events.Error, (error) => {
+rest.on(Events.Error, error => {
   console.error('REST Error:', error);
 });
 ```
@@ -152,7 +160,7 @@ rest.on(Events.Error, (error) => {
 ```typescript
 import { REST } from '@ovendjs/rest';
 
-const rest = new REST({ 
+const rest = new REST({
   token: 'YOUR_BOT_TOKEN',
   performance: {
     enableMetrics: true,
@@ -233,7 +241,7 @@ class CustomCache extends CacheAdapter {
   }
 }
 
-const rest = new REST({ 
+const rest = new REST({
   token: 'YOUR_BOT_TOKEN',
   cache: {
     adapter: new CustomCache(),

@@ -1,6 +1,6 @@
 /**
  * Discord API type definitions
- * 
+ *
  * This file extends the types from discord-api-types with additional
  * types specific to the enhanced REST client implementation.
  */
@@ -14,9 +14,7 @@ export * from 'discord-api-types/v10';
 // Enhanced types that build on discord-api-types
 
 // Import common types
-import type {
-  RequestPriority,
-  CacheStrategy} from './common';
+import type { RequestPriority, CacheStrategy } from './common';
 
 // Branded types for additional type safety
 export type Snowflake = Discord.Snowflake & { readonly __snowflake__: unique symbol };
@@ -62,6 +60,7 @@ export interface RequestOptions {
   signal?: AbortSignal;
   retryOptions?: RetryOptions;
   cacheOptions?: CacheOptions;
+  disableBatching?: boolean;
 }
 
 export interface RetryOptions {
@@ -270,6 +269,19 @@ export interface MetricsOptions {
   interval?: number;
   retentionPeriod?: number;
   customMetrics?: Record<string, any>;
+  reporting?: {
+    enabled?: boolean;
+    format?: 'json' | 'prometheus' | 'influxdb' | 'console';
+    destination?: 'console' | 'file' | 'http' | 'webhook';
+    interval?: number;
+    endpoint?: string;
+    headers?: Record<string, string>;
+    filename?: string;
+    includeMetadata?: boolean;
+    includeHistograms?: boolean;
+    includeTimers?: boolean;
+    maxMetricsPerReport?: number;
+  };
 }
 
 // Middleware types
@@ -362,7 +374,8 @@ export function isAPIResponse(value: any): value is APIResponse {
 }
 
 // Type utilities
-export type ExtractAPIResponse<T extends APIRequest<any>> = T extends APIRequest<infer R> ? R : unknown;
+export type ExtractAPIResponse<T extends APIRequest<any>> =
+  T extends APIRequest<infer R> ? R : unknown;
 
 export type WithPriority<T extends APIRequest<any>, P extends RequestPriority> = T & {
   priority: P;
@@ -377,7 +390,7 @@ export type WithRetry<T extends APIRequest<any>, R extends RetryOptions> = T & {
 };
 
 // API route types
-export type APIRoute = 
+export type APIRoute =
   | '/users/@me'
   | `/users/${Discord.Snowflake}`
   | `/channels/${Discord.Snowflake}`
